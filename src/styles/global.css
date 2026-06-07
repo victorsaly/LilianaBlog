@@ -406,14 +406,31 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   /* keep the words crisp on the see-through panel */
   .page-body .page-text { text-shadow: 0 1px 2px rgba(255, 253, 246, 0.7); }
 
-  /* keep the controls reachable: pinned to the bottom over the picture */
-  .reader-bar {
+  /* keep the controls reachable: pinned to the bottom over the picture.
+     (.reader prefix raises specificity so it beats the later base .reader-bar) */
+  .reader .reader-bar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; width: 100%;
     margin: 0; border-radius: 0; border-left: none; border-right: none;
     background: color-mix(in srgb, var(--page-bg) 92%, transparent);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    gap: 0.4rem; padding: 0.4rem 0.5rem; flex-wrap: nowrap;
   }
+  /* compact controls on phones: one tidy row (Back · Read · Next · 🔊) */
+  .reader .reader-bar #restart-btn, .reader .reader-bar .speed { display: none; }
+  .reader .reader-bar .btn { font-size: 0.92rem; padding: 0.45em 0.8em; min-height: 42px; }
+  .reader .reader-bar .play-btn { font-size: 1rem; padding: 0.5em 0.95em; flex: 0 1 auto; justify-content: center; }
+  .reader .reader-bar .nav-arrow { padding: 0.45em 0.7em; }
   .hint { position: relative; z-index: 2; margin-bottom: 76px; }
+
+  /* while reading, hide the bar down to just a floating Pause button so the
+     story (words + picture) isn't clashing with the controls */
+  #reader.is-reading .reader-bar {
+    left: auto; right: 12px; bottom: 12px; width: auto;
+    padding: 0; background: transparent; box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  #reader.is-reading .reader-bar > :not(.play-btn) { display: none; }
+  #reader.is-reading .play-btn { box-shadow: var(--shadow-lg); border-radius: var(--r-pill); }
 }
 
 /* ---- Reader controls -------------------------------------------------- */

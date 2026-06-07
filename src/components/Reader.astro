@@ -269,7 +269,7 @@ function view(scene: (typeof story.scenes)[number]) {
       if (!soundOn) return;
       const mood = moodName(title);
       const bed = sfxAvail.has(`music-${mood}`) ? `music-${mood}` : sfxAvail.has(`amb-${mood}`) ? `amb-${mood}` : null;
-      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.volume = bed.startsWith('music') ? 0.085 : 0.14; ambientAudio.play().catch(() => {}); return; }
+      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.volume = bed.startsWith('music') ? 0.05 : 0.12; ambientAudio.play().catch(() => {}); return; }
       startSynthAmbient(title);
     }
     function stopAmbient() { ambientAudio.pause(); stopSynthAmbient(); }
@@ -414,6 +414,7 @@ function view(scene: (typeof story.scenes)[number]) {
 
     function setBtn(state: 'play' | 'pause' | 'idle' | 'loading') {
       playBtn.disabled = state === 'loading';
+      root!.classList.toggle('is-reading', state === 'play');
       if (state === 'loading') { playBtn.textContent = '⏳ Loading…'; playBtn.classList.remove('is-playing'); }
       else if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); }
       else if (state === 'pause') { playBtn.textContent = '▶ Continue'; playBtn.classList.remove('is-playing'); }
