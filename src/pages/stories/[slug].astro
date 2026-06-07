@@ -12,11 +12,7 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <Base title={`${story.title} · Lili's Story World`} active="story" description={story.tagline}>
-  <section class="wrap" style="margin-top:0.5rem">
-    <a class="btn btn-ghost" href={base}>◀ All stories</a>
-  </section>
-
-  <section style="margin-top:1rem">
+  <section style="margin-top:0.6rem">
     <Reader story={story} />
   </section>
 </Base>

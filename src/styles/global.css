@@ -151,9 +151,9 @@ img { max-width: 100%; display: block; }
   backdrop-filter: saturate(1.3) blur(12px);
   border-bottom: 1px solid var(--paper-edge);
 }
-.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; }
-.brand { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-serif); font-weight: 600; font-size: 1.45rem; letter-spacing: -0.2px; color: var(--ink); text-decoration: none; }
-.brand .logo { font-size: 1.4rem; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; }
+.brand { display: inline-flex; align-items: center; gap: 0.45rem; font-family: var(--font-serif); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.2px; color: var(--ink); text-decoration: none; }
+.brand .logo { font-size: 1.25rem; }
 .brand:hover { color: var(--teal-deep); }
 .nav { display: flex; gap: 1.2rem; align-items: center; }
 .nav a { text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; padding: 0.3em 0; position: relative; }
@@ -286,12 +286,14 @@ img { max-width: 100%; display: block; }
    THE READER  (read-along page)
    ========================================================================= */
 .reader { width: var(--w-reader, min(840px, 94vw)); margin: 0 auto; }
-.reader-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
-.reader-title { font-size: 1.55rem; }
+.reader-top { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem 1rem; flex-wrap: wrap; margin-bottom: 0.35rem; }
+.reader-title { font-size: 1.25rem; flex: 1 1 auto; min-width: 0; }
+.back-all { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--ink-soft); text-decoration: none; white-space: nowrap; }
+.back-all:hover { color: var(--teal-deep); }
 .scene-count { font-weight: 800; color: var(--ink-soft); font-family: var(--font-display); }
 
 /* scene progress bar */
-.scene-progress { height: 10px; border-radius: var(--r-pill); background: rgba(43,37,51,0.10); overflow: hidden; margin: 0.2rem 0 1rem; }
+.scene-progress { height: 8px; border-radius: var(--r-pill); background: rgba(43,37,51,0.10); overflow: hidden; margin: 0.15rem 0 0.6rem; }
 .scene-progress-fill { height: 100%; width: 12%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--sunny), var(--teal)); transition: width 0.35s ease; }
 
 /* the "page" of the book */
@@ -362,10 +364,10 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 /* --- desktop: picture and words side-by-side, one screen --- */
 @media (min-width: 820px) {
   .reader { width: min(1180px, 95vw); }
-  .scene { display: grid; grid-template-columns: 1.1fr 1fr; align-items: stretch; min-height: 74vh; }
-  .page-art.stage { min-height: 74vh; }
-  .page-body { max-height: 82vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; }
-  .page-text { max-width: 42ch; }
+  .scene:not([hidden]) { display: grid; grid-template-columns: 0.92fr 1.15fr; align-items: stretch; min-height: 62vh; }
+  .page-art.stage { min-height: 62vh; }
+  .page-body { max-height: 70vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; }
+  .page-text { max-width: 46ch; }
 }
 
 /* --- mobile: picture band on top, words on a paper panel over its lower edge --- */
@@ -381,16 +383,16 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 }
 
 /* ---- Reader controls -------------------------------------------------- */
-.reader-controls {
-  display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
-  margin: 1.1rem auto 0.4rem; padding: 0.7rem; width: fit-content; max-width: 100%;
-  background: rgba(255,255,255,0.7); border-radius: var(--r-pill); box-shadow: var(--shadow-sm);
+/* one compact control bar: Back · Read to me · ↺ · speed · Next */
+.reader-bar {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;
+  margin: 0.7rem auto 0; padding: 0.45rem 0.7rem; width: fit-content; max-width: 100%;
+  background: rgba(255,255,255,0.78); border: 1px solid var(--paper-edge); border-radius: var(--r-pill); box-shadow: var(--shadow-sm);
 }
-.reader-nav { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: 0.9rem; }
-.reader-nav .spacer { flex: 1; }
+.nav-arrow { font-size: 1rem; padding: 0.55em 1.1em; }
 
-.play-btn { font-size: 1.45rem; padding: 0.7em 1.7em; background: linear-gradient(135deg, #1ad0c0, var(--teal-deep)); color: #fff; box-shadow: var(--shadow); }
-.play-btn.is-playing { background: linear-gradient(135deg, #ff8f8f, var(--coral)); }
+.play-btn { font-size: 1.2rem; padding: 0.6em 1.4em; background: var(--teal); color: #fff; border-color: transparent; box-shadow: var(--shadow-sm); }
+.play-btn.is-playing { background: var(--coral); }
 
 .speed { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.8); padding: 0.4rem 0.9rem; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); }
 .speed input { width: 120px; accent-color: var(--purple); }

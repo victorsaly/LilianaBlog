@@ -33,7 +33,33 @@ function establishing(scene: (typeof story.scenes)[number]): string | null {
 
 // Build the "stage" (the establishing picture + each inline picture, with the
 // word position it appears at) and the text-only paragraphs for each scene.
+// Per-paragraph pictures (scene-<n>-p<P>) — one per paragraph, shown while that
+// paragraph is read. Each is anchored at the word where its paragraph starts.
+function perParagraphStage(scene: (typeof story.scenes)[number]) {
+  const stage: { src: string; alt: string; anchor: number }[] = [];
+  let words = 0;
+  let p = 0;
+  for (const b of scene.blocks) {
+    if (b.type !== 'text') continue;
+    p++;
+    let file: string | null = null;
+    for (const ext of ['png', 'webp', 'jpg', 'jpeg']) {
+      if (fs.existsSync(path.join(sceneArtDir, `scene-${scene.n}-p${p}.${ext}`))) { file = `scene-${scene.n}-p${p}.${ext}`; break; }
+    }
+    if (file) stage.push({ src: `${base}art/scenes/${story.slug}/${file}`, alt: scene.title, anchor: words });
+    words += b.text.trim() ? b.text.trim().split(/\s+/).length : 0;
+  }
+  return stage;
+}
+
 function view(scene: (typeof story.scenes)[number]) {
+  const text = scene.blocks.filter((b) => b.type === 'text').map((b) => (b as any).text as string);
+
+  // prefer per-paragraph pictures if they exist
+  const pp = perParagraphStage(scene);
+  if (pp.length) return { stage: pp, text };
+
+  // otherwise: establishing picture + any inline images
   const lead = establishing(scene);
   const leadIsImage = scene.blocks[0] && scene.blocks[0].type === 'image';
   const stage: { src: string; alt: string; anchor: number }[] = [];
@@ -43,13 +69,13 @@ function view(scene: (typeof story.scenes)[number]) {
       stage.push({ src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor });
     }
   });
-  const text = scene.blocks.filter((b) => b.type === 'text').map((b) => (b as any).text as string);
   return { stage, text };
 }
 ---
 
 <div class="reader" id="reader" data-total={total}>
   <div class="reader-top">
+    <a class="back-all" href={base}>◀ All stories</a>
     <h1 class="reader-title">{story.emoji} {story.title}</h1>
     <span class="scene-count">Page <b id="scene-now">1</b> of {total}</span>
   </div>
@@ -88,22 +114,14 @@ function view(scene: (typeof story.scenes)[number]) {
     })}
   </div>
 
-  <div class="reader-controls">
+  <div class="reader-bar">
+    <button class="btn btn-ghost nav-arrow" id="prev-btn" type="button">◀ Back</button>
     <button class="btn play-btn" id="play-btn" type="button">▶ Read to me</button>
-    <button class="btn btn-ghost" id="restart-btn" type="button">↺ Start again</button>
-    <label class="speed" title="Reading speed">
-      🐢 <input type="range" id="speed-quick" min="0.6" max="1.3" step="0.05" aria-label="Reading speed" /> 🐇
-    </label>
-  </div>
-
-  <div class="reader-nav">
-    <button class="btn btn-purple" id="prev-btn" type="button">◀ Back</button>
-    <label class="btn btn-ghost" style="cursor:pointer;font-size:1rem;">
-      <input type="checkbox" id="autoplay" style="width:20px;height:20px;accent-color:var(--teal);vertical-align:middle;margin-right:6px;" />
-      Keep reading the next page
-    </label>
-    <span class="spacer"></span>
-    <button class="btn btn-teal" id="next-btn" type="button">Next ▶</button>
+    <button class="btn btn-ghost" id="restart-btn" type="button" aria-label="Start again">↺</button>
+    <label class="speed" title="Reading speed">🐢 <input type="range" id="speed-quick" min="0.6" max="1.3" step="0.05" aria-label="Reading speed" /> 🐇</label>
+    <button class="btn btn-teal nav-arrow" id="next-btn" type="button">Next ▶</button>
+    <button class="btn btn-ghost" id="sound-btn" type="button" aria-label="Sound on or off" aria-pressed="true">🔊</button>
+    <input type="checkbox" id="autoplay" hidden />
   </div>
 
   <p class="hint" id="tap-hint">👆 Tip: tap any <span class="tapword-demo">underlined</span> word to hear it on its own.</p>
@@ -136,9 +154,10 @@ function view(scene: (typeof story.scenes)[number]) {
 
     interface Word { start: number; end: number; el: HTMLElement; }
     interface Stage { anchor: number; el: HTMLElement; }
+    interface Para { anchor: number; cue: string | null; }
     interface SceneData {
       el: HTMLElement; words: Word[]; textEls: HTMLElement[]; fullText: string;
-      stage: Stage[]; stageCur: number;
+      stage: Stage[]; stageCur: number; paras: Para[]; title: string; lastPara: number;
       audioUrl: string; timingsUrl: string; starts: (number | null)[] | null;
     }
     const scenes: SceneData[] = [];
@@ -146,10 +165,12 @@ function view(scene: (typeof story.scenes)[number]) {
     sceneEls.forEach((el) => {
       const textEls = Array.from(el.querySelectorAll('.page-text')) as HTMLElement[];
       const words: Word[] = [];
+      const paras: Para[] = [];
       let fullText = '';
       let cursor = 0;
       textEls.forEach((tEl, bi) => {
         const raw = tEl.textContent || '';
+        paras.push({ anchor: words.length, cue: cueForText(raw) });
         if (bi > 0) { fullText += '\n\n'; cursor += 2; }
         const tokens = tokenize(raw);
         tEl.textContent = '';
@@ -177,12 +198,99 @@ function view(scene: (typeof story.scenes)[number]) {
       }));
       scenes.push({
         el, words, textEls, fullText, stage, stageCur: 0,
+        paras, title: el.querySelector('.page-scene-title')?.textContent || '', lastPara: -1,
         audioUrl: el.dataset.audio || '', timingsUrl: el.dataset.timings || '', starts: null,
       });
     });
 
     const anyAudio = scenes.some((s) => s.audioUrl);
     const canRead = anyAudio || ttsSupport;
+
+    // ---------------------- gentle sound (synthesized, no files) ----------------
+    let soundOn = localStorage.getItem('lili-sound') !== 'off';   // default on
+    let actx: AudioContext | null = null;
+    let master: GainNode | null = null;
+    let ambient: { g: GainNode; oscs: OscillatorNode[] } | null = null;
+    const soundBtn = document.getElementById('sound-btn') as HTMLButtonElement;
+
+    function cueForText(t: string): string | null {
+      const s = (t || '').toLowerCase();
+      if (/restart|reset|game over|poof|happy|teamwork|the end|fixed|truce/.test(s)) return 'chime';
+      if (/portal|whoosh|pulled inside|vibrate|buzz|swirl/.test(s)) return 'whoosh';
+      if (/zzzt|signal|crack/.test(s)) return 'zzzt';
+      if (/evil|laughed|nunchuck|surrender|villain|knocked/.test(s)) return 'villain';
+      if (/power|energy|glow|spark|silver|stylus|magic|flame|fire|wind|crackl|sword/.test(s)) return 'sparkle';
+      if (/stamp|rumble|march|stone|earth|mash|shook|bumped/.test(s)) return 'thud';
+      return null;
+    }
+    function ensureCtx(): AudioContext | null {
+      if (actx) return actx;
+      try {
+        const AC = (window.AudioContext || (window as any).webkitAudioContext);
+        actx = new AC();
+        master = actx.createGain(); master.gain.value = soundOn ? 1 : 0; master.connect(actx.destination);
+      } catch { actx = null; }
+      return actx;
+    }
+    function resumeCtx() { if (actx && actx.state === 'suspended') actx.resume(); }
+    function moodFor(title: string): number[] {
+      const t = (title || '').toLowerCase();
+      if (/ocean|cave|deep/.test(t)) return [98.0, 146.83, 196.0];
+      if (/portal|inside the game|powers|wonder/.test(t)) return [146.83, 220.0, 293.66];
+      if (/deeper|great potato/.test(t)) return [110.0, 164.81, 220.0];
+      return [130.81, 164.81, 196.0];
+    }
+    function startAmbient(title: string) {
+      if (!soundOn) return; const ctx = ensureCtx(); if (!ctx || !master) return;
+      stopAmbient();
+      const g = ctx.createGain(); g.gain.value = 0; g.connect(master);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.connect(g);
+      const oscs = moodFor(title).map((f, i) => { const o = ctx.createOscillator(); o.type = i === 0 ? 'sine' : 'triangle'; o.frequency.value = f; o.detune.value = (i - 1) * 6; o.connect(lp); o.start(); return o; });
+      g.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 2);
+      ambient = { g, oscs };
+    }
+    function stopAmbient() {
+      if (!ambient || !actx) return;
+      const { g, oscs } = ambient; const t = actx.currentTime;
+      try { g.gain.cancelScheduledValues(t); g.gain.linearRampToValueAtTime(0, t + 0.5); oscs.forEach((o) => o.stop(t + 0.6)); } catch {}
+      ambient = null;
+    }
+    function tone(freq: number, dur: number, type: OscillatorType, vol: number, delay = 0) {
+      const ctx = ensureCtx(); if (!ctx || !master || !soundOn) return;
+      const t = ctx.currentTime + delay;
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type = type; o.frequency.value = freq; o.connect(g); g.connect(master);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+    function whoosh() {
+      const ctx = ensureCtx(); if (!ctx || !master || !soundOn) return;
+      const dur = 0.6; const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+      const d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass';
+      const t = ctx.currentTime;
+      bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(1800, t + 0.3); bp.frequency.exponentialRampToValueAtTime(400, t + dur);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.1, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+      src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t + dur);
+    }
+    function playCue(name: string | null) {
+      if (!name || !soundOn) return;
+      if (name === 'sparkle') [1318, 1568, 2093].forEach((f, i) => tone(f, 0.5, 'sine', 0.08, i * 0.07));
+      else if (name === 'whoosh') whoosh();
+      else if (name === 'zzzt') { tone(180, 0.14, 'square', 0.09, 0); tone(250, 0.12, 'square', 0.07, 0.05); }
+      else if (name === 'chime') [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.5, 'sine', 0.09, i * 0.09));
+      else if (name === 'thud') tone(80, 0.35, 'sine', 0.15, 0);
+      else if (name === 'villain') [220, 174, 138].forEach((f, i) => tone(f, 0.42, 'sawtooth', 0.07, i * 0.08));
+    }
+    function setSoundIcon() { if (soundBtn) { soundBtn.textContent = soundOn ? '🔊' : '🔇'; soundBtn.setAttribute('aria-pressed', String(soundOn)); } }
+    setSoundIcon();
+    soundBtn?.addEventListener('click', () => {
+      soundOn = !soundOn; localStorage.setItem('lili-sound', soundOn ? 'on' : 'off'); setSoundIcon();
+      if (master) master.gain.value = soundOn ? 1 : 0;
+      if (!soundOn) stopAmbient();
+      else if (playing) { ensureCtx(); resumeCtx(); startAmbient(scenes[current].title); }
+    });
 
     // ---- state ----
     let current = 0, playing = false, paused = false;
@@ -233,6 +341,12 @@ function view(scene: (typeof story.scenes)[number]) {
         lastNow = nowIdx;
       }
       updateStage(s, nowIdx);
+      // per-paragraph sound cue when we enter a new paragraph
+      if (playing && s.paras.length) {
+        let cur = 0;
+        for (let i = 0; i < s.paras.length; i++) { if (s.paras[i].anchor <= nowIdx) cur = i; else break; }
+        if (cur !== s.lastPara) { s.lastPara = cur; playCue(s.paras[cur].cue); }
+      }
     }
     function clearPaint(s: SceneData) { s.words.forEach((w) => w.el.classList.remove('now', 'read')); lastNow = -1; }
     function paintAllRead(s: SceneData) { s.words.forEach((w) => { w.el.classList.add('read'); w.el.classList.remove('now'); }); lastNow = s.words.length - 1; }
@@ -331,9 +445,10 @@ function view(scene: (typeof story.scenes)[number]) {
       stop();
       current = idx; showScene(idx);
       const s = scenes[idx];
-      clearPaint(s); resetStage(s);
+      clearPaint(s); resetStage(s); s.lastPara = -1;
       if (!canRead) return;
       playing = true; paused = false; dim(s, true);
+      if (soundOn) { ensureCtx(); resumeCtx(); startAmbient(s.title); }
       if (s.audioUrl) { setBtn('loading'); playAudio(s); }
       else if (ttsSupport) { setBtn('play'); playTts(s); }
       else { playing = false; setBtn('idle'); }
@@ -346,17 +461,18 @@ function view(scene: (typeof story.scenes)[number]) {
       if (autoplayBox.checked && current < total - 1) window.setTimeout(() => startScene(current + 1), 550);
     }
     function stop() {
-      stopFallback(); cancelRaf();
+      stopFallback(); cancelRaf(); stopAmbient();
       playing = false; paused = false;
       if (synth) synth.cancel();
       audio.pause();
       if (scenes[current]) dim(scenes[current], false);
       setBtn('idle');
     }
-    function pause() { if (!playing) return; if (mode === 'audio') audio.pause(); else if (synth) synth.pause(); playing = false; paused = true; setBtn('pause'); dim(scenes[current], false); }
+    function pause() { if (!playing) return; if (mode === 'audio') audio.pause(); else if (synth) synth.pause(); stopAmbient(); playing = false; paused = true; setBtn('pause'); dim(scenes[current], false); }
     function resume() {
       if (!paused) return;
       playing = true; paused = false; setBtn('play'); dim(scenes[current], true);
+      if (soundOn) { resumeCtx(); startAmbient(scenes[current].title); }
       if (mode === 'audio') { audio.play().catch(() => {}); runAudioHighlight(scenes[current]); }
       else if (synth) synth.resume();
     }

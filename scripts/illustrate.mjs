@@ -53,6 +53,8 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--sketch') flags.sketch = argv[++i];
   else if (a === '--desc') flags.desc = argv[++i];
   else if (a === '--scenes') flags.scenes = argv[++i];
+  else if (a === '--per-paragraph') flags.perParagraph = true;
+  else if (a === '--only') flags.only = parseInt(argv[++i], 10);
   else ids.push(a);
 }
 
@@ -157,7 +159,31 @@ async function generateScenes(slug) {
 
   console.log(`🎬 ${slug} — ${scenes.length} pages`);
   for (const scene of scenes) {
+    if (flags.only && scene.n !== flags.only) continue;
     const refs = refsForScene(scene.text);
+
+    // 0) per-paragraph pictures: one illustration per paragraph (the picture the
+    //    reader's stage shows while that paragraph is read). Skips existing.
+    if (flags.perParagraph) {
+      const paras = scene.blocks.filter((b) => b.type === 'text');
+      for (let p = 0; p < paras.length; p++) {
+        const P = p + 1;
+        const exists = ['png', 'jpg', 'jpeg', 'webp'].some((e) => fs.existsSync(path.join(outDir, `scene-${scene.n}-p${P}.${e}`)));
+        if (exists) continue;
+        const prompt = `A storybook illustration of this exact moment from "The Great Potato Adventure" (scene: "${scene.title}"). Show: ${paras[p].text}\n\n${SCENE_STYLE}`;
+        if (flags.promptOnly || !KEY) {
+          console.log(`\n=== scene ${scene.n} para ${P} ===\n${prompt}\nSave as: public/art/scenes/${slug}/scene-${scene.n}-p${P}.png`);
+          continue;
+        }
+        process.stdout.write(`   📄 scene ${scene.n} para ${P}/${paras.length} … `);
+        try {
+          const png = await callGemini(prompt, refs);
+          fs.writeFileSync(path.join(outDir, `scene-${scene.n}-p${P}.png`), png);
+          console.log(`✅ ${(png.length / 1024).toFixed(0)} KB`);
+        } catch (err) { console.log(`❌ ${err.message}`); }
+      }
+      continue; // per-paragraph mode handles this scene fully
+    }
 
     // 1) establishing scene picture (skip if one already exists)
     if (!sceneExists(outDir, scene.n)) {
