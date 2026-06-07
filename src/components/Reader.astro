@@ -264,18 +264,20 @@ function view(scene: (typeof story.scenes)[number]) {
       }
       return true;
     }
+    // Cues play as decoded Web Audio buffers — reliable + level-controlled on iOS,
+    // and they can overlap. Buffers are fetched once and cached.
+    const cueBuffers: Record<string, AudioBuffer> = {};
     function playFile(name: string, vol: number) {
-      const a = new Audio(sfxBase + name + '.mp3');
       const ctx = ensureCtx();
-      if (ctx && master) {
-        try {
-          const src = ctx.createMediaElementSource(a);
-          const g = ctx.createGain(); g.gain.value = vol;
-          src.connect(g); g.connect(master); a.volume = 1;
-          a.addEventListener('ended', () => { try { src.disconnect(); g.disconnect(); } catch {} });
-        } catch { a.volume = vol; }
-      } else { a.volume = vol; }
-      a.play().catch(() => {});
+      if (!ctx || !master) { const a = new Audio(sfxBase + name + '.mp3'); a.volume = vol; a.play().catch(() => {}); return; }
+      const play = (buf: AudioBuffer) => {
+        const s = ctx.createBufferSource(); s.buffer = buf;
+        const g = ctx.createGain(); g.gain.value = vol;
+        s.connect(g); g.connect(master!); s.start();
+      };
+      if (cueBuffers[name]) { play(cueBuffers[name]); return; }
+      fetch(sfxBase + name + '.mp3').then((r) => r.arrayBuffer()).then((arr) => ctx.decodeAudioData(arr))
+        .then((buf) => { cueBuffers[name] = buf; play(buf); }).catch(() => {});
     }
     function moodFor(title: string): number[] {
       const t = (title || '').toLowerCase();
@@ -354,7 +356,7 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     function playCue(name: string | null) {
       if (!name || !soundOn) return;
-      if (sfxAvail.has(name)) { playFile(name, 0.45); return; }
+      if (sfxAvail.has(name)) { playFile(name, 0.85); return; }
       if (name === 'sparkle') [1318, 1568, 2093].forEach((f, i) => tone(f, 0.55, 'sine', 0.07, i * 0.08));
       else if (name === 'whoosh') whoosh();
       else if (name === 'zzzt') { buzz(170, 0.13, 0.07); buzz(240, 0.1, 0.06, 0.06); }

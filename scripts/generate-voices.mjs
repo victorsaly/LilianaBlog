@@ -55,11 +55,21 @@ function esc(s) {
 function voiceFor(speaker) {
   return VOICES[speaker] || VOICES.unknown || VOICES.narrator;
 }
+// Make the SPOKEN text sound right without changing word count (so word-timings
+// stay aligned to the on-screen text): say all-caps words as words ("LEO!" -> "Leo!"
+// instead of "L-E-O"), and fix onomatopoeia the TTS mangles.
+const SPOKEN_FIX = { zzzt: 'bzzzt', poof: 'poof' };
+function titleCase(w) { return w.charAt(0) + w.slice(1).toLowerCase(); }
+function speakable(text) {
+  let t = String(text).replace(/\b[A-Z]{2,}\b/g, titleCase);
+  for (const [k, v] of Object.entries(SPOKEN_FIX)) t = t.replace(new RegExp(`\\b${k}\\b`, 'gi'), v);
+  return t;
+}
 function segmentSsml(seg) {
   const v = voiceFor(seg.speaker);
   const pitch = v.pitch || '0%';
   const rate = v.rate || GLOBAL_RATE || '0%';
-  let inner = `<prosody pitch="${pitch}" rate="${rate}">${esc(seg.text)}</prosody>`;
+  let inner = `<prosody pitch="${pitch}" rate="${rate}">${esc(speakable(seg.text))}</prosody>`;
   if (v.style) inner = `<mstts:express-as style="${v.style}">${inner}</mstts:express-as>`;
   return `  <voice name="${v.voice}">${inner}</voice>`;
 }
