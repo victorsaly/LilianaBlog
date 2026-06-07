@@ -43,12 +43,16 @@ But the morning was NOT ordinary. Lily didn't know it yet, but someone had quiet
 > Draw this: the Nintendo bumped off the table. The crack glows and a tiny zzzt signal flies away.
 
 "Lily! Breakfast!" Mum called. No answer. Lily was too deep in her game.
+![Lily](/art/illustrations/lily.png)
 
 So Leo did what big brothers do — he shook her chair to get her attention, and bumped her Nintendo right off the table and onto the floor. Lily lost the game she was about to win.
+![Leo](/art/illustrations/leo.png)
 
 "LEO!" she yelled. And just like that, the two of them were fighting.
 
 "Stop it, both of you!" said Mum. Then Dad came out of the office. "Breakfast's ready," he said. "Come on — let's just get this settled."
+![Mum](/art/illustrations/mum.png)
+![Dad](/art/illustrations/dad.png)
 
 What nobody noticed was this: when the Nintendo hit the floor, it cracked... and that crack sent a tiny secret signal — zzzt — far, far away.
 
@@ -58,6 +62,7 @@ What nobody noticed was this: when the Nintendo hit the floor, it cracked... and
 Down, down, down — at the very bottom of the ocean, in a glowing cave, the signal arrived. And someone was waiting for it.
 
 He was a potato. A flying potato dressed like a ninja, spinning a pair of potato nunchucks. And he was EVIL.
+![The Great Potato](/art/illustrations/potato.png)
 
 "It worked!" he laughed. "My plan is beginning! Soon every person on Earth will play video games forever — and never, ever eat breakfast again!" It was the broken Nintendo that had switched on his whole plan. The fight at breakfast had mattered after all.
 
@@ -69,6 +74,10 @@ The family sat down and ate breakfast together. And that's when the Nintendo on 
 A huge, swirling portal burst open in the middle of the kitchen. The walls, the table, the breakfast — everything stopped, then twisted and turned into a strange, mythical world. And before anyone could grab the doorframe...
 
 WHOOSH. The whole family was pulled inside the video game.
+![Lily](/art/illustrations/lily.png)
+![Leo](/art/illustrations/leo.png)
+![Mum](/art/illustrations/mum.png)
+![Dad](/art/illustrations/dad.png)
 
 ## Scene 5 — Inside the Game (Powers Awaken!)
 > Draw this: the family in their costumes. Earth, wind and fire spark up — but Lily's power doesn't appear yet!
@@ -104,28 +113,49 @@ Lily looked at Leo. Leo looked at Lily. They were still a little mad... but they
 ## Scene 6 — Deeper and Deeper
 > Draw this: the team using their powers through the levels — earth walls, wind gusts, fire, Pip rolling, Blaze swooping.
 
-Working as a TEAM, the family used their powers. Dad raised stone walls with his earth to block the ketchup-blasts. Mum's wind swept whole rows of fries off their feet. Leo's fire melted the locked doors. Pip rolled circles around the guards, and Blaze swooped overhead, lighting the way and scouting the path. And Lily led them deeper and deeper — even without a power, she was the bravest of all — level after glowing level, all the way down to the ocean cave.
+Working as a TEAM, the family used their powers.
+
+Dad raised stone walls with his earth to block the ketchup-blasts.
+![Dad](/art/illustrations/dad.png)
+
+Mum's wind swept whole rows of fries off their feet.
+![Mum](/art/illustrations/mum.png)
+
+Leo's fire melted the locked doors.
+![Leo](/art/illustrations/leo.png)
+
+Pip rolled circles around the guards, and Blaze swooped overhead, lighting the way and scouting the path.
+![Pip](/art/illustrations/pip.png)
+![Blaze](/art/illustrations/blaze.png)
+
+And Lily led them deeper and deeper — even without a power, she was the bravest of all — level after glowing level, all the way down to the ocean cave.
+![Lily](/art/illustrations/lily.png)
 
 ## Scene 7 — The Great Potato (Lily's Wonder Power)
 > Draw this: the family lends their power to Lily. She glows with Energy. The three powers swirl into her, she hits RESTART, and the potato turns plain.
 
 There he was, floating in the air, spinning his nunchucks. "You'll never beat me!" the potato laughed. And he was strong — too strong. His nunchucks knocked Dad's earth walls to dust, blew past Mum's wind, and snuffed out Leo's fire. One by one, the family was knocked back.
+![The Great Potato](/art/illustrations/potato.png)
 
 Lily tried the restart — she tapped her stylus-sword three times — but it wasn't enough. She felt small and alone.
 
 Then her family gathered close around her.
 
 "You don't need to do this by yourself," said Dad, and his earth power flowed into her.
+![Dad](/art/illustrations/dad.png)
 
 "We're with you," said Mum, and her wind power swirled into her.
+![Mum](/art/illustrations/mum.png)
 
 "You've got this, sis," said Leo, and his fire power blazed into her.
+![Leo](/art/illustrations/leo.png)
 
 And as Lily felt how much her family loved her — how much they cared, and how much she cared about them — a warm light began to glow in her chest. It grew brighter and brighter. The earth, the wind, and the fire all spun together inside her and became something brand new: pure Energy — the Ultimate Power.
 
 This was Lily's wonder power all along. It didn't come from armour or a sword. It came from her love and caring — and it only woke up when her family stood together.
 
 Glowing from head to toe, Lily raised her stylus-sword high. "Game over, Potato," she said — and hit the final RESTART.
+![Lily glowing with Energy](/art/illustrations/lily.png)
 
 A wave of bright energy washed through the cave. The potato spun faster and faster — "Nooo, not the reset!" — until poof! He turned back into a plain, ordinary, harmless little potato, sitting on the cave floor.
 
@@ -135,10 +165,13 @@ A wave of bright energy washed through the cave. The potato spun faster and fast
 The portal opened, and the family tumbled back into their kitchen, right where they'd started. The Nintendo was fixed. Breakfast was still warm. And best of all — Lily and Leo weren't fighting anymore.
 
 "You saved everyone, Lily," said Mum.
+![Mum](/art/illustrations/mum.png)
 
 "No," said Lily, smiling at all of them. "We did. Teamwork."
+![Lily](/art/illustrations/lily.png)
 
 "Teamwork," said Leo. "Want to play a game together later? A real one?"
+![Leo](/art/illustrations/leo.png)
 
 "Yeah," said Lily. "Just... no potatoes this time."
 

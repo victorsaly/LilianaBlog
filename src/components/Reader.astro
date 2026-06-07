@@ -32,15 +32,22 @@ function topImage(scene: (typeof story.scenes)[number]): string | null {
 }
 
 // The interleaved flow: text paragraphs + inline images, in order. We drop the
-// leading establishing image (it's shown on top) so it isn't duplicated.
-function flowFor(scene: (typeof story.scenes)[number]) {
+// leading establishing image (shown on top), and group consecutive images into
+// a single row so they sit side-by-side instead of stacking.
+type Img = { src: string; alt: string; anchor: number };
+type FlowItem = { type: 'text'; text: string } | { type: 'row'; images: Img[] };
+function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
   const blocks = scene.blocks.slice();
   if (blocks[0] && blocks[0].type === 'image') blocks.shift();
-  return blocks.map((b) =>
-    b.type === 'text'
-      ? { type: 'text' as const, text: b.text }
-      : { type: 'image' as const, src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor }
-  );
+  const out: FlowItem[] = [];
+  for (const b of blocks) {
+    if (b.type === 'text') { out.push({ type: 'text', text: b.text }); continue; }
+    const img: Img = { src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor };
+    const last = out[out.length - 1];
+    if (last && last.type === 'row') last.images.push(img);
+    else out.push({ type: 'row', images: [img] });
+  }
+  return out;
 }
 ---
 
@@ -77,9 +84,13 @@ function flowFor(scene: (typeof story.scenes)[number]) {
                 item.type === 'text' ? (
                   <p class="page-text">{item.text}</p>
                 ) : (
-                  <figure class="scene-illo" data-anchor={item.anchor}>
-                    <img src={item.src} alt={item.alt} loading="lazy" />
-                  </figure>
+                  <div class="illo-row">
+                    {item.images.map((im) => (
+                      <figure class="scene-illo" data-anchor={im.anchor}>
+                        <img src={im.src} alt={im.alt} loading="lazy" />
+                      </figure>
+                    ))}
+                  </div>
                 )
               )}
             </div>
