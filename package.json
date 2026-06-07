@@ -2,7 +2,7 @@
   "name": "lilis-story-world",
   "version": "1.0.0",
   "private": true,
-  "description": "Lily's Story World — an illustrated, read-along storybook site built for a young dyslexic author.",
+  "description": "Lili's Story World — an illustrated, read-along storybook site built for a young dyslexic author.",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
