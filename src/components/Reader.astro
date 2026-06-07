@@ -151,7 +151,8 @@ function view(scene: (typeof story.scenes)[number]) {
     const sfxAvail = new Set((root.dataset.sfx || '').split(',').filter(Boolean));
     const ambientAudio = new Audio();
     ambientAudio.loop = true;
-    ambientAudio.volume = 0.14;
+    let ambientSource: MediaElementAudioSourceNode | null = null;
+    let ambientGain: GainNode | null = null;
 
     const sceneEls = Array.from(root.querySelectorAll('.scene')) as HTMLElement[];
     const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -250,6 +251,32 @@ function view(scene: (typeof story.scenes)[number]) {
       return actx;
     }
     function resumeCtx() { if (actx && actx.state === 'suspended') actx.resume(); }
+    // Route media through Web Audio + GainNode so the level is respected on iOS
+    // (iOS/WebKit ignores HTMLAudioElement.volume).
+    function ensureAmbientRouting(): boolean {
+      const ctx = ensureCtx(); if (!ctx || !master) return false;
+      if (!ambientSource) {
+        try {
+          ambientSource = ctx.createMediaElementSource(ambientAudio);
+          ambientGain = ctx.createGain();
+          ambientSource.connect(ambientGain); ambientGain.connect(master);
+        } catch { return false; }
+      }
+      return true;
+    }
+    function playFile(name: string, vol: number) {
+      const a = new Audio(sfxBase + name + '.mp3');
+      const ctx = ensureCtx();
+      if (ctx && master) {
+        try {
+          const src = ctx.createMediaElementSource(a);
+          const g = ctx.createGain(); g.gain.value = vol;
+          src.connect(g); g.connect(master); a.volume = 1;
+          a.addEventListener('ended', () => { try { src.disconnect(); g.disconnect(); } catch {} });
+        } catch { a.volume = vol; }
+      } else { a.volume = vol; }
+      a.play().catch(() => {});
+    }
     function moodFor(title: string): number[] {
       const t = (title || '').toLowerCase();
       if (/ocean|cave|deep/.test(t)) return [98.0, 146.83, 196.0];
@@ -269,7 +296,15 @@ function view(scene: (typeof story.scenes)[number]) {
       if (!soundOn) return;
       const mood = moodName(title);
       const bed = sfxAvail.has(`music-${mood}`) ? `music-${mood}` : sfxAvail.has(`amb-${mood}`) ? `amb-${mood}` : null;
-      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.volume = bed.startsWith('music') ? 0.05 : 0.12; ambientAudio.play().catch(() => {}); return; }
+      if (bed) {
+        stopSynthAmbient();
+        const level = bed.startsWith('music') ? 0.1 : 0.14;
+        if (ensureAmbientRouting()) { ambientGain!.gain.value = level; ambientAudio.volume = 1; }
+        else { ambientAudio.volume = level; }   // desktop fallback if Web Audio unavailable
+        ambientAudio.src = sfxBase + bed + '.mp3';
+        ambientAudio.play().catch(() => {});
+        return;
+      }
       startSynthAmbient(title);
     }
     function stopAmbient() { ambientAudio.pause(); stopSynthAmbient(); }
@@ -319,7 +354,7 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     function playCue(name: string | null) {
       if (!name || !soundOn) return;
-      if (sfxAvail.has(name)) { const a = new Audio(sfxBase + name + '.mp3'); a.volume = 0.45; a.play().catch(() => {}); return; }
+      if (sfxAvail.has(name)) { playFile(name, 0.45); return; }
       if (name === 'sparkle') [1318, 1568, 2093].forEach((f, i) => tone(f, 0.55, 'sine', 0.07, i * 0.08));
       else if (name === 'whoosh') whoosh();
       else if (name === 'zzzt') { buzz(170, 0.13, 0.07); buzz(240, 0.1, 0.06, 0.06); }
