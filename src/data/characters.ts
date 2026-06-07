@@ -1,5 +1,5 @@
 /* The cast of The Great Potato Adventure.
-   The first four have Lily's real sketches; the rest are waiting for her
+   The first four have Lili's real sketches; the rest are waiting for her
    to draw them (they show a friendly "draw me!" card until then). */
 
 export interface Character {
@@ -16,13 +16,13 @@ export interface Character {
 export const characters: Character[] = [
   {
     id: 'lily',
-    name: 'Lily',
+    name: 'Lili',
     emoji: '⭐',
     power: 'Energy — the Ultimate Power',
     powerClass: 'pow-energy',
     color: '#12b3a6',
     sketch: 'lily-sketch.jpeg',
-    desc: 'The hero. Clever, brave, and a little stubborn. Her greatest power grows from her love and caring — and only wakes up when her family stands with her.',
+    desc: 'The hero — Lili (Liliana). Clever, brave, and a little stubborn. Her greatest power grows from her love and caring — and only wakes up when her family stands with her.',
   },
   {
     id: 'leo',

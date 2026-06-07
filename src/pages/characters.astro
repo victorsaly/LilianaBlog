@@ -8,7 +8,7 @@ const base = import.meta.env.BASE_URL;
 
 // Auto-detect a finished illustration for a character: drop a file named
 // <id>.png (or .jpg/.jpeg/.webp) into public/art/illustrations/ and it appears
-// here automatically — with a toggle back to Lily's original sketch.
+// here automatically — with a toggle back to Lili's original sketch.
 const cards = characters.map((c) => ({
   ...c,
   sketchUrl: artUrl(c.sketch, 'character', base),
@@ -17,10 +17,10 @@ const cards = characters.map((c) => ({
 const doneCount = cards.filter((c) => c.illoUrl).length;
 ---
 
-<Base title="Meet the Characters · Lily's Story World" active="characters">
+<Base title="Meet the Characters · Lili's Story World" active="characters">
   <section class="wrap hero" style="padding-bottom:0">
     <h1>🎭 Meet the Characters</h1>
-    <p>Everyone from <b>The Great Potato Adventure</b> — drawn by Lily.
+    <p>Everyone from <b>The Great Potato Adventure</b> — drawn by Lili.
       {doneCount > 0
         ? <span>Tap <b>✏️ Sketch</b> / <b>🎨 Colour</b> to see how a drawing came to life!</span>
         : <span>Her sketches are here now — the colourful illustrations are coming next!</span>}
@@ -34,18 +34,18 @@ const doneCount = cards.filter((c) => c.illoUrl).length;
           {c.illoUrl && c.sketchUrl ? (
             <div class="frame flip" data-show="art">
               <img class="layer art" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" />
-              <img class="layer sketch" src={c.sketchUrl} alt={`Lily's pencil sketch of ${c.name}`} loading="lazy" />
+              <img class="layer sketch" src={c.sketchUrl} alt={`Lili's pencil sketch of ${c.name}`} loading="lazy" />
               <button class="flip-btn" type="button" data-flip>✏️ Sketch</button>
             </div>
           ) : c.illoUrl ? (
             <div class="frame"><img class="illo" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" /></div>
           ) : c.sketchUrl ? (
-            <div class="frame"><img src={c.sketchUrl} alt={`Lily's drawing of ${c.name}`} loading="lazy" /></div>
+            <div class="frame"><img src={c.sketchUrl} alt={`Lili's drawing of ${c.name}`} loading="lazy" /></div>
           ) : (
             <div class="frame placeholder">
               <div>
                 <div style="font-size:2.2rem">✏️</div>
-                <b>Draw me, Lily!</b>
+                <b>Draw me, Lili!</b>
               </div>
             </div>
           )}
@@ -63,7 +63,7 @@ const doneCount = cards.filter((c) => c.illoUrl).length;
 </Base>
 
 <script>
-  // Flip a card between the finished illustration and Lily's original sketch.
+  // Flip a card between the finished illustration and Lili's original sketch.
   document.querySelectorAll<HTMLButtonElement>('[data-flip]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const frame = btn.closest('.frame') as HTMLElement;

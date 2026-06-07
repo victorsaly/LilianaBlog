@@ -1,11 +1,11 @@
-# 🎨 Turning Lily's Sketches into Illustrations
+# 🎨 Turning Lili's Sketches into Illustrations
 
-A step-by-step plan + ready-to-paste prompts to turn Lily's pencil drawings into
+A step-by-step plan + ready-to-paste prompts to turn Lili's pencil drawings into
 bright cartoon illustrations — while keeping them **recognisably HER drawings**.
 
 > The golden rule: we are *bringing her drawings to life*, not replacing them.
 > Every prompt below tells the AI to keep her pose, proportions and special
-> details. The magic is that Lily sees her own ideas leveled-up.
+> details. The magic is that Lili sees her own ideas leveled-up.
 
 ---
 
@@ -48,12 +48,12 @@ rather paste prompts into Gemini yourself.
    - **Midjourney** — most beautiful, a bit more fiddly. Use the `--cref` (character reference) trick for consistency.
    - **Adobe Firefly** — commercially "safe" licensing, integrates with Photoshop.
 2. **Use the full-size originals as input** — they're in `_originals/` (sharper than the web copies).
-3. **Do Lily first.** Her finished picture becomes the *style anchor* for everyone else.
-4. For each next character, **also attach Lily's finished image** and add:
+3. **Do Lili first.** Her finished picture becomes the *style anchor* for everyone else.
+4. For each next character, **also attach Lili's finished image** and add:
    *"Match this exact art style, colours and line thickness."* → this keeps the whole family looking like one team.
 5. Save the finished pictures as PNGs (see naming at the bottom) and tell me —
    I'll wire them straight into the website. The site is already set up to show
-   each illustration *with a "see Lily's original sketch" toggle*. 💛
+   each illustration *with a "see Lili's original sketch" toggle*. 💛
 
 ---
 
@@ -67,7 +67,7 @@ rather paste prompts into Gemini yourself.
 > character so they look like one team.
 
 **KEEP (paste into every prompt):**
-> Important: this is based on a real pencil drawing by Lily, age 9. Keep her
+> Important: this is based on a real pencil drawing by Lili, age 9. Keep her
 > pose, her proportions and ALL her special details — just bring them to life
 > with colour and clean lines. Do not make a generic character; keep it
 > recognisably HER drawing.
@@ -78,7 +78,7 @@ rather paste prompts into Gemini yourself.
 *Input: `_originals/lily-sketch.original.jpeg`*
 
 > Turn this pencil sketch into a finished character illustration. A brave,
-> cheerful 9-year-old girl hero named Lily. Keep her cat-ear headband, her big
+> cheerful 9-year-old girl hero named Lili. Keep her cat-ear headband, her big
 > sparkly happy eyes, and her dynamic pose with one arm raised holding a glowing
 > silver STYLUS-SWORD. Surround her with swirling golden-white ENERGY light, a
 > small floating heart, and bright sparks at her feet — this is her "love and
@@ -124,8 +124,8 @@ rather paste prompts into Gemini yourself.
 
 ---
 
-## 🐾 The characters Lily hasn't drawn yet
-*(No sketch input — generate from the description. Still attach Lily's finished
+## 🐾 The characters Lili hasn't drawn yet
+*(No sketch input — generate from the description. Still attach Lili's finished
 image and say "match this art style".)*
 
 **🦔 PIP — the hedgehog:** A cosy brown hedgehog with a cream tummy and friendly
@@ -185,7 +185,7 @@ public/art/illustrations/
 
 Use lowercase names exactly like above. I'll then:
 - show each illustration on the **Characters** page,
-- add a **"✏️ see Lily's original sketch"** toggle on each card,
+- add a **"✏️ see Lili's original sketch"** toggle on each card,
 - use them as **story covers** and later in the **scene pictures**.
 
 > Tip: keep a copy of every AI prompt that worked well — re-using the same

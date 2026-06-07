@@ -7,13 +7,13 @@ import { illustrationUrl, idFromCover } from '../lib/art';
 const base = import.meta.env.BASE_URL;
 const stories = getStories();
 
-// A book cover automatically upgrades to Lily's illustration once it exists.
+// A book cover automatically upgrades to Lili's illustration once it exists.
 function coverFor(story: (typeof stories)[number]): string | null {
   const id = idFromCover(story.cover);
   return (id && illustrationUrl(id, base)) || artUrl(story.cover, 'character', base);
 }
 
-// "From Lily's sketchbook" — show before/after for any character drawn by her.
+// "From Lili's sketchbook" — show before/after for any character drawn by her.
 const drawn = characters.filter((c) => c.sketch).map((c) => ({
   name: c.name,
   sketchUrl: artUrl(c.sketch, 'character', base),
@@ -27,17 +27,17 @@ const cast = characters
   .map((c) => ({ name: c.name, url: illustrationUrl(c.id, base) || artUrl(c.sketch, 'character', base) }))
   .filter((c) => c.url);
 
-// Hero star: Lily's illustration if she has one, else her sketch.
-const lily = drawn.find((d) => d.name === 'Lily');
+// Hero star: Lili's illustration if she has one, else her sketch.
+const lily = drawn.find((d) => d.name === 'Lili');
 const heroImg = lily?.illoUrl || lily?.sketchUrl;
 const firstStory = stories[0];
 ---
 
-<Base title="Lily's Story World" active="home">
+<Base title="Lili's Story World" active="home">
   <section class="wrap hero-wide">
     <div class="hero-copy">
-      <h1>Lily's Story World</h1>
-      <p>Magical stories written and drawn by Lily — that read themselves out loud while the words light up. 💛</p>
+      <h1>Lili's Story World</h1>
+      <p>Magical stories written and drawn by Lili — that read themselves out loud while the words light up. 💛</p>
       <div class="hero-cta">
         {firstStory && <a class="btn btn-teal btn-big" href={`${base}stories/${firstStory.slug}/`}>▶ Read a story</a>}
         <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Characters</a>
@@ -49,7 +49,7 @@ const firstStory = stories[0];
         <span class="spark s1" aria-hidden="true">✨</span>
         <span class="spark s2" aria-hidden="true">⭐</span>
         <span class="spark s3" aria-hidden="true">💛</span>
-        <img src={heroImg} alt="Lily the hero" />
+        <img src={heroImg} alt="Lili the hero" />
       </div>
     )}
   </section>
@@ -84,7 +84,7 @@ const firstStory = stories[0];
   <section class="wrap">
     <div class="section-title">
       <span aria-hidden="true" style="font-size:1.8rem">✏️</span>
-      <h2>From Lily's sketchbook</h2>
+      <h2>From Lili's sketchbook</h2>
     </div>
     {donePairs.length > 0 ? (
       <div class="showcase">
@@ -101,7 +101,7 @@ const firstStory = stories[0];
         <div class="teaser-strip">
           {sketches.map((c) => <img src={c.sketchUrl} alt={`${c.name} sketch`} />)}
         </div>
-        <p class="tag">🎨 Colour versions are coming soon — Lily's sketches become bright illustrations next!</p>
+        <p class="tag">🎨 Colour versions are coming soon — Lili's sketches become bright illustrations next!</p>
       </div>
     )}
   </section>

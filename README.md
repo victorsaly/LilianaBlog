@@ -1,9 +1,9 @@
-# 📖✨ Lily's Story World
+# 📖✨ Lili's Story World
 
 An illustrated, **read-along** storybook website for a young author who is
 dyslexic. Every page reads itself out loud while the words light up one by one,
 so reading along is easy and fun. Built with [Astro](https://astro.build) so each
-story is just a **plain Markdown file Lily can write and edit herself**.
+story is just a **plain Markdown file Lili can write and edit herself**.
 
 First story: 🥔 **The Great Potato Adventure**.
 
@@ -84,7 +84,7 @@ base path for you).
 
 ---
 
-## ✍️ How Lily adds a NEW story
+## ✍️ How Lili adds a NEW story
 
 **Quickest:** run `npm run new-story -- --title "My Dragon Tale" --emoji "🐉"`
 (or, in Claude Code, use the **/new-story** skill to draft a whole story from an
@@ -96,7 +96,7 @@ idea). Then fill in the scenes. Manual steps:
    ```markdown
    ---
    title: My Dragon Tale
-   author: Lily
+   author: Lili
    emoji: "🐉"
    cover: lily-sketch.jpeg          # a picture for the bookshelf (in art/characters or art/covers)
    tagline: A brave girl and a shy dragon.
@@ -123,7 +123,7 @@ idea). Then fill in the scenes. Manual steps:
    **Inline pictures (as many as you like):** put `![...](...)` lines *between
    paragraphs, right where they explain the words*. Each one **reveals as the
    read-along reaches it** — so pictures pop in as the story is read. Three ways:
-   - reuse art we already have: `![Lily](/art/illustrations/lily.png)`
+   - reuse art we already have: `![Lili](/art/illustrations/lily.png)`
    - a file you saved in `public/art/scenes/`: `![the cave](cave.png)`
    - **auto-generate it:** `![a tall purple castle at night](auto)` then run
      `npm run illustrate -- --scenes <story-slug>` — it draws each `(auto)`
@@ -140,7 +140,7 @@ idea). Then fill in the scenes. Manual steps:
   in the `![ ](name.png)` line. (A photo of a paper drawing is totally fine.)
 - **Story cover:** put the image in `public/art/characters/` (or make a
   `public/art/covers/` folder and write `cover: /art/covers/name.png`).
-- Lily's character sketches live in `public/art/characters/`. The untouched
+- Lili's character sketches live in `public/art/characters/`. The untouched
   original photos are backed up in `_originals/`.
 
 ---
@@ -165,7 +165,7 @@ idea). Then fill in the scenes. Manual steps:
 
 ```
 src/
-  stories/           ← Lily's stories (Markdown). Add new ones here.
+  stories/           ← Lili's stories (Markdown). Add new ones here.
   data/characters.ts ← the cast for the Characters page
   components/         ← Reader (read-along engine) + Reading-settings panel
   layouts/Base.astro ← shared page shell, fonts, nav
@@ -173,7 +173,7 @@ src/
   pages/             ← Home, Characters, and the story reader route
   styles/global.css  ← all the styling + dyslexia reading variables
 public/
-  art/characters/    ← Lily's character drawings
+  art/characters/    ← Lili's character drawings
   art/scenes/        ← scene pictures (add yours here)
   fonts/             ← OpenDyslexic (bundled, works offline)
 character-bible.md   ← the master story + character design notes
@@ -189,14 +189,14 @@ Two ways to read aloud, and the site picks the best one available per page:
 1. **Browser voice (default, $0, zero setup)** — works immediately, and powers
    the word-highlighting out of the box.
 2. **Per-character studio voices (free Azure tier)** — pre-generate audio with
-   `npm run voices` so narrator, Lily, Leo, Mum, Dad and the Potato each get
+   `npm run voices` so narrator, Lili, Leo, Mum, Dad and the Potato each get
    their own voice, still perfectly highlighted. See **`VOICES-GUIDE.md`**.
 
 ## 🎨 Turning sketches into illustrations
 
 See **`ILLUSTRATION-GUIDE.md`** for a ready-to-paste prompt pack (built from
-Lily's actual sketches) and the workflow. Drop finished art into
+Lili's actual sketches) and the workflow. Drop finished art into
 `public/art/illustrations/` and the Characters page shows it automatically, with
 a **✏️ Sketch / 🎨 Colour** toggle back to her original drawing.
 
-Made with 💛 for Lily.
+Made with 💛 for Lili.

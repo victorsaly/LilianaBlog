@@ -1,4 +1,4 @@
-# 🎨 Lily's Story World — Design System
+# 🎨 Lili's Story World — Design System
 
 > This doubles as our living style guide **and** the design system to import into
 > TypeUI. In TypeUI: *Create a design system → Upload markdown → paste/zip this
@@ -90,7 +90,7 @@ blue, earth = brown/green.
 ## 6. Layout patterns
 
 - **Home:** two-column hero (copy + a floating transparent hero character with a
-  soft blob + sparkles) → "Pick a story" shelf grid → "From Lily's sketchbook"
+  soft blob + sparkles) → "Pick a story" shelf grid → "From Lili's sketchbook"
   before/after → "Meet the cast" strip.
 - **Reader:** centered narrow column (`--w-reader`), one scene per page, prev/next.
 - **Characters:** responsive card grid.

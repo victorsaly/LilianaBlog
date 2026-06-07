@@ -1,7 +1,7 @@
 # 🔊 Per-character voices (free, with Azure Neural TTS)
 
 Each story page can be read aloud with a **different voice for each character**
-— narrator, Lily, Leo, Mum, Dad, even the Great Potato — with the words
+— narrator, Lili, Leo, Mum, Dad, even the Great Potato — with the words
 lighting up in time with the audio.
 
 How it works: we generate the audio **once on your computer** and save it as
@@ -108,7 +108,7 @@ Browse all the voices (with audio samples) here:
 The generator reads the story and gives quoted lines to the character named
 nearest the quote — `"Stop it!" said Mum` → Mum's voice. Everything else is the
 narrator. To nudge a tricky line, just make the attribution clear in the story
-(e.g. add `said Lily`). It never affects the on-screen words or the
+(e.g. add `said Lili`). It never affects the on-screen words or the
 highlighting — only which voice is used.
 
 ---

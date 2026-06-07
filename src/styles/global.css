@@ -1,5 +1,5 @@
 /* =========================================================================
-   Lily's Story World — global styles
+   Lili's Story World — global styles
    Friendly for young readers, and especially kind to dyslexic readers
    (clear fonts, generous spacing, warm low-glare colours, short lines,
    strong read-along highlighting). Polished storybook look.
@@ -272,7 +272,7 @@ img { max-width: 100%; display: block; }
 .pow-earth  { background: linear-gradient(90deg,#9b7a4e,#6f5230); }
 .pow-none   { background: #9b94a8; }
 
-/* ---- "From Lily's sketchbook" ----------------------------------------- */
+/* ---- "From Lili's sketchbook" ----------------------------------------- */
 .showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
 .ba { margin: 0; background: var(--card-bg); border-radius: var(--r); box-shadow: var(--shadow-sm); padding: 0.9rem; display: flex; align-items: center; gap: 0.6rem; border: 1px solid var(--card-ring); }
 .ba img { flex: 1; min-width: 0; aspect-ratio: 3/4; object-fit: cover; object-position: top center; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px var(--card-ring); }
@@ -352,7 +352,7 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 /* the stage: pictures stacked; only the current one is shown (cross-fade) */
 .page-art.stage { position: relative; overflow: hidden; }
 .page-art .stage-img {
-  position: absolute; inset: 7%; margin: auto;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   width: auto; height: auto; max-width: 86%; max-height: 86%;
   object-fit: contain; opacity: 0; transition: opacity 0.5s ease;
   filter: drop-shadow(0 14px 22px rgba(43, 37, 51, 0.22));

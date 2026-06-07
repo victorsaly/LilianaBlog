@@ -2,11 +2,11 @@
    stories.ts — reads every Markdown story in src/stories/ and turns it into
    structured scenes the read-along Reader can use.
 
-   A story file looks like this (this is ALL Lily needs to write):
+   A story file looks like this (this is ALL Lili needs to write):
 
        ---
        title: The Great Potato Adventure
-       author: Lily
+       author: Lili
        emoji: "🥔"
        cover: lily-sketch.jpeg
        tagline: A story about love, teamwork, and mashing some fries.
@@ -67,7 +67,7 @@ function buildStory(path: string, raw: string): Story {
   return {
     slug,
     title: String(data.title ?? slug),
-    author: String(data.author ?? 'Lily'),
+    author: String(data.author ?? 'Lili'),
     emoji: String(data.emoji ?? '📖'),
     cover: data.cover ? String(data.cover) : null,
     tagline: String(data.tagline ?? ''),

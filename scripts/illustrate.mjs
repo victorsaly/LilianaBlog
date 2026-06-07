@@ -128,7 +128,7 @@ async function makeOne(id, body, sketchName) {
 
 // Which characters appear in a scene's text (so we can attach their art as refs).
 const NAME_RX = {
-  lily: /\blily\b/i, leo: /\bleo\b/i, mum: /\bmum\b/i, dad: /\bdad\b/i,
+  lily: /\blil[iy]\b/i, leo: /\bleo\b/i, mum: /\bmum\b/i, dad: /\bdad\b/i,
   pip: /\bpip\b/i, blaze: /\bblaze\b/i, potato: /\bpotato\b/i, fries: /\b(fries|fry)\b/i,
 };
 function refsForScene(text) {

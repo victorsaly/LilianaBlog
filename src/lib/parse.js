@@ -133,7 +133,7 @@ export function makeChunks(text) {
 
 // Characters the narrator can hand a line to (lowercase keys -> speaker id).
 const NAME_TO_SPEAKER = {
-  lily: 'lily', leo: 'leo', mum: 'mum', mom: 'mum', mummy: 'mum',
+  lili: 'lily', lily: 'lily', leo: 'leo', mum: 'mum', mom: 'mum', mummy: 'mum',
   dad: 'dad', daddy: 'dad', pip: 'pip', blaze: 'blaze',
   potato: 'potato',
 };
