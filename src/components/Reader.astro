@@ -269,7 +269,7 @@ function view(scene: (typeof story.scenes)[number]) {
       if (!soundOn) return;
       const mood = moodName(title);
       const bed = sfxAvail.has(`music-${mood}`) ? `music-${mood}` : sfxAvail.has(`amb-${mood}`) ? `amb-${mood}` : null;
-      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.play().catch(() => {}); return; }
+      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.volume = bed.startsWith('music') ? 0.085 : 0.14; ambientAudio.play().catch(() => {}); return; }
       startSynthAmbient(title);
     }
     function stopAmbient() { ambientAudio.pause(); stopSynthAmbient(); }
@@ -400,10 +400,12 @@ function view(scene: (typeof story.scenes)[number]) {
       return Math.min(lo, words.length - 1);
     }
     function ensureVisible(el: HTMLElement) {
-      const r = el.getBoundingClientRect();
       const scroller = el.closest('.page-body') as HTMLElement | null;
-      const top = scroller ? scroller.getBoundingClientRect().top + 80 : 130;
-      const bottom = scroller ? scroller.getBoundingClientRect().bottom - 80 : window.innerHeight - 130;
+      const useScroller = !!scroller && scroller.scrollHeight > scroller.clientHeight + 4;
+      const r = el.getBoundingClientRect();
+      let top: number, bottom: number;
+      if (useScroller) { const s = scroller!.getBoundingClientRect(); top = s.top + 70; bottom = s.bottom - 70; }
+      else { top = 110; bottom = window.innerHeight - 150; } // leave room for the fixed bottom bar
       if (r.top < top || r.bottom > bottom) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
     function cancelRaf() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }

@@ -370,15 +370,32 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   .page-text { max-width: 46ch; }
 }
 
-/* --- mobile: picture band on top, words on a paper panel over its lower edge --- */
+/* --- mobile: picture is the full background; words scroll over it in a
+       readable panel (space is tight, so we overlay rather than stack) --- */
 @media (max-width: 819px) {
+  .reader { width: 100%; }
+  .page { background: transparent; box-shadow: none; border: none; }
+  .page::after { display: none; }
   .page-art::before { display: none; }
-  .page-art.stage { height: 46vh; }                 /* explicit height so it always shows */
-  .page .scene .page-body {
-    position: relative; z-index: 1; margin-top: -28px;
-    background: var(--read-bg);
+
+  /* image fills an explicit-height band (renders reliably); text panel is
+     pulled up over its lower part so the picture reads as the background */
+  .page-art.stage { height: 60vh; border-radius: var(--r-lg); }
+  .scene .page-art.stage .stage-img {
+    position: absolute; inset: 0; transform: none;
+    width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; border-radius: var(--r-lg);
+  }
+  .scene .page-art.stage::after {
+    content: ""; position: absolute; inset: 0; border-radius: var(--r-lg);
+    background: linear-gradient(180deg, rgba(43,37,51,0.04) 0%, rgba(43,37,51,0.28) 55%, rgba(43,37,51,0.55) 100%);
+  }
+  .page-body {
+    position: relative; z-index: 1; margin: -34vh 0.6rem 0;
+    background: color-mix(in srgb, var(--read-bg) 92%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     border-radius: var(--r-lg) var(--r-lg) 0 0;
-    box-shadow: 0 -14px 30px rgba(43, 37, 51, 0.16);
+    box-shadow: 0 -8px 30px rgba(43, 37, 51, 0.22);
+    padding: 1rem 1rem 1.4rem;
   }
 }
 
