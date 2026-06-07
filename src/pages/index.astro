@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { getStories, artUrl } from '../lib/stories';
+import { characters } from '../data/characters';
+import { illustrationUrl, idFromCover } from '../lib/art';
+
+const base = import.meta.env.BASE_URL;
+const stories = getStories();
+
+// A book cover automatically upgrades to Lily's illustration once it exists.
+function coverFor(story: (typeof stories)[number]): string | null {
+  const id = idFromCover(story.cover);
+  return (id && illustrationUrl(id, base)) || artUrl(story.cover, 'character', base);
+}
+
+// "From Lily's sketchbook" — show before/after for any character drawn by her.
+const drawn = characters.filter((c) => c.sketch).map((c) => ({
+  name: c.name,
+  sketchUrl: artUrl(c.sketch, 'character', base),
+  illoUrl: illustrationUrl(c.id, base),
+}));
+const donePairs = drawn.filter((p) => p.illoUrl);
+const sketches = drawn.slice(0, 4);
+
+// Hero star: Lily's illustration if she has one, else her sketch.
+const lily = drawn.find((d) => d.name === 'Lily');
+const heroImg = lily?.illoUrl || lily?.sketchUrl;
+const firstStory = stories[0];
+---
+
+<Base title="Lily's Story World" active="home">
+  <section class="wrap hero-wide">
+    <div class="hero-copy">
+      <h1>Lily's Story World</h1>
+      <p>Magical stories written and drawn by Lily — that read themselves out loud while the words light up. 💛</p>
+      <div class="hero-cta">
+        {firstStory && <a class="btn btn-teal btn-big" href={`${base}stories/${firstStory.slug}/`}>▶ Read a story</a>}
+        <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Characters</a>
+      </div>
+    </div>
+    {heroImg && (
+      <div class="hero-figure">
+        <div class="blob" aria-hidden="true"></div>
+        <span class="spark s1" aria-hidden="true">✨</span>
+        <span class="spark s2" aria-hidden="true">⭐</span>
+        <span class="spark s3" aria-hidden="true">💛</span>
+        <img src={heroImg} alt="Lily the hero" />
+      </div>
+    )}
+  </section>
+
+  <section class="wrap">
+    <div class="section-title">
+      <span aria-hidden="true" style="font-size:1.8rem">📚</span>
+      <h2>Pick a story</h2>
+    </div>
+
+    <div class="shelf">
+      {stories.map((story) => {
+        const cover = coverFor(story);
+        return (
+          <a class="book" href={`${base}stories/${story.slug}/`} style={`--accent:${story.accent}`}>
+            {cover
+              ? <img class="cover" src={cover} alt={`Cover of ${story.title}`} />
+              : <div class="cover-emoji" style={`background:${story.accent}22`}>{story.emoji}</div>}
+            <div class="meta">
+              <h3>{story.emoji} {story.title}</h3>
+              <div class="by">by {story.author}</div>
+              {story.tagline && <p class="tag">{story.tagline}</p>}
+              <p class="tag">{story.scenes.length} pages · about {story.wordCount} words</p>
+              <span class="readpill">▶ Read along</span>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="section-title">
+      <span aria-hidden="true" style="font-size:1.8rem">✏️</span>
+      <h2>From Lily's sketchbook</h2>
+    </div>
+    {donePairs.length > 0 ? (
+      <div class="showcase">
+        {donePairs.map((p) => (
+          <figure class="ba">
+            <img src={p.sketchUrl} alt={`${p.name} sketch`} />
+            <span class="arrow" aria-hidden="true">➜</span>
+            <img src={p.illoUrl} alt={`${p.name} illustration`} />
+          </figure>
+        ))}
+      </div>
+    ) : (
+      <div class="showcase-teaser">
+        <div class="teaser-strip">
+          {sketches.map((c) => <img src={c.sketchUrl} alt={`${c.name} sketch`} />)}
+        </div>
+        <p class="tag">🎨 Colour versions are coming soon — Lily's sketches become bright illustrations next!</p>
+      </div>
+    )}
+  </section>
+
+  <section class="wrap center" style="margin:2rem 0 1rem">
+    <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Meet the characters</a>
+  </section>
+</Base>

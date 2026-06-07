@@ -1,0 +1,25 @@
+{
+  "name": "lilis-story-world",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lily's Story World — an illustrated, read-along storybook site built for a young dyslexic author.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host",
+    "astro": "astro",
+    "voices": "node scripts/generate-voices.mjs",
+    "voices:dry": "node scripts/generate-voices.mjs --dry",
+    "illustrate": "node scripts/illustrate.mjs",
+    "new-story": "node scripts/new-story.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.2.5",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "microsoft-cognitiveservices-speech-sdk": "^1.40.0"
+  }
+}

@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import Reader from '../../components/Reader.astro';
+import { getStories, getStory } from '../../lib/stories';
+
+export function getStaticPaths() {
+  return getStories().map((story) => ({ params: { slug: story.slug }, props: { story } }));
+}
+
+const { story } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title={`${story.title} · Lily's Story World`} active="story" description={story.tagline}>
+  <section class="wrap" style="margin-top:0.5rem">
+    <a class="btn btn-ghost" href={base}>◀ All stories</a>
+  </section>
+
+  <section style="margin-top:1rem">
+    <Reader story={story} />
+  </section>
+</Base>
