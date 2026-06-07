@@ -27,7 +27,10 @@ export function stripSceneNumber(t) {
   return String(t).replace(/^\s*(scene|chapter|part)\s*\d+\s*[—–:.\-]\s*/i, '').trim();
 }
 
-/** Split a story body (markdown) into scenes. Mirrors the rules in the README. */
+/** Split a story body (markdown) into scenes, each as an ORDERED list of blocks
+ *  (text paragraphs and images, in the order written). Images get a `anchor` =
+ *  the number of words before them, so the reader can reveal each picture as the
+ *  read-along passes that point. Mirrors the rules in the README. */
 export function parseScenes(body) {
   const lines = String(body).replace(/\r\n/g, '\n').split('\n');
   const scenes = [];
@@ -36,7 +39,7 @@ export function parseScenes(body) {
   const flush = () => {
     if (cur && cur.buf.length) {
       const para = cleanProse(cur.buf.join(' ')).replace(/\s+/g, ' ').trim();
-      if (para) cur.paras.push(para);
+      if (para) cur.blocks.push({ type: 'text', text: para });
       cur.buf = [];
     }
   };
@@ -46,13 +49,13 @@ export function parseScenes(body) {
     if (h) {
       flush();
       if (cur) scenes.push(cur);
-      cur = { title: h[1].trim(), image: null, alt: '', draw: [], paras: [], buf: [] };
+      cur = { title: h[1].trim(), draw: [], blocks: [], buf: [] };
       continue;
     }
     if (!cur) continue;
 
     const img = line.match(/^!\[(.*?)\]\((.*?)\)\s*$/);
-    if (img) { flush(); cur.image = img[2].trim(); cur.alt = img[1].trim(); continue; }
+    if (img) { flush(); cur.blocks.push({ type: 'image', src: img[2].trim(), alt: img[1].trim() }); continue; }
 
     const bq = line.match(/^>\s?(.*)$/);
     if (bq) { flush(); cur.draw.push(cleanProse(bq[1])); continue; }
@@ -63,15 +66,30 @@ export function parseScenes(body) {
   flush();
   if (cur) scenes.push(cur);
 
-  return scenes.map((s, i) => ({
-    n: i + 1,
-    title: stripSceneNumber(s.title) || s.title,
-    rawTitle: s.title,
-    image: s.image,
-    alt: s.alt || stripSceneNumber(s.title) || s.title,
-    draw: s.draw.join(' ').trim(),
-    text: s.paras.join('\n\n'),
-  }));
+  return scenes.map((s, i) => {
+    let words = 0;
+    const blocks = s.blocks.map((b) => {
+      if (b.type === 'text') {
+        const out = { type: 'text', text: b.text };
+        words += b.text.trim() ? b.text.trim().split(/\s+/).length : 0;
+        return out;
+      }
+      return { type: 'image', src: b.src, alt: b.alt, anchor: words };
+    });
+    const text = blocks.filter((b) => b.type === 'text').map((b) => b.text).join('\n\n');
+    // a leading image (before any text) is the scene's "establishing" picture
+    const lead = blocks[0] && blocks[0].type === 'image' ? blocks[0] : null;
+    return {
+      n: i + 1,
+      title: stripSceneNumber(s.title) || s.title,
+      rawTitle: s.title,
+      image: lead ? lead.src : null,
+      alt: lead ? lead.alt : (stripSceneNumber(s.title) || s.title),
+      draw: s.draw.join(' ').trim(),
+      text,
+      blocks,
+    };
+  });
 }
 
 /** Break text into tokens. Word tokens carry their character start/end so the

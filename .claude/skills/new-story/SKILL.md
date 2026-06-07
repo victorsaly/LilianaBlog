@@ -28,8 +28,17 @@ overwrite an existing story.)
 Edit the new file and replace the placeholder scenes. Follow the house style of
 the existing `the-great-potato-adventure.md`:
 - One `## Scene N — Title` per page (6–8 pages).
-- Under each, a `> Draw this: ...` hint describing the picture for that page.
+- Under each, a `> Draw this: ...` hint describing the BIG top picture for that page.
 - Then the prose.
+- **Inline pictures (as many as needed):** place `![...](...)` lines *between
+  paragraphs, right where they explain the words*. They reveal one-by-one as the
+  read-along passes them. Three ways:
+  - reuse existing art: `![Lily](/art/illustrations/lily.png)`
+  - a saved file: `![the cave](my-cave.png)` (in `public/art/scenes/`)
+  - auto-generate: `![a tall purple castle at night](auto)` then run
+    `npm run illustrate -- --scenes <slug>` (rewrites `(auto)` to the new file).
+  Keep words identical if you add images to a story that already has audio — the
+  highlighting stays in sync as long as the words don't change.
 
 **Write it dyslexia-friendly and age-9:**
 - Short, clear sentences. Simple, warm vocabulary. One idea per sentence.

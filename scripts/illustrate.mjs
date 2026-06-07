@@ -20,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
 import matter from 'gray-matter';
-import { CHARACTERS, buildPrompt, buildScenePrompt } from '../art-style.mjs';
+import { CHARACTERS, buildPrompt, buildScenePrompt, SCENE_STYLE } from '../art-style.mjs';
 import { parseScenes } from '../src/lib/parse.js';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -142,34 +142,62 @@ function refsForScene(text) {
   return refs.slice(0, 4); // keep the reference set focused
 }
 
+function sceneExists(outDir, n) {
+  return ['png', 'webp', 'jpg', 'jpeg'].some((e) => fs.existsSync(path.join(outDir, `scene-${n}.${e}`)));
+}
+
 async function generateScenes(slug) {
   const file = path.join(ROOT, 'src', 'stories', `${slug}.md`);
   if (!fs.existsSync(file)) { console.log(`⚠️  no story at src/stories/${slug}.md`); return; }
-  const { content } = matter(fs.readFileSync(file, 'utf8'));
+  let md = fs.readFileSync(file, 'utf8');
+  const { content } = matter(md);
   const scenes = parseScenes(content);
   const outDir = path.join(ROOT, 'public', 'art', 'scenes', slug);
   fs.mkdirSync(outDir, { recursive: true });
 
-  console.log(`🎬 ${slug} — ${scenes.length} scene pictures`);
+  console.log(`🎬 ${slug} — ${scenes.length} pages`);
   for (const scene of scenes) {
-    const prompt = buildScenePrompt(scene.title, scene.draw);
     const refs = refsForScene(scene.text);
-    if (flags.promptOnly || !KEY) {
-      console.log(`\n=== scene ${scene.n}: ${scene.title} ===`);
-      if (refs.length) console.log(`Refs: ${refs.map((r) => path.basename(r)).join(', ')}`);
-      console.log(prompt);
-      console.log(`Save as: public/art/scenes/${slug}/scene-${scene.n}.png`);
-      continue;
+
+    // 1) establishing scene picture (skip if one already exists)
+    if (!sceneExists(outDir, scene.n)) {
+      const prompt = buildScenePrompt(scene.title, scene.draw);
+      if (flags.promptOnly || !KEY) {
+        console.log(`\n=== scene ${scene.n} (top): ${scene.title} ===\n${prompt}\nSave as: public/art/scenes/${slug}/scene-${scene.n}.png`);
+      } else {
+        process.stdout.write(`🎬 scene ${scene.n} top … `);
+        try {
+          const png = await callGemini(prompt, refs);
+          fs.writeFileSync(path.join(outDir, `scene-${scene.n}.png`), png);
+          console.log(`✅ ${(png.length / 1024).toFixed(0)} KB`);
+        } catch (err) { console.log(`❌ ${err.message}`); }
+      }
     }
-    process.stdout.write(`🎬 scene ${scene.n} … `);
-    try {
-      const png = await callGemini(prompt, refs);
-      const outPath = path.join(outDir, `scene-${scene.n}.png`);
-      fs.writeFileSync(outPath, png);
-      console.log(`✅ ${(png.length / 1024).toFixed(0)} KB → scene-${scene.n}.png (refs: ${refs.length})`);
-    } catch (err) {
-      console.log(`❌ ${err.message}`);
+
+    // 2) inline images written as ![description](auto) — generate from the
+    //    description, save, and rewrite the markdown to point at the new file.
+    const autos = scene.blocks.filter((b) => b.type === 'image' && b.src === 'auto');
+    let k = 0;
+    for (const b of autos) {
+      k++;
+      const prompt = `${b.alt}\n\n${SCENE_STYLE}`;
+      const rel = `/art/scenes/${slug}/scene-${scene.n}-illo-${k}.png`;
+      if (flags.promptOnly || !KEY) {
+        console.log(`\n=== scene ${scene.n} inline ${k} ===\n${prompt}\nSave as: public${rel}`);
+        continue;
+      }
+      process.stdout.write(`   🖼️  scene ${scene.n} inline ${k} … `);
+      try {
+        const png = await callGemini(prompt, refs);
+        fs.writeFileSync(path.join(ROOT, 'public', rel), png);
+        md = md.replace('](auto)', `](${rel})`); // first remaining auto = this one (document order)
+        console.log(`✅ ${(png.length / 1024).toFixed(0)} KB → ${rel}`);
+      } catch (err) { console.log(`❌ ${err.message}`); }
     }
+  }
+
+  if (!flags.promptOnly && KEY) {
+    fs.writeFileSync(file, md); // persist the (auto) -> real-path rewrites
   }
 }
 

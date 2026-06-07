@@ -1,3 +1,7 @@
+export type Block =
+  | { type: 'text'; text: string }
+  | { type: 'image'; src: string; alt: string; anchor: number };
+
 export interface ParsedScene {
   n: number;
   title: string;
@@ -6,6 +10,7 @@ export interface ParsedScene {
   alt: string;
   draw: string;
   text: string;
+  blocks: Block[];
 }
 
 export interface Token {

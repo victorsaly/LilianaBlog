@@ -66,6 +66,18 @@ Give the user the prompt and tell them: paste it into **Google Gemini
   "match the style of the other characters" — the shared STYLE block handles most
   of this automatically.
 
+## Step 3b — inline scene pictures (optional)
+A story page can have **many** pictures that reveal as the words are read. In the
+story markdown, write `![a description of the picture](auto)` between paragraphs,
+then generate them all:
+```bash
+npm run illustrate -- --scenes <story-slug>
+```
+This generates each `(auto)` image from its description (matching the blog
+style), saves it under `public/art/scenes/<slug>/`, and rewrites the markdown to
+point at the new file. It also makes the big top picture for any page that
+doesn't have one yet.
+
 ## Step 4 — show it on the site
 The Characters page and the home "sketchbook" showcase pick up
 `public/art/illustrations/<id>.png` automatically, and the story cover upgrades

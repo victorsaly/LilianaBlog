@@ -9,27 +9,19 @@ const { story } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const total = story.scenes.length;
 
-// Auto-detect pre-generated studio audio for each scene (made with `npm run
-// voices`). If present we play it; if not, the reader uses free browser voices.
+// Pre-generated studio audio per scene (npm run voices).
 const audioDir = path.join(process.cwd(), 'public', 'audio', story.slug);
 function sceneAudio(n: number): { audio: string; timings: string } | null {
-  if (
-    fs.existsSync(path.join(audioDir, `scene-${n}.mp3`)) &&
-    fs.existsSync(path.join(audioDir, `scene-${n}.json`))
-  ) {
-    return {
-      audio: `${base}audio/${story.slug}/scene-${n}.mp3`,
-      timings: `${base}audio/${story.slug}/scene-${n}.json`,
-    };
+  if (fs.existsSync(path.join(audioDir, `scene-${n}.mp3`)) && fs.existsSync(path.join(audioDir, `scene-${n}.json`))) {
+    return { audio: `${base}audio/${story.slug}/scene-${n}.mp3`, timings: `${base}audio/${story.slug}/scene-${n}.json` };
   }
   return null;
 }
-const hasAnyAudio = story.scenes.some((s) => sceneAudio(s.n));
 
-// Scene picture: use the one from the story file if given, otherwise
-// auto-detect a generated one in public/art/scenes/<slug>/scene-<n>.<ext>.
+// Establishing (top) picture: the scene's leading image, else an auto-detected
+// generated scene picture in public/art/scenes/<slug>/scene-<n>.<ext>.
 const sceneArtDir = path.join(process.cwd(), 'public', 'art', 'scenes', story.slug);
-function sceneImg(scene: (typeof story.scenes)[number]): string | null {
+function topImage(scene: (typeof story.scenes)[number]): string | null {
   if (scene.image) return artUrl(scene.image, 'scene', base);
   for (const ext of ['png', 'webp', 'jpg', 'jpeg']) {
     if (fs.existsSync(path.join(sceneArtDir, `scene-${scene.n}.${ext}`))) {
@@ -37,6 +29,18 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     }
   }
   return null;
+}
+
+// The interleaved flow: text paragraphs + inline images, in order. We drop the
+// leading establishing image (it's shown on top) so it isn't duplicated.
+function flowFor(scene: (typeof story.scenes)[number]) {
+  const blocks = scene.blocks.slice();
+  if (blocks[0] && blocks[0].type === 'image') blocks.shift();
+  return blocks.map((b) =>
+    b.type === 'text'
+      ? { type: 'text' as const, text: b.text }
+      : { type: 'image' as const, src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor }
+  );
 }
 ---
 
@@ -50,8 +54,9 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
 
   <div class="page">
     {story.scenes.map((scene) => {
-      const img = sceneImg(scene);
+      const img = topImage(scene);
       const a = sceneAudio(scene.n);
+      const flow = flowFor(scene);
       return (
         <article class="scene" data-scene={scene.n} data-audio={a?.audio} data-timings={a?.timings} hidden={scene.n !== 1}>
           {img ? (
@@ -67,7 +72,17 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
           )}
           <div class="page-body">
             <h2 class="page-scene-title">{scene.title}</h2>
-            <div class="page-text">{scene.text}</div>
+            <div class="page-flow">
+              {flow.map((item) =>
+                item.type === 'text' ? (
+                  <p class="page-text">{item.text}</p>
+                ) : (
+                  <figure class="scene-illo" data-anchor={item.anchor}>
+                    <img src={item.src} alt={item.alt} loading="lazy" />
+                  </figure>
+                )
+              )}
+            </div>
           </div>
         </article>
       );
@@ -99,14 +114,9 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
 <script>
   import { tokenize, makeChunks } from '../lib/parse.js';
 
-  // ----------------------------------------------------------------------
-  // Read-along engine with TWO ways to read:
-  //   1. STUDIO AUDIO  — plays a pre-generated mp3 (per-character voices) and
-  //      highlights each word using a word-timing file. Best quality.
-  //   2. BROWSER VOICE — if a page has no audio yet, the browser reads it aloud
-  //      (free, no setup) and highlights using word-boundary events.
-  // Either way: tap a word to hear it, big buttons, auto-advance, speed slider.
-  // ----------------------------------------------------------------------
+  // Read-along engine: studio audio (mp3 + word timings) when available, else
+  // free browser voices. Words highlight in time, and inline scene pictures
+  // reveal as the reading passes them. Tap a word to hear it.
   const root = document.getElementById('reader');
   if (root) {
     const ttsSupport = 'speechSynthesis' in window;
@@ -123,54 +133,68 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     const autoplayBox = document.getElementById('autoplay') as HTMLInputElement;
     const speedQuick = document.getElementById('speed-quick') as HTMLInputElement;
     const sceneNow = document.getElementById('scene-now') as HTMLElement;
+    const progressFill = document.getElementById('scene-progress-fill') as HTMLElement | null;
 
     interface Word { start: number; end: number; el: HTMLElement; }
+    interface Illo { anchor: number; el: HTMLElement; }
     interface SceneData {
-      words: Word[]; textEl: HTMLElement;
+      el: HTMLElement; words: Word[]; textEls: HTMLElement[]; fullText: string; illos: Illo[];
       audioUrl: string; timingsUrl: string; starts: (number | null)[] | null;
     }
     const scenes: SceneData[] = [];
 
-    // Build tappable word spans for every page from the shared tokenizer.
+    // Build word spans across all text blocks of a scene, with GLOBAL char
+    // offsets (so browser-voice boundaries map correctly) and global order (so
+    // audio word-timings line up).
     sceneEls.forEach((el) => {
-      const textEl = el.querySelector('.page-text') as HTMLElement;
-      const tokens = tokenize(textEl.textContent || '');
-      textEl.textContent = '';
+      const textEls = Array.from(el.querySelectorAll('.page-text')) as HTMLElement[];
       const words: Word[] = [];
-      for (const t of tokens) {
-        if (t.isWord) {
-          const span = document.createElement('span');
-          span.className = 'w';
-          span.textContent = t.text;
-          words.push({ start: t.start, end: t.end, el: span });
-          textEl.appendChild(span);
-        } else {
-          textEl.appendChild(document.createTextNode(t.text));
+      let fullText = '';
+      let cursor = 0;
+      textEls.forEach((tEl, bi) => {
+        const raw = tEl.textContent || '';
+        if (bi > 0) { fullText += '\n\n'; cursor += 2; }
+        const tokens = tokenize(raw);
+        tEl.textContent = '';
+        for (const t of tokens) {
+          if (t.isWord) {
+            const span = document.createElement('span');
+            span.className = 'w';
+            span.textContent = t.text;
+            words.push({ start: cursor + t.start, end: cursor + t.end, el: span });
+            tEl.appendChild(span);
+          } else {
+            tEl.appendChild(document.createTextNode(t.text));
+          }
         }
-      }
-      const data: SceneData = {
-        words, textEl,
+        fullText += raw;
+        cursor += raw.length;
+        tEl.addEventListener('click', (e) => {
+          const target = (e.target as HTMLElement).closest('.w') as HTMLElement | null;
+          if (!target || playing) return;
+          speakWord(target);
+        });
+      });
+      const illos: Illo[] = Array.from(el.querySelectorAll('.scene-illo')).map((node) => ({
+        anchor: parseInt((node as HTMLElement).dataset.anchor || '0', 10),
+        el: node as HTMLElement,
+      }));
+      scenes.push({
+        el, words, textEls, fullText, illos,
         audioUrl: el.dataset.audio || '', timingsUrl: el.dataset.timings || '', starts: null,
-      };
-      scenes.push(data);
-      textEl.addEventListener('click', (e) => {
-        const target = (e.target as HTMLElement).closest('.w') as HTMLElement | null;
-        if (!target || playing) return;
-        speakWord(target);
       });
     });
 
     const anyAudio = scenes.some((s) => s.audioUrl);
     const canRead = anyAudio || ttsSupport;
 
-    // ---- shared state ----
+    // ---- state ----
     let current = 0;
     let playing = false;
     let paused = false;
     let mode: 'audio' | 'tts' = 'tts';
     let lastNow = -1;
     let rafId: number | null = null;
-    // tts-only
     let chunks: { text: string; start: number }[] = [];
     let chunkIdx = 0;
     let usedBoundary = false;
@@ -187,13 +211,15 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       const voices = synth.getVoices();
       if (uri) { const v = voices.find((v) => v.voiceURI === uri); if (v) return v; }
       const en = voices.filter((v) => /^en/i.test(v.lang));
-      const nice = en.find((v) => /natural|samantha|google uk english female|google us english|libby|aria|jenny|sonia/i.test(v.name));
-      return nice || en[0] || voices[0] || null;
+      return en.find((v) => /natural|samantha|google uk english female|google us english|libby|aria|jenny|sonia/i.test(v.name)) || en[0] || voices[0] || null;
     }
 
-    // ---- highlighting ----
+    // ---- highlight + reveal ----
+    function revealIllos(s: SceneData, idx: number) {
+      for (const im of s.illos) if (im.anchor <= idx && !im.el.classList.contains('seen')) im.el.classList.add('seen');
+    }
     function paint(s: SceneData, nowIdx: number) {
-      if (nowIdx === lastNow || nowIdx < 0) return;
+      if (nowIdx < 0 || nowIdx === lastNow) { revealIllos(s, nowIdx); return; }
       const ws = s.words;
       if (nowIdx > lastNow) {
         for (let i = Math.max(lastNow, 0); i < nowIdx; i++) { ws[i].el.classList.add('read'); ws[i].el.classList.remove('now'); }
@@ -203,47 +229,43 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       }
       if (ws[nowIdx]) { ws[nowIdx].el.classList.add('now'); ws[nowIdx].el.classList.remove('read'); ensureVisible(ws[nowIdx].el); }
       lastNow = nowIdx;
+      revealIllos(s, nowIdx);
     }
     function clearPaint(s: SceneData) { s.words.forEach((w) => w.el.classList.remove('now', 'read')); lastNow = -1; }
     function paintAllRead(s: SceneData) { s.words.forEach((w) => { w.el.classList.add('read'); w.el.classList.remove('now'); }); lastNow = s.words.length - 1; }
     function findWord(words: Word[], idx: number): number {
       let lo = 0, hi = words.length - 1;
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1, w = words[mid];
-        if (idx < w.start) hi = mid - 1;
-        else if (idx >= w.end) lo = mid + 1;
-        else return mid;
-      }
+      while (lo <= hi) { const mid = (lo + hi) >> 1, w = words[mid]; if (idx < w.start) hi = mid - 1; else if (idx >= w.end) lo = mid + 1; else return mid; }
       return Math.min(lo, words.length - 1);
     }
     function ensureVisible(el: HTMLElement) {
       const r = el.getBoundingClientRect();
-      const margin = 130;
-      if (r.top < margin || r.bottom > window.innerHeight - margin) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (r.top < 130 || r.bottom > window.innerHeight - 130) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
     function cancelRaf() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
     function stopFallback() { if (fallback !== null) { clearTimeout(fallback); fallback = null; } }
 
-    // ---- UI ----
-    function setPlayingUI(state: 'play' | 'pause' | 'idle') {
-      const tEl = scenes[current].textEl;
-      if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); tEl.classList.add('is-playing'); }
-      else if (state === 'pause') { playBtn.textContent = '▶ Continue'; playBtn.classList.remove('is-playing'); tEl.classList.remove('is-playing'); }
-      else { playBtn.textContent = '▶ Read to me'; playBtn.classList.remove('is-playing'); tEl.classList.remove('is-playing'); }
+    // reveal/dim helpers
+    function dim(s: SceneData, on: boolean) { s.textEls.forEach((t) => t.classList.toggle('is-playing', on)); }
+    function revealMode(s: SceneData, on: boolean) { s.el.classList.toggle('revealing', on); }
+    function revealAll(s: SceneData) { s.illos.forEach((im) => im.el.classList.add('seen')); }
+    function resetIllos(s: SceneData) { s.illos.forEach((im) => im.el.classList.remove('seen')); }
+
+    function setBtn(state: 'play' | 'pause' | 'idle') {
+      if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); }
+      else if (state === 'pause') { playBtn.textContent = '▶ Continue'; playBtn.classList.remove('is-playing'); }
+      else { playBtn.textContent = '▶ Read to me'; playBtn.classList.remove('is-playing'); }
     }
 
     // ============================ STUDIO AUDIO ============================
     async function playAudio(s: SceneData) {
       mode = 'audio';
-      if (!s.starts) {
-        try { const r = await fetch(s.timingsUrl); const j = await r.json(); s.starts = (j && j.starts) || []; }
-        catch { s.starts = []; }
-      }
+      if (!s.starts) { try { const r = await fetch(s.timingsUrl); const j = await r.json(); s.starts = (j && j.starts) || []; } catch { s.starts = []; } }
       audio.src = s.audioUrl;
       audio.playbackRate = clampRate(settings().rate);
       audio.onended = () => { if (playing) finishScene(); };
-      audio.onerror = () => { if (ttsSupport) { playTts(s); } else { stop(); } };
-      try { await audio.play(); } catch { /* gesture/autoplay issues */ }
+      audio.onerror = () => { if (ttsSupport) playTts(s); else stop(); };
+      try { await audio.play(); } catch { /* gesture/autoplay */ }
       runAudioHighlight(s);
     }
     function runAudioHighlight(s: SceneData) {
@@ -253,13 +275,8 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       const tick = () => {
         if (!playing || mode !== 'audio') return;
         const ms = audio.currentTime * 1000;
-        let target = ptr;
-        let j = ptr + 1;
-        while (j < starts.length) {
-          const v = starts[j];
-          if (v == null) { j++; continue; }
-          if (v <= ms) { target = j; j++; } else break;
-        }
+        let target = ptr, j = ptr + 1;
+        while (j < starts.length) { const v = starts[j]; if (v == null) { j++; continue; } if (v <= ms) { target = j; j++; } else break; }
         if (target !== ptr && target >= 0) { ptr = target; paint(s, target); }
         rafId = requestAnimationFrame(tick);
       };
@@ -270,8 +287,7 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     function playTts(s: SceneData) {
       mode = 'tts';
       if (!synth) { stop(); return; }
-      chunks = makeChunks(s.textEl.textContent || '');
-      chunkIdx = 0; usedBoundary = false;
+      chunks = makeChunks(s.fullText); chunkIdx = 0; usedBoundary = false;
       speakChunk(s);
     }
     function speakChunk(s: SceneData) {
@@ -300,8 +316,7 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       const step = () => {
         if (!playing || mode !== 'tts' || usedBoundary || i >= s.words.length) return;
         paint(s, i);
-        const w = s.words[i].el.textContent || '';
-        i++;
+        const w = s.words[i].el.textContent || ''; i++;
         fallback = window.setTimeout(step, Math.max(170, w.length * 55 + 90) / rate);
       };
       step();
@@ -311,18 +326,18 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     function startScene(idx: number) {
       stop();
       current = idx; showScene(idx);
-      const s = scenes[idx]; clearPaint(s);
-      if (!canRead) return;
-      playing = true; paused = false; setPlayingUI('play');
-      if (s.audioUrl) playAudio(s);
-      else if (ttsSupport) playTts(s);
-      else { playing = false; setPlayingUI('idle'); }
+      const s = scenes[idx];
+      clearPaint(s); resetIllos(s);
+      if (!canRead) { revealAll(s); return; }
+      playing = true; paused = false; setBtn('play'); dim(s, true); revealMode(s, true);
+      if (s.audioUrl) playAudio(s); else if (ttsSupport) playTts(s); else { playing = false; setBtn('idle'); revealAll(s); }
     }
     function finishScene() {
       stopFallback(); cancelRaf();
       playing = false; paused = false;
-      paintAllRead(scenes[current]);
-      setPlayingUI('idle');
+      const s = scenes[current];
+      paintAllRead(s); dim(s, false); revealMode(s, false); revealAll(s);
+      setBtn('idle');
       if (autoplayBox.checked && current < total - 1) window.setTimeout(() => startScene(current + 1), 550);
     }
     function stop() {
@@ -330,17 +345,14 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       playing = false; paused = false;
       if (synth) synth.cancel();
       audio.pause();
-      setPlayingUI('idle');
+      const s = scenes[current];
+      if (s) { dim(s, false); revealMode(s, false); revealAll(s); }
+      setBtn('idle');
     }
-    function pause() {
-      if (!playing) return;
-      if (mode === 'audio') audio.pause();
-      else if (synth) synth.pause();
-      playing = false; paused = true; setPlayingUI('pause');
-    }
+    function pause() { if (!playing) return; if (mode === 'audio') audio.pause(); else if (synth) synth.pause(); playing = false; paused = true; setBtn('pause'); dim(scenes[current], false); }
     function resume() {
       if (!paused) return;
-      playing = true; paused = false; setPlayingUI('play');
+      playing = true; paused = false; setBtn('play'); dim(scenes[current], true);
       if (mode === 'audio') { audio.play().catch(() => {}); runAudioHighlight(scenes[current]); }
       else if (synth) synth.resume();
     }
@@ -361,7 +373,6 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     }
 
     // ---- navigation ----
-    const progressFill = document.getElementById('scene-progress-fill') as HTMLElement | null;
     function showScene(idx: number) {
       sceneEls.forEach((el, i) => { el.hidden = i !== idx; });
       sceneNow.textContent = String(idx + 1);
@@ -375,17 +386,12 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       stop();
       current = idx;
       if (wasPlaying && canRead) startScene(idx);
-      else { showScene(idx); clearPaint(scenes[idx]); }
+      else { showScene(idx); clearPaint(scenes[idx]); revealMode(scenes[idx], false); revealAll(scenes[idx]); }
       root!.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 
     // ---- buttons ----
-    playBtn.addEventListener('click', () => {
-      if (!canRead) return;
-      if (playing) pause();
-      else if (paused) resume();
-      else startScene(current);
-    });
+    playBtn.addEventListener('click', () => { if (!canRead) return; if (playing) pause(); else if (paused) resume(); else startScene(current); });
     restartBtn.addEventListener('click', () => { if (canRead) startScene(current); });
     prevBtn.addEventListener('click', () => goTo(current - 1));
     nextBtn.addEventListener('click', () => goTo(current + 1));
@@ -400,22 +406,17 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     // ---- autoplay + speed ----
     autoplayBox.checked = localStorage.getItem('lili-autoplay') !== 'off';
     autoplayBox.addEventListener('change', () => localStorage.setItem('lili-autoplay', autoplayBox.checked ? 'on' : 'off'));
-
     function syncSpeed() { speedQuick.value = String(settings().rate || 0.9); }
     speedQuick.addEventListener('input', () => {
-      const cur = settings();
-      cur.rate = parseFloat(speedQuick.value);
+      const cur = settings(); cur.rate = parseFloat(speedQuick.value);
       localStorage.setItem('lili-reading-v1', JSON.stringify(cur));
       if (mode === 'audio') audio.playbackRate = clampRate(cur.rate);
       document.dispatchEvent(new CustomEvent('lili:reading-change', { detail: cur }));
     });
-    document.addEventListener('lili:reading-change', () => {
-      syncSpeed();
-      if (mode === 'audio') audio.playbackRate = clampRate(settings().rate);
-    });
+    document.addEventListener('lili:reading-change', () => { syncSpeed(); if (mode === 'audio') audio.playbackRate = clampRate(settings().rate); });
     syncSpeed();
 
-    // ---- availability messaging ----
+    // ---- availability ----
     if (!canRead) {
       document.getElementById('no-speech')?.removeAttribute('hidden');
       document.getElementById('tap-hint')?.setAttribute('hidden', '');
@@ -426,6 +427,7 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
     if (synth) synth.onvoiceschanged = () => {};
 
     showScene(0);
+    if (scenes[0]) revealAll(scenes[0]);
     window.addEventListener('pagehide', () => { if (synth) synth.cancel(); audio.pause(); });
   }
 </script>

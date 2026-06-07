@@ -21,7 +21,21 @@ order: 1
 ## Scene 1 — A Normal Morning (That Wasn't)
 > Draw this: the cosy house with Lily, Leo, Mum, Dad, Pip and Blaze. (The headphones quietly switch to silent mode.)
 
-It looked like a totally ordinary morning. Lily, who was nine, sat curled up with her Nintendo, big headphones over her ears. Her twelve-year-old brother Leo was at his computer, building towers in Minecraft. Mum was in the kitchen flipping breakfast, and Dad was in the office, busy with work. Pip the hedgehog snoozed under the table, and Blaze the parrot dozed on his perch.
+It looked like a totally ordinary morning.
+
+Lily, who was nine, sat curled up with her Nintendo, big headphones over her ears.
+![Lily](/art/illustrations/lily.png)
+
+Her twelve-year-old brother Leo was at his computer, building towers in Minecraft.
+![Leo](/art/illustrations/leo.png)
+
+Mum was in the kitchen flipping breakfast, and Dad was in the office, busy with work.
+![Mum](/art/illustrations/mum.png)
+![Dad](/art/illustrations/dad.png)
+
+Pip the hedgehog snoozed under the table, and Blaze the parrot dozed on his perch.
+![Pip](/art/illustrations/pip.png)
+![Blaze](/art/illustrations/blaze.png)
 
 But the morning was NOT ordinary. Lily didn't know it yet, but someone had quietly switched her headphones to silent mode — which is why she couldn't hear a single thing Mum was saying.
 
@@ -66,12 +80,16 @@ Lily and Leo were still arguing — they didn't even notice the world had change
 And then their clothes began to change — and so did something deeper inside them. Each of them had a power.
 
 Dad stamped his foot and the ground rumbled — he had Earth power, and his tie became a cape, his coffee mug glowing.
+![Dad's Earth power](/art/illustrations/dad.png)
 
 Mum lifted her hand and the air swirled — she had Wind power, with a golden battle-cloak and a frying-pan shield.
+![Mum's Wind power](/art/illustrations/mum.png)
 
 Leo clenched his fists and sparks crackled — he had Fire power, in blocky diamond-blue armour with a pickaxe that could break anything.
+![Leo's Fire power](/art/illustrations/leo.png)
 
 But Lily? Lily got her glowing silver armour and her stylus-sword... and when she tried to feel her power — nothing happened. She felt scared. "Why don't I have a power?" she whispered.
+![Lily](/art/illustrations/lily.png)
 
 Even the pets had been pulled in! Pip the hedgehog could now curl into a super-fast spiky speed-ball, and Blaze the parrot burst into bright flame-coloured feathers that lit up the dark and shot little sparks.
 

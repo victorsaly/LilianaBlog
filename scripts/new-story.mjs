@@ -62,8 +62,13 @@ order: ${order}
 <!--
   Hi Lily! 💛  This is a brand-new story.
   • Each "## Scene" is one page of the book.
-  • Add a picture:   ![what it shows](my-picture.png)   (save it in public/art/scenes/)
-  • The "> Draw this" line reminds you what to draw.
+  • Put a picture RIGHT WHERE it belongs in the words. As many as you like!
+      - Use a picture we already have:  ![Lily](/art/illustrations/lily.png)
+      - Use a new picture you saved:    ![what it shows](my-picture.png)
+      - Or let the computer draw it:     ![a tall purple castle at night](auto)
+        then run:  npm run illustrate -- --scenes ${slug}
+    Pictures placed after some words "pop in" as the reading reaches them.
+  • The "> Draw this" line is the big picture for the top of the page.
   • Everything else is the words that get read out loud.
   When you're done: run  npm run voices  for narration.
 -->
@@ -72,6 +77,7 @@ order: ${order}
 > Draw this: where the story starts.
 
 Write the first page of your story here. Keep the sentences nice and short and clear.
+![a friendly picture for this moment](auto)
 
 ## Scene 2 — Something Happens
 > Draw this: the exciting bit!

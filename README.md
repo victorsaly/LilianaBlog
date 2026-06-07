@@ -116,10 +116,21 @@ idea). Then fill in the scenes. Manual steps:
 
    **The rules are simple:**
    - Each `## Scene` heading = one page of the book.
-   - An optional `![what it shows](picture.png)` line adds the picture.
-   - An optional `> Draw this: ...` line is just a reminder of what to draw
-     (shown on the page until the real picture is added).
+   - An optional `> Draw this: ...` line is the BIG picture at the top of the page
+     (and a reminder of what to draw until the real one is added).
    - Everything else is the story words that get read out loud.
+
+   **Inline pictures (as many as you like):** put `![...](...)` lines *between
+   paragraphs, right where they explain the words*. Each one **reveals as the
+   read-along reaches it** — so pictures pop in as the story is read. Three ways:
+   - reuse art we already have: `![Lily](/art/illustrations/lily.png)`
+   - a file you saved in `public/art/scenes/`: `![the cave](cave.png)`
+   - **auto-generate it:** `![a tall purple castle at night](auto)` then run
+     `npm run illustrate -- --scenes <story-slug>` — it draws each `(auto)`
+     picture (in the blog's style), saves it, and updates the story file.
+
+   > Adding pictures never changes the words, so a story's narration stays in
+   > perfect sync even after you add lots of illustrations.
 
 3. Save — the story appears on the bookshelf automatically. 🎉
 

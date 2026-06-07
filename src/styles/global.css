@@ -312,6 +312,14 @@ html[data-calm='on'] .page-text.is-playing .w { color: color-mix(in srgb, var(--
 html[data-calm='on'] .page-text.is-playing .w.read { color: color-mix(in srgb, var(--hl-read) 70%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 
+/* inline scene pictures that reveal as the read-along passes them */
+.page-flow { display: flex; flex-direction: column; }
+.scene-illo { margin: var(--space-5) auto; text-align: center; transition: opacity 0.5s ease, transform 0.5s ease; max-width: 100%; }
+.scene-illo img { display: inline-block; max-height: 260px; width: auto; max-width: 100%; border-radius: 16px; filter: drop-shadow(0 12px 16px rgba(43, 37, 51, 0.2)); }
+.scene-illo figcaption { color: var(--ink-soft); font-size: var(--text-sm); margin-top: var(--space-1); }
+/* only hidden while a scene is actively being read aloud */
+.scene.revealing .scene-illo:not(.seen) { opacity: 0; transform: translateY(16px) scale(0.96); }
+
 /* ---- Reader controls -------------------------------------------------- */
 .reader-controls {
   display: flex; align-items: center; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
