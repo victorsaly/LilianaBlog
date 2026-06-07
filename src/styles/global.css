@@ -343,6 +343,15 @@ html[data-calm='on'] .page-text.is-playing .w { color: color-mix(in srgb, var(--
 html[data-calm='on'] .page-text.is-playing .w.read { color: color-mix(in srgb, var(--hl-read) 70%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 
+/* speaker portrait shown beside a spoken line (instead of relying on "X said") */
+.say { display: flex; align-items: flex-start; gap: 0.6rem; margin: 1em 0; }
+.say .page-text { flex: 1; min-width: 0; margin: 0; }
+.speaker-pip {
+  flex: none; width: 46px; height: 46px; border-radius: 50%;
+  object-fit: cover; object-position: top center; background: #fff;
+  border: 2px solid #fff; box-shadow: var(--shadow-sm); margin-top: 0.15rem;
+}
+
 /* =========================================================================
    Scene "slide": a text-only column + a STAGE picture that swaps as the
    reading passes each point. Desktop = side-by-side; mobile = picture above,

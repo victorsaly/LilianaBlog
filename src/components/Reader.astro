@@ -3,11 +3,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Story } from '../lib/stories';
 import { artUrl } from '../lib/stories';
+import { segmentScene } from '../lib/parse.js';
 
 interface Props { story: Story; }
 const { story } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const total = story.scenes.length;
+
+// Who speaks a paragraph (for the little speaker portrait)? Reuse the same
+// speaker detection the voices use; map the speaker id to its illustration.
+const illoDir = path.join(process.cwd(), 'public', 'art', 'illustrations');
+function portraitFor(paraText: string): { speaker: string; src: string } | null {
+  const seg = (segmentScene(paraText) as any[]).find((s) => s.speaker && s.speaker !== 'narrator' && s.speaker !== 'unknown');
+  if (!seg || !fs.existsSync(path.join(illoDir, `${seg.speaker}.png`))) return null;
+  return { speaker: seg.speaker, src: `${base}art/illustrations/${seg.speaker}.png` };
+}
 
 // Generated sound effects + ambience (npm run sfx) — names without .mp3.
 const sfxDir = path.join(process.cwd(), 'public', 'audio', 'sfx');
@@ -59,7 +69,11 @@ function perParagraphStage(scene: (typeof story.scenes)[number]) {
 }
 
 function view(scene: (typeof story.scenes)[number]) {
-  const text = scene.blocks.filter((b) => b.type === 'text').map((b) => (b as any).text as string);
+  const text = scene.blocks.filter((b) => b.type === 'text').map((b) => {
+    const t = (b as any).text as string;
+    const p = portraitFor(t);
+    return { text: t, portrait: p?.src || null, speaker: p?.speaker || null };
+  });
 
   // prefer per-paragraph pictures if they exist
   const pp = perParagraphStage(scene);
@@ -112,7 +126,14 @@ function view(scene: (typeof story.scenes)[number]) {
           <div class="page-body">
             <h2 class="page-scene-title">{scene.title}</h2>
             <div class="page-flow">
-              {text.map((t) => <p class="page-text">{t}</p>)}
+              {text.map((t) => (
+                t.portrait ? (
+                  <div class="say">
+                    <img class="speaker-pip" src={t.portrait} alt={t.speaker} loading="lazy" />
+                    <p class="page-text">{t.text}</p>
+                  </div>
+                ) : <p class="page-text">{t.text}</p>
+              ))}
             </div>
           </div>
         </article>
