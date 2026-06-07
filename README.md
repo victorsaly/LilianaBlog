@@ -192,6 +192,20 @@ Two ways to read aloud, and the site picks the best one available per page:
    `npm run voices` so narrator, Lili, Leo, Mum, Dad and the Potato each get
    their own voice, still perfectly highlighted. See **`VOICES-GUIDE.md`**.
 
+## 🔊 Sound effects + ambience
+
+Each scene has gentle background ambience and each paragraph can trigger a small
+sound cue (zzzt, whoosh, sparkle, chime…), kept quiet under the narrator with a
+**🔊 toggle**. Generate real effects with **ElevenLabs** (free tier):
+
+```bash
+echo "ELEVENLABS_API_KEY=sk_xxx" >> .env   # free key from elevenlabs.io
+npm run sfx                                # -> public/audio/sfx/*.mp3
+```
+
+Until generated, the reader uses gentle in-browser synthesized sounds as a
+fallback (no files, no key).
+
 ## 🎨 Turning sketches into illustrations
 
 See **`ILLUSTRATION-GUIDE.md`** for a ready-to-paste prompt pack (built from

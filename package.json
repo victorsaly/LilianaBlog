@@ -12,6 +12,7 @@
     "astro": "astro",
     "voices": "node scripts/generate-voices.mjs",
     "voices:dry": "node scripts/generate-voices.mjs --dry",
+    "sfx": "node scripts/generate-sfx.mjs",
     "illustrate": "node scripts/illustrate.mjs",
     "remove-bg": "python3 scripts/remove-bg.py",
     "new-story": "node scripts/new-story.mjs"
