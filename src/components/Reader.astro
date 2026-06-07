@@ -18,10 +18,10 @@ function sceneAudio(n: number): { audio: string; timings: string } | null {
   return null;
 }
 
-// Establishing (top) picture: the scene's leading image, else an auto-detected
+// Establishing picture: a leading image in the story, else an auto-detected
 // generated scene picture in public/art/scenes/<slug>/scene-<n>.<ext>.
 const sceneArtDir = path.join(process.cwd(), 'public', 'art', 'scenes', story.slug);
-function topImage(scene: (typeof story.scenes)[number]): string | null {
+function establishing(scene: (typeof story.scenes)[number]): string | null {
   if (scene.image) return artUrl(scene.image, 'scene', base);
   for (const ext of ['png', 'webp', 'jpg', 'jpeg']) {
     if (fs.existsSync(path.join(sceneArtDir, `scene-${scene.n}.${ext}`))) {
@@ -31,23 +31,20 @@ function topImage(scene: (typeof story.scenes)[number]): string | null {
   return null;
 }
 
-// The interleaved flow: text paragraphs + inline images, in order. We drop the
-// leading establishing image (shown on top), and group consecutive images into
-// a single row so they sit side-by-side instead of stacking.
-type Img = { src: string; alt: string; anchor: number };
-type FlowItem = { type: 'text'; text: string } | { type: 'row'; images: Img[] };
-function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
-  const blocks = scene.blocks.slice();
-  if (blocks[0] && blocks[0].type === 'image') blocks.shift();
-  const out: FlowItem[] = [];
-  for (const b of blocks) {
-    if (b.type === 'text') { out.push({ type: 'text', text: b.text }); continue; }
-    const img: Img = { src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor };
-    const last = out[out.length - 1];
-    if (last && last.type === 'row') last.images.push(img);
-    else out.push({ type: 'row', images: [img] });
-  }
-  return out;
+// Build the "stage" (the establishing picture + each inline picture, with the
+// word position it appears at) and the text-only paragraphs for each scene.
+function view(scene: (typeof story.scenes)[number]) {
+  const lead = establishing(scene);
+  const leadIsImage = scene.blocks[0] && scene.blocks[0].type === 'image';
+  const stage: { src: string; alt: string; anchor: number }[] = [];
+  if (lead) stage.push({ src: lead, alt: scene.alt, anchor: 0 });
+  scene.blocks.forEach((b, i) => {
+    if (b.type === 'image' && !(leadIsImage && i === 0)) {
+      stage.push({ src: artUrl(b.src, 'scene', base)!, alt: b.alt, anchor: b.anchor });
+    }
+  });
+  const text = scene.blocks.filter((b) => b.type === 'text').map((b) => (b as any).text as string);
+  return { stage, text };
 }
 ---
 
@@ -61,13 +58,16 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
 
   <div class="page">
     {story.scenes.map((scene) => {
-      const img = topImage(scene);
+      const { stage, text } = view(scene);
       const a = sceneAudio(scene.n);
-      const flow = flowFor(scene);
       return (
         <article class="scene" data-scene={scene.n} data-audio={a?.audio} data-timings={a?.timings} hidden={scene.n !== 1}>
-          {img ? (
-            <div class="page-art" style={`--scene-bg:url('${img}')`}><img src={img} alt={scene.alt} loading="lazy" /></div>
+          {stage.length ? (
+            <div class="page-art stage" style={`--scene-bg:url('${stage[0].src}')`}>
+              {stage.map((im, i) => (
+                <img class={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} />
+              ))}
+            </div>
           ) : (
             <div class="page-art placeholder">
               <div>
@@ -80,19 +80,7 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
           <div class="page-body">
             <h2 class="page-scene-title">{scene.title}</h2>
             <div class="page-flow">
-              {flow.map((item) =>
-                item.type === 'text' ? (
-                  <p class="page-text">{item.text}</p>
-                ) : (
-                  <div class="illo-row">
-                    {item.images.map((im) => (
-                      <figure class="scene-illo" data-anchor={im.anchor}>
-                        <img src={im.src} alt={im.alt} loading="lazy" />
-                      </figure>
-                    ))}
-                  </div>
-                )
-              )}
+              {text.map((t) => <p class="page-text">{t}</p>)}
             </div>
           </div>
         </article>
@@ -118,16 +106,16 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     <button class="btn btn-teal" id="next-btn" type="button">Next ▶</button>
   </div>
 
-  <p class="hint" id="tap-hint">Tip: when it's not reading, tap any word to hear just that word. 👆</p>
+  <p class="hint" id="tap-hint">👆 Tip: tap any <span class="tapword-demo">underlined</span> word to hear it on its own.</p>
   <p class="hint" id="no-speech" hidden>Reading-aloud isn't available in this browser, but you can still read the story and flip the pages. Try Chrome, Edge or Safari for the voice. 💛</p>
 </div>
 
 <script>
   import { tokenize, makeChunks } from '../lib/parse.js';
 
-  // Read-along engine: studio audio (mp3 + word timings) when available, else
-  // free browser voices. Words highlight in time, and inline scene pictures
-  // reveal as the reading passes them. Tap a word to hear it.
+  // Read-along engine. Each page is a "slide": the words stay on screen while a
+  // picture on the stage swaps in as the reading passes each point. Studio
+  // audio (mp3 + word timings) when available, else free browser voices.
   const root = document.getElementById('reader');
   if (root) {
     const ttsSupport = 'speechSynthesis' in window;
@@ -147,16 +135,14 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     const progressFill = document.getElementById('scene-progress-fill') as HTMLElement | null;
 
     interface Word { start: number; end: number; el: HTMLElement; }
-    interface Illo { anchor: number; el: HTMLElement; }
+    interface Stage { anchor: number; el: HTMLElement; }
     interface SceneData {
-      el: HTMLElement; words: Word[]; textEls: HTMLElement[]; fullText: string; illos: Illo[];
+      el: HTMLElement; words: Word[]; textEls: HTMLElement[]; fullText: string;
+      stage: Stage[]; stageCur: number;
       audioUrl: string; timingsUrl: string; starts: (number | null)[] | null;
     }
     const scenes: SceneData[] = [];
 
-    // Build word spans across all text blocks of a scene, with GLOBAL char
-    // offsets (so browser-voice boundaries map correctly) and global order (so
-    // audio word-timings line up).
     sceneEls.forEach((el) => {
       const textEls = Array.from(el.querySelectorAll('.page-text')) as HTMLElement[];
       const words: Word[] = [];
@@ -186,12 +172,11 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
           speakWord(target);
         });
       });
-      const illos: Illo[] = Array.from(el.querySelectorAll('.scene-illo')).map((node) => ({
-        anchor: parseInt((node as HTMLElement).dataset.anchor || '0', 10),
-        el: node as HTMLElement,
+      const stage: Stage[] = Array.from(el.querySelectorAll('.stage-img')).map((n) => ({
+        anchor: parseInt((n as HTMLElement).dataset.anchor || '0', 10), el: n as HTMLElement,
       }));
       scenes.push({
-        el, words, textEls, fullText, illos,
+        el, words, textEls, fullText, stage, stageCur: 0,
         audioUrl: el.dataset.audio || '', timingsUrl: el.dataset.timings || '', starts: null,
       });
     });
@@ -200,18 +185,14 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     const canRead = anyAudio || ttsSupport;
 
     // ---- state ----
-    let current = 0;
-    let playing = false;
-    let paused = false;
+    let current = 0, playing = false, paused = false;
     let mode: 'audio' | 'tts' = 'tts';
     let lastNow = -1;
     let rafId: number | null = null;
     let chunks: { text: string; start: number }[] = [];
-    let chunkIdx = 0;
-    let usedBoundary = false;
+    let chunkIdx = 0, usedBoundary = false;
     let fallback: number | null = null;
 
-    // ---- settings ----
     function settings() {
       try { return Object.assign({ rate: 0.9, voiceURI: '' }, JSON.parse(localStorage.getItem('lili-reading-v1') || '{}')); }
       catch { return { rate: 0.9, voiceURI: '' }; }
@@ -225,22 +206,33 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       return en.find((v) => /natural|samantha|google uk english female|google us english|libby|aria|jenny|sonia/i.test(v.name)) || en[0] || voices[0] || null;
     }
 
-    // ---- highlight + reveal ----
-    function revealIllos(s: SceneData, idx: number) {
-      for (const im of s.illos) if (im.anchor <= idx && !im.el.classList.contains('seen')) im.el.classList.add('seen');
+    // ---- stage (the swapping picture) ----
+    function updateStage(s: SceneData, idx: number) {
+      if (!s.stage.length) return;
+      let best = 0;
+      if (idx >= 0) for (let i = 0; i < s.stage.length; i++) { if (s.stage[i].anchor <= idx) best = i; else break; }
+      if (best === s.stageCur) return;
+      s.stage[s.stageCur]?.el.classList.remove('on');
+      s.stage[best].el.classList.add('on');
+      s.stageCur = best;
     }
+    function resetStage(s: SceneData) { s.stage.forEach((im, i) => im.el.classList.toggle('on', i === 0)); s.stageCur = 0; }
+
+    // ---- highlight ----
     function paint(s: SceneData, nowIdx: number) {
-      if (nowIdx < 0 || nowIdx === lastNow) { revealIllos(s, nowIdx); return; }
-      const ws = s.words;
-      if (nowIdx > lastNow) {
-        for (let i = Math.max(lastNow, 0); i < nowIdx; i++) { ws[i].el.classList.add('read'); ws[i].el.classList.remove('now'); }
-      } else {
-        for (let i = nowIdx + 1; i <= lastNow && i < ws.length; i++) ws[i].el.classList.remove('now', 'read');
-        for (let i = 0; i < nowIdx; i++) { ws[i].el.classList.add('read'); ws[i].el.classList.remove('now'); }
+      if (nowIdx < 0) return;
+      if (nowIdx !== lastNow) {
+        const ws = s.words;
+        if (nowIdx > lastNow) {
+          for (let i = Math.max(lastNow, 0); i < nowIdx; i++) { ws[i].el.classList.add('read'); ws[i].el.classList.remove('now'); }
+        } else {
+          for (let i = nowIdx + 1; i <= lastNow && i < ws.length; i++) ws[i].el.classList.remove('now', 'read');
+          for (let i = 0; i < nowIdx; i++) { ws[i].el.classList.add('read'); ws[i].el.classList.remove('now'); }
+        }
+        if (ws[nowIdx]) { ws[nowIdx].el.classList.add('now'); ws[nowIdx].el.classList.remove('read'); ensureVisible(ws[nowIdx].el); }
+        lastNow = nowIdx;
       }
-      if (ws[nowIdx]) { ws[nowIdx].el.classList.add('now'); ws[nowIdx].el.classList.remove('read'); ensureVisible(ws[nowIdx].el); }
-      lastNow = nowIdx;
-      revealIllos(s, nowIdx);
+      updateStage(s, nowIdx);
     }
     function clearPaint(s: SceneData) { s.words.forEach((w) => w.el.classList.remove('now', 'read')); lastNow = -1; }
     function paintAllRead(s: SceneData) { s.words.forEach((w) => { w.el.classList.add('read'); w.el.classList.remove('now'); }); lastNow = s.words.length - 1; }
@@ -251,19 +243,19 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     }
     function ensureVisible(el: HTMLElement) {
       const r = el.getBoundingClientRect();
-      if (r.top < 130 || r.bottom > window.innerHeight - 130) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const scroller = el.closest('.page-body') as HTMLElement | null;
+      const top = scroller ? scroller.getBoundingClientRect().top + 80 : 130;
+      const bottom = scroller ? scroller.getBoundingClientRect().bottom - 80 : window.innerHeight - 130;
+      if (r.top < top || r.bottom > bottom) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
     function cancelRaf() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
     function stopFallback() { if (fallback !== null) { clearTimeout(fallback); fallback = null; } }
-
-    // reveal/dim helpers
     function dim(s: SceneData, on: boolean) { s.textEls.forEach((t) => t.classList.toggle('is-playing', on)); }
-    function revealMode(s: SceneData, on: boolean) { s.el.classList.toggle('revealing', on); }
-    function revealAll(s: SceneData) { s.illos.forEach((im) => im.el.classList.add('seen')); }
-    function resetIllos(s: SceneData) { s.illos.forEach((im) => im.el.classList.remove('seen')); }
 
-    function setBtn(state: 'play' | 'pause' | 'idle') {
-      if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); }
+    function setBtn(state: 'play' | 'pause' | 'idle' | 'loading') {
+      playBtn.disabled = state === 'loading';
+      if (state === 'loading') { playBtn.textContent = '⏳ Loading…'; playBtn.classList.remove('is-playing'); }
+      else if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); }
       else if (state === 'pause') { playBtn.textContent = '▶ Continue'; playBtn.classList.remove('is-playing'); }
       else { playBtn.textContent = '▶ Read to me'; playBtn.classList.remove('is-playing'); }
     }
@@ -275,7 +267,8 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       audio.src = s.audioUrl;
       audio.playbackRate = clampRate(settings().rate);
       audio.onended = () => { if (playing) finishScene(); };
-      audio.onerror = () => { if (ttsSupport) playTts(s); else stop(); };
+      audio.onplaying = () => { if (playing) setBtn('play'); };
+      audio.onerror = () => { if (ttsSupport) { setBtn('play'); playTts(s); } else stop(); };
       try { await audio.play(); } catch { /* gesture/autoplay */ }
       runAudioHighlight(s);
     }
@@ -338,16 +331,17 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       stop();
       current = idx; showScene(idx);
       const s = scenes[idx];
-      clearPaint(s); resetIllos(s);
-      if (!canRead) { revealAll(s); return; }
-      playing = true; paused = false; setBtn('play'); dim(s, true); revealMode(s, true);
-      if (s.audioUrl) playAudio(s); else if (ttsSupport) playTts(s); else { playing = false; setBtn('idle'); revealAll(s); }
+      clearPaint(s); resetStage(s);
+      if (!canRead) return;
+      playing = true; paused = false; dim(s, true);
+      if (s.audioUrl) { setBtn('loading'); playAudio(s); }
+      else if (ttsSupport) { setBtn('play'); playTts(s); }
+      else { playing = false; setBtn('idle'); }
     }
     function finishScene() {
       stopFallback(); cancelRaf();
       playing = false; paused = false;
-      const s = scenes[current];
-      paintAllRead(s); dim(s, false); revealMode(s, false); revealAll(s);
+      paintAllRead(scenes[current]); dim(scenes[current], false);
       setBtn('idle');
       if (autoplayBox.checked && current < total - 1) window.setTimeout(() => startScene(current + 1), 550);
     }
@@ -356,8 +350,7 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       playing = false; paused = false;
       if (synth) synth.cancel();
       audio.pause();
-      const s = scenes[current];
-      if (s) { dim(s, false); revealMode(s, false); revealAll(s); }
+      if (scenes[current]) dim(scenes[current], false);
       setBtn('idle');
     }
     function pause() { if (!playing) return; if (mode === 'audio') audio.pause(); else if (synth) synth.pause(); playing = false; paused = true; setBtn('pause'); dim(scenes[current], false); }
@@ -397,11 +390,10 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       stop();
       current = idx;
       if (wasPlaying && canRead) startScene(idx);
-      else { showScene(idx); clearPaint(scenes[idx]); revealMode(scenes[idx], false); revealAll(scenes[idx]); }
+      else { showScene(idx); clearPaint(scenes[idx]); resetStage(scenes[idx]); }
       root!.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 
-    // ---- buttons ----
     playBtn.addEventListener('click', () => { if (!canRead) return; if (playing) pause(); else if (paused) resume(); else startScene(current); });
     restartBtn.addEventListener('click', () => { if (canRead) startScene(current); });
     prevBtn.addEventListener('click', () => goTo(current - 1));
@@ -414,7 +406,6 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
       else if (e.key === ' ') { e.preventDefault(); playBtn.click(); }
     });
 
-    // ---- autoplay + speed ----
     autoplayBox.checked = localStorage.getItem('lili-autoplay') !== 'off';
     autoplayBox.addEventListener('change', () => localStorage.setItem('lili-autoplay', autoplayBox.checked ? 'on' : 'off'));
     function syncSpeed() { speedQuick.value = String(settings().rate || 0.9); }
@@ -427,7 +418,6 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     document.addEventListener('lili:reading-change', () => { syncSpeed(); if (mode === 'audio') audio.playbackRate = clampRate(settings().rate); });
     syncSpeed();
 
-    // ---- availability ----
     if (!canRead) {
       document.getElementById('no-speech')?.removeAttribute('hidden');
       document.getElementById('tap-hint')?.setAttribute('hidden', '');
@@ -438,7 +428,6 @@ function flowFor(scene: (typeof story.scenes)[number]): FlowItem[] {
     if (synth) synth.onvoiceschanged = () => {};
 
     showScene(0);
-    if (scenes[0]) revealAll(scenes[0]);
     window.addEventListener('pagehide', () => { if (synth) synth.cancel(); audio.pause(); });
   }
 </script>

@@ -66,19 +66,19 @@ const canonical = `${origin}${base}`;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to the story</a>
-    <div class="wrap">
-      <header class="site-header">
+    <header class="site-header">
+      <div class="wrap header-inner">
         <a class="brand" href={base}>
-          <span class="logo" aria-hidden="true">📖✨</span>
+          <span class="logo" aria-hidden="true">📖</span>
           <span>Lily's Story World</span>
         </a>
         <nav class="nav" aria-label="Main">
-          <a href={base} aria-current={active === 'home' ? 'page' : undefined}>🏠 Home</a>
-          <a href={`${base}characters/`} aria-current={active === 'characters' ? 'page' : undefined}>🎭 Characters</a>
-          <button id="open-settings" class="btn btn-ghost" aria-haspopup="dialog">⚙️ Reading</button>
+          <a href={base} aria-current={active === 'home' ? 'page' : undefined}>Home</a>
+          <a href={`${base}characters/`} aria-current={active === 'characters' ? 'page' : undefined}>Characters</a>
+          <button id="open-settings" class="btn nav-settings" aria-haspopup="dialog">⚙️ Reading</button>
         </nav>
-      </header>
-    </div>
+      </div>
+    </header>
 
     <main id="main">
       <slot />

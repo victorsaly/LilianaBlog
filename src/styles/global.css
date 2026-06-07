@@ -144,22 +144,30 @@ img { max-width: 100%; display: block; }
 .btn-icon  { width: 48px; min-width: 48px; padding: 0; justify-content: center; border-radius: 50%; }
 
 /* ---- Site header (sticky, translucent) -------------------------------- */
+/* elegant editorial header: full-width bar, serif brand, understated nav */
 .site-header {
   position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;
-  padding: 0.6rem 0.9rem; margin: 0.6rem auto; width: min(1120px, 94vw);
-  background: rgba(255, 251, 240, 0.82);
-  backdrop-filter: saturate(1.4) blur(10px);
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: var(--r-pill); box-shadow: var(--shadow-sm);
+  background: color-mix(in srgb, var(--page-bg) 80%, transparent);
+  backdrop-filter: saturate(1.3) blur(12px);
+  border-bottom: 1px solid var(--paper-edge);
 }
-.brand { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; color: var(--ink); text-decoration: none; }
-.brand .logo { font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
-.brand:hover { transform: rotate(-1deg); }
-.nav { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
-.nav a { text-decoration: none; color: var(--ink); background: rgba(255,255,255,0.8); padding: 0.5em 1em; border-radius: var(--r-pill); font-weight: 700; box-shadow: var(--shadow-sm); transition: transform 0.12s ease; }
-.nav a:hover { transform: translateY(-2px); }
-.nav a[aria-current='page'] { background: linear-gradient(135deg, #1ad0c0, var(--teal-deep)); color: #fff; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.7rem 0; }
+.brand { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-serif); font-weight: 600; font-size: 1.45rem; letter-spacing: -0.2px; color: var(--ink); text-decoration: none; }
+.brand .logo { font-size: 1.4rem; }
+.brand:hover { color: var(--teal-deep); }
+.nav { display: flex; gap: 1.2rem; align-items: center; }
+.nav a { text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; padding: 0.3em 0; position: relative; }
+.nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform 0.2s ease; }
+.nav a:hover::after, .nav a[aria-current='page']::after { transform: scaleX(1); }
+.nav a[aria-current='page'] { color: var(--teal-deep); }
+/* the ⚙️ Reading settings button — a quiet outline pill */
+.nav .nav-settings { min-height: 0; padding: 0.4em 0.9em; font-size: 0.95rem; font-weight: 700; background: #fff; color: var(--ink); border: 1px solid var(--paper-edge); border-radius: var(--r-pill); box-shadow: none; }
+.nav .nav-settings:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+@media (max-width: 560px) {
+  .header-inner { flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+  .brand { font-size: 1.25rem; }
+  .nav { gap: 1rem; }
+}
 
 .site-footer { text-align: center; color: var(--ink-soft); padding: 2.5rem 0 3rem; font-size: 0.95rem; }
 .site-footer::before { content: "✦ ✦ ✦"; display: block; color: var(--sunny); letter-spacing: 0.8rem; margin-bottom: 0.8rem; opacity: 0.7; }
@@ -316,32 +324,60 @@ html[data-bg='night'] .page-scene-title { color: #7be0d4; }
   letter-spacing: var(--read-letter); word-spacing: var(--read-word);
   white-space: pre-wrap; text-align: left; max-width: var(--w-prose, 38ch); margin-inline: auto;
 }
-.page-text .w { border-radius: 6px; padding: 0 0.04em; cursor: pointer; transition: background 0.08s ease, color 0.08s ease; }
+.page-text .w {
+  border-radius: 6px; padding: 0 0.04em; cursor: pointer;
+  transition: background 0.08s ease, color 0.08s ease;
+  /* affordance: a faint dotted underline shows words are tappable to hear */
+  text-decoration: underline dotted color-mix(in srgb, var(--teal) 42%, transparent);
+  text-decoration-thickness: 2px; text-underline-offset: 0.22em;
+}
 .page-text .w:hover { background: rgba(139, 92, 246, 0.18); }
+/* during read-aloud the dotted hint disappears (the highlight leads instead) */
+.page-text.is-playing .w { text-decoration-color: transparent; }
+.tapword-demo { text-decoration: underline dotted color-mix(in srgb, var(--teal) 60%, transparent); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
 .page-text .w.read { color: var(--hl-read); }
 .page-text .w.now { background: var(--hl-now-bg); color: var(--hl-now-fg); font-weight: 700; box-shadow: 0 0 0 3px var(--hl-now-bg); }
 html[data-calm='on'] .page-text.is-playing .w { color: color-mix(in srgb, var(--read-fg) 38%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.read { color: color-mix(in srgb, var(--hl-read) 70%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 
-/* inline scene pictures that reveal as the read-along passes them.
-   Consecutive pictures share a row (wrap on small screens). */
-.illo-row {
-  display: flex; flex-wrap: wrap; gap: var(--space-4);
-  justify-content: center; align-items: flex-end;
-  margin: var(--space-5) auto;
+/* =========================================================================
+   Scene "slide": a text-only column + a STAGE picture that swaps as the
+   reading passes each point. Desktop = side-by-side; mobile = picture above,
+   words on a paper panel over it. Each page is sized to fit the screen.
+   ========================================================================= */
+.scene:not([hidden]) { animation: scene-in 0.4s ease both; }
+@keyframes scene-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+
+/* the stage: pictures stacked; only the current one is shown (cross-fade) */
+.page-art.stage { position: relative; overflow: hidden; }
+.page-art .stage-img {
+  position: absolute; inset: 7%; margin: auto;
+  width: auto; height: auto; max-width: 86%; max-height: 86%;
+  object-fit: contain; opacity: 0; transition: opacity 0.5s ease;
+  filter: drop-shadow(0 14px 22px rgba(43, 37, 51, 0.22));
 }
-.scene-illo { margin: 0; text-align: center; transition: opacity 0.5s ease, transform 0.5s ease; }
-.scene-illo img {
-  display: block; height: 200px; width: auto; max-width: 100%;
-  border-radius: 16px; filter: drop-shadow(0 12px 16px rgba(43, 37, 51, 0.2));
+.page-art .stage-img.on { opacity: 1; }
+
+/* --- desktop: picture and words side-by-side, one screen --- */
+@media (min-width: 820px) {
+  .reader { width: min(1180px, 95vw); }
+  .scene { display: grid; grid-template-columns: 1.1fr 1fr; align-items: stretch; min-height: 74vh; }
+  .page-art.stage { min-height: 74vh; }
+  .page-body { max-height: 82vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; }
+  .page-text { max-width: 42ch; }
 }
-.scene-illo figcaption { color: var(--ink-soft); font-size: var(--text-sm); margin-top: var(--space-1); }
-/* only hidden while a scene is actively being read aloud */
-.scene.revealing .scene-illo:not(.seen) { opacity: 0; transform: translateY(16px) scale(0.96); }
-@media (max-width: 600px) {
-  .illo-row { gap: var(--space-3); margin: var(--space-4) auto; }
-  .scene-illo img { height: 138px; }
+
+/* --- mobile: picture band on top, words on a paper panel over its lower edge --- */
+@media (max-width: 819px) {
+  .page-art::before { display: none; }
+  .page-art.stage { height: 46vh; }                 /* explicit height so it always shows */
+  .page .scene .page-body {
+    position: relative; z-index: 1; margin-top: -28px;
+    background: var(--read-bg);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: 0 -14px 30px rgba(43, 37, 51, 0.16);
+  }
 }
 
 /* ---- Reader controls -------------------------------------------------- */
