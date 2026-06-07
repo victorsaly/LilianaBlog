@@ -40,6 +40,12 @@ const CUES = {
   chime:   { text: 'a happy bright success chime, cheerful ascending bells, short, magical', duration: 1.6 },
   thud:    { text: 'a soft cartoon stomp, a gentle rumbly thud, short, not scary', duration: 1.0 },
   villain: { text: 'a short comedic villain sting, low playful dramatic brass, cartoonish, not frightening', duration: 1.4 },
+  laugh:   { text: 'a short playful cartoon villain laugh, mischievous ha-ha-ha, silly not scary, child-friendly', duration: 1.8 },
+  cheer:   { text: "a short happy little children's cheer, a warm yay, bright and joyful", duration: 1.4 },
+  sizzle:  { text: 'a gentle cooking sizzle, breakfast frying softly in a pan, short, cosy', duration: 1.2 },
+  squawk:  { text: 'a friendly cartoon parrot squawk, short, playful and bright', duration: 1.0 },
+  splat:   { text: 'a soft comedic splat, light squishy cartoon splat, short', duration: 0.8 },
+  clang:   { text: 'a light magical sword shing and soft clang, bright and short, heroic', duration: 0.9 },
 };
 // gentle looping ambience per scene mood (names match the reader's moodName())
 const AMBI = {
@@ -47,6 +53,13 @@ const AMBI = {
   'amb-ocean':  { text: 'deep calm underwater ocean cave ambience, soft watery drones, gentle, loopable background', duration: 12, loop: true },
   'amb-magic':  { text: 'dreamy gentle magical sparkly ambience, soft shimmering pad, calm, loopable background', duration: 12, loop: true },
   'amb-battle': { text: 'light adventurous gentle ambience with a soft sense of excitement, calm, loopable, not scary', duration: 12, loop: true },
+};
+// gentle BACKGROUND MUSIC per scene mood (used as the bed when present)
+const MUSIC = {
+  'music-warm':   { text: "gentle warm children's storybook background music, soft piano and light strings, cosy and calm, loopable", duration: 22, loop: true },
+  'music-ocean':  { text: 'soft mysterious dreamy underwater background music, gentle and calm, loopable, not scary', duration: 22, loop: true },
+  'music-magic':  { text: "playful magical children's adventure background music, light and sparkly, gentle, loopable", duration: 22, loop: true },
+  'music-battle': { text: "light heroic children's adventure background music, a gentle sense of excitement, loopable, not scary", duration: 22, loop: true },
 };
 
 async function gen(name, spec) {
@@ -74,6 +87,7 @@ async function main() {
   console.log('🎚️  Sound effects + ambience\n');
   for (const [n, s] of Object.entries(CUES)) await gen(n, s);
   for (const [n, s] of Object.entries(AMBI)) await gen(n, s);
+  for (const [n, s] of Object.entries(MUSIC)) await gen(n, s);
   console.log(DRY ? '\n👉 add ELEVENLABS_API_KEY and run `npm run sfx`' : '\n🎉 Done. Commit public/audio/sfx/ and the site will use them.');
 }
 main().catch((e) => { console.error(e); process.exit(1); });

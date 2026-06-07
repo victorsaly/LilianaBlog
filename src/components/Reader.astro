@@ -151,7 +151,7 @@ function view(scene: (typeof story.scenes)[number]) {
     const sfxAvail = new Set((root.dataset.sfx || '').split(',').filter(Boolean));
     const ambientAudio = new Audio();
     ambientAudio.loop = true;
-    ambientAudio.volume = 0.16;
+    ambientAudio.volume = 0.14;
 
     const sceneEls = Array.from(root.querySelectorAll('.scene')) as HTMLElement[];
     const playBtn = document.getElementById('play-btn') as HTMLButtonElement;
@@ -226,12 +226,18 @@ function view(scene: (typeof story.scenes)[number]) {
 
     function cueForText(t: string): string | null {
       const s = (t || '').toLowerCase();
-      if (/restart|reset|game over|poof|happy|teamwork|the end|fixed|truce/.test(s)) return 'chime';
+      if (/laugh|ha-ha|cackle|hee-hee/.test(s)) return 'laugh';
+      if (/restart|reset|game over|poof|fixed/.test(s)) return 'chime';
+      if (/saved everyone|teamwork|hooray|cheer|happiest|the end/.test(s)) return 'cheer';
       if (/portal|whoosh|pulled inside|vibrate|buzz|swirl/.test(s)) return 'whoosh';
       if (/zzzt|signal|crack/.test(s)) return 'zzzt';
-      if (/evil|laughed|nunchuck|surrender|villain|knocked/.test(s)) return 'villain';
-      if (/power|energy|glow|spark|silver|stylus|magic|flame|fire|wind|crackl|sword/.test(s)) return 'sparkle';
-      if (/stamp|rumble|march|stone|earth|mash|shook|bumped/.test(s)) return 'thud';
+      if (/breakfast|kitchen|flipping|sizzl/.test(s)) return 'sizzle';
+      if (/blaze|parrot|squawk|feather/.test(s)) return 'squawk';
+      if (/ketchup|fries|\bfry\b|mash/.test(s)) return 'splat';
+      if (/sword|stylus|pickaxe|armour|clang/.test(s)) return 'clang';
+      if (/evil|nunchuck|surrender|villain|knocked|great potato/.test(s)) return 'villain';
+      if (/power|energy|glow|spark|silver|magic|flame|fire|wind|crackl/.test(s)) return 'sparkle';
+      if (/stamp|rumble|march|stone|earth|mash|shook|bumped|thud/.test(s)) return 'thud';
       return null;
     }
     function ensureCtx(): AudioContext | null {
@@ -253,16 +259,17 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     function moodName(title: string): string {
       const t = (title || '').toLowerCase();
-      if (/ocean|cave|deep/.test(t)) return 'amb-ocean';
-      if (/portal|inside the game|powers|wonder/.test(t)) return 'amb-magic';
-      if (/deeper|great potato/.test(t)) return 'amb-battle';
-      return 'amb-warm';
+      if (/ocean|cave|deep/.test(t)) return 'ocean';
+      if (/portal|inside the game|powers|wonder/.test(t)) return 'magic';
+      if (/deeper|great potato/.test(t)) return 'battle';
+      return 'warm';
     }
-    // ambient: prefer a generated loop file; otherwise synthesize
+    // background bed: prefer music, then ambience loop, then synth
     function startAmbient(title: string) {
       if (!soundOn) return;
-      const m = moodName(title);
-      if (sfxAvail.has(m)) { stopSynthAmbient(); ambientAudio.src = sfxBase + m + '.mp3'; ambientAudio.play().catch(() => {}); return; }
+      const mood = moodName(title);
+      const bed = sfxAvail.has(`music-${mood}`) ? `music-${mood}` : sfxAvail.has(`amb-${mood}`) ? `amb-${mood}` : null;
+      if (bed) { stopSynthAmbient(); ambientAudio.src = sfxBase + bed + '.mp3'; ambientAudio.play().catch(() => {}); return; }
       startSynthAmbient(title);
     }
     function stopAmbient() { ambientAudio.pause(); stopSynthAmbient(); }
