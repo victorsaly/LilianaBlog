@@ -217,9 +217,15 @@ img { max-width: 100%; display: block; }
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .char:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-.char .frame { background: #fff; padding: 10px; border-radius: var(--r-sm); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), var(--shadow-sm); transform: rotate(-1.2deg); }
+.char .frame {
+  padding: 10px; border-radius: var(--r-sm); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), var(--shadow-sm);
+  transform: rotate(-1.2deg);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--tint, #ffffff) 16%, #fff), #fff);
+}
 .char:nth-child(even) .frame { transform: rotate(1.2deg); }
 .char .frame img { border-radius: 8px; width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; }
+/* finished (transparent) illustrations show in FULL on the tinted panel */
+.char .frame img.illo, .char .frame .layer.art { object-fit: contain; }
 .char .frame.placeholder {
   aspect-ratio: 3/4; display: grid; place-items: center; text-align: center;
   background: repeating-linear-gradient(45deg,#fff,#fff 14px,#fbf6ea 14px,#fbf6ea 28px);
@@ -272,8 +278,15 @@ img { max-width: 100%; display: block; }
 .page { position: relative; background: var(--read-bg); color: var(--read-fg); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--card-ring); }
 .page::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px rgba(43,37,51,0.05); border-radius: var(--r-lg); }
 
-.page-art { width: 100%; background: #f3ede1; }
-.page-art img { width: 100%; max-height: 54vh; object-fit: contain; background: #f3ede1; }
+/* scene illustration sits, contained, over a soft blurred version of itself
+   (an "ambient" backdrop) so any aspect ratio looks intentional and polished */
+.page-art { position: relative; width: 100%; background: #f3ede1; overflow: hidden; }
+.page-art::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: var(--scene-bg); background-size: cover; background-position: center;
+  filter: blur(30px) brightness(0.92) saturate(1.1); transform: scale(1.2); opacity: 0.5;
+}
+.page-art img { position: relative; z-index: 1; display: block; width: 100%; max-height: 54vh; object-fit: contain; margin-inline: auto; }
 .page-art.placeholder {
   min-height: 200px; display: grid; place-items: center; text-align: center; padding: 1.6rem;
   background: radial-gradient(circle at 50% 30%, #fff 0%, transparent 70%), repeating-linear-gradient(45deg, #f6efe2, #f6efe2 18px, #efe6d4 18px, #efe6d4 36px);

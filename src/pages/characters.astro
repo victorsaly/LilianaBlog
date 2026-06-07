@@ -30,7 +30,7 @@ const doneCount = cards.filter((c) => c.illoUrl).length;
   <section class="wrap" style="margin-top:1.5rem">
     <div class="char-grid">
       {cards.map((c) => (
-        <div class="char">
+        <div class="char" style={`--tint:${c.color}`}>
           {c.illoUrl && c.sketchUrl ? (
             <div class="frame flip" data-show="art">
               <img class="layer art" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" />
@@ -38,7 +38,7 @@ const doneCount = cards.filter((c) => c.illoUrl).length;
               <button class="flip-btn" type="button" data-flip>✏️ Sketch</button>
             </div>
           ) : c.illoUrl ? (
-            <div class="frame"><img src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" /></div>
+            <div class="frame"><img class="illo" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" /></div>
           ) : c.sketchUrl ? (
             <div class="frame"><img src={c.sketchUrl} alt={`Lily's drawing of ${c.name}`} loading="lazy" /></div>
           ) : (

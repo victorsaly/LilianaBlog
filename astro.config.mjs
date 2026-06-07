@@ -5,8 +5,8 @@ import { defineConfig } from 'astro/config';
 // Locally, and for a user page / custom domain, the base is just "/".
 const base = process.env.BASE_PATH || '/';
 
-// Optional: set your final URL here (used for sitemaps / absolute links).
-const site = process.env.SITE_URL || undefined;
+// Final URL origin (used for absolute share-image / OG links).
+const site = process.env.SITE_URL || 'https://victorsaly.github.io';
 
 export default defineConfig({
   base,

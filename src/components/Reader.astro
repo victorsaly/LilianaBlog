@@ -55,7 +55,7 @@ function sceneImg(scene: (typeof story.scenes)[number]): string | null {
       return (
         <article class="scene" data-scene={scene.n} data-audio={a?.audio} data-timings={a?.timings} hidden={scene.n !== 1}>
           {img ? (
-            <div class="page-art"><img src={img} alt={scene.alt} loading="lazy" /></div>
+            <div class="page-art" style={`--scene-bg:url('${img}')`}><img src={img} alt={scene.alt} loading="lazy" /></div>
           ) : (
             <div class="page-art placeholder">
               <div>

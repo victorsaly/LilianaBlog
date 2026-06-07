@@ -7,9 +7,15 @@ interface Props {
   title: string;
   description?: string;
   active?: 'home' | 'characters' | 'story';
+  ogImage?: string;
 }
-const { title, description = "Lily's Story World — read-along illustrated stories.", active } = Astro.props;
+const { title, description = "Lily's Story World — read-along illustrated stories.", active, ogImage } = Astro.props;
 const base = import.meta.env.BASE_URL; // ends with "/"
+const origin = Astro.site ? Astro.site.origin : '';
+// absolute URL for the share-preview image (a colourful scene by default)
+const shareImg = `${origin}${base}art/scenes/the-great-potato-adventure/scene-1.jpg`;
+const ogImageUrl = ogImage ? `${origin}${base}${ogImage}` : shareImg;
+const canonical = `${origin}${base}`;
 ---
 
 <!doctype html>
@@ -20,6 +26,18 @@ const base = import.meta.env.BASE_URL; // ends with "/"
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" href={`${base}favicon.svg`} />
+    <meta name="theme-color" content="#12b3a6" />
+
+    <!-- Social share previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="Lily's Story World" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     <!-- Reading fonts: a reading-optimised font, a literacy font, and a
          highly-legible font. OpenDyslexic is loaded locally in global.css. -->
