@@ -19,7 +19,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import { CHARACTERS, buildPrompt } from '../art-style.mjs';
+import matter from 'gray-matter';
+import { CHARACTERS, buildPrompt, buildScenePrompt } from '../art-style.mjs';
+import { parseScenes } from '../src/lib/parse.js';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -50,6 +52,7 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--id') flags.id = argv[++i];
   else if (a === '--sketch') flags.sketch = argv[++i];
   else if (a === '--desc') flags.desc = argv[++i];
+  else if (a === '--scenes') flags.scenes = argv[++i];
   else ids.push(a);
 }
 
@@ -68,11 +71,11 @@ function findSketch(id, fallbackName) {
   return tries.find((p) => fs.existsSync(p)) || null;
 }
 
-async function callGemini(prompt, sketchPath) {
+async function callGemini(prompt, imagePaths = []) {
   const parts = [{ text: prompt }];
-  if (sketchPath) {
-    const data = fs.readFileSync(sketchPath).toString('base64');
-    parts.push({ inline_data: { mime_type: mimeFor(sketchPath), data } });
+  for (const p of imagePaths.filter(Boolean)) {
+    const data = fs.readFileSync(p).toString('base64');
+    parts.push({ inline_data: { mime_type: mimeFor(p), data } });
   }
   const body = {
     contents: [{ parts }],
@@ -113,7 +116,7 @@ async function makeOne(id, body, sketchName) {
   const sketch = findSketch(id, sketchName) || customSketch;
   process.stdout.write(`🎨 ${id} … `);
   try {
-    const png = await callGemini(prompt, sketch);
+    const png = await callGemini(prompt, [sketch]);
     fs.mkdirSync(OUT_DIR, { recursive: true });
     const outPath = path.join(OUT_DIR, `${id}.png`);
     fs.writeFileSync(outPath, png);
@@ -123,8 +126,58 @@ async function makeOne(id, body, sketchName) {
   }
 }
 
+// Which characters appear in a scene's text (so we can attach their art as refs).
+const NAME_RX = {
+  lily: /\blily\b/i, leo: /\bleo\b/i, mum: /\bmum\b/i, dad: /\bdad\b/i,
+  pip: /\bpip\b/i, blaze: /\bblaze\b/i, potato: /\bpotato\b/i, fries: /\b(fries|fry)\b/i,
+};
+function refsForScene(text) {
+  const refs = [];
+  for (const id of Object.keys(CHARACTERS)) {
+    if (NAME_RX[id]?.test(text)) {
+      const p = path.join(OUT_DIR, `${id}.png`);
+      if (fs.existsSync(p)) refs.push(p);
+    }
+  }
+  return refs.slice(0, 4); // keep the reference set focused
+}
+
+async function generateScenes(slug) {
+  const file = path.join(ROOT, 'src', 'stories', `${slug}.md`);
+  if (!fs.existsSync(file)) { console.log(`⚠️  no story at src/stories/${slug}.md`); return; }
+  const { content } = matter(fs.readFileSync(file, 'utf8'));
+  const scenes = parseScenes(content);
+  const outDir = path.join(ROOT, 'public', 'art', 'scenes', slug);
+  fs.mkdirSync(outDir, { recursive: true });
+
+  console.log(`🎬 ${slug} — ${scenes.length} scene pictures`);
+  for (const scene of scenes) {
+    const prompt = buildScenePrompt(scene.title, scene.draw);
+    const refs = refsForScene(scene.text);
+    if (flags.promptOnly || !KEY) {
+      console.log(`\n=== scene ${scene.n}: ${scene.title} ===`);
+      if (refs.length) console.log(`Refs: ${refs.map((r) => path.basename(r)).join(', ')}`);
+      console.log(prompt);
+      console.log(`Save as: public/art/scenes/${slug}/scene-${scene.n}.png`);
+      continue;
+    }
+    process.stdout.write(`🎬 scene ${scene.n} … `);
+    try {
+      const png = await callGemini(prompt, refs);
+      const outPath = path.join(outDir, `scene-${scene.n}.png`);
+      fs.writeFileSync(outPath, png);
+      console.log(`✅ ${(png.length / 1024).toFixed(0)} KB → scene-${scene.n}.png (refs: ${refs.length})`);
+    } catch (err) {
+      console.log(`❌ ${err.message}`);
+    }
+  }
+}
+
 async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
+
+  // scene illustrations for a story
+  if (flags.scenes) { await generateScenes(flags.scenes); return; }
 
   // custom one-off sketch (used by the skill for brand-new characters)
   if (flags.id) {

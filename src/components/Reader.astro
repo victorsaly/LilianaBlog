@@ -25,6 +25,19 @@ function sceneAudio(n: number): { audio: string; timings: string } | null {
   return null;
 }
 const hasAnyAudio = story.scenes.some((s) => sceneAudio(s.n));
+
+// Scene picture: use the one from the story file if given, otherwise
+// auto-detect a generated one in public/art/scenes/<slug>/scene-<n>.<ext>.
+const sceneArtDir = path.join(process.cwd(), 'public', 'art', 'scenes', story.slug);
+function sceneImg(scene: (typeof story.scenes)[number]): string | null {
+  if (scene.image) return artUrl(scene.image, 'scene', base);
+  for (const ext of ['png', 'webp', 'jpg', 'jpeg']) {
+    if (fs.existsSync(path.join(sceneArtDir, `scene-${scene.n}.${ext}`))) {
+      return `${base}art/scenes/${story.slug}/scene-${scene.n}.${ext}`;
+    }
+  }
+  return null;
+}
 ---
 
 <div class="reader" id="reader" data-total={total}>
@@ -37,7 +50,7 @@ const hasAnyAudio = story.scenes.some((s) => sceneAudio(s.n));
 
   <div class="page">
     {story.scenes.map((scene) => {
-      const img = artUrl(scene.image, 'scene', base);
+      const img = sceneImg(scene);
       const a = sceneAudio(scene.n);
       return (
         <article class="scene" data-scene={scene.n} data-audio={a?.audio} data-timings={a?.timings} hidden={scene.n !== 1}>

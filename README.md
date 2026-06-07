@@ -7,6 +7,8 @@ story is just a **plain Markdown file Lily can write and edit herself**.
 
 First story: 🥔 **The Great Potato Adventure**.
 
+🌍 **Live:** <https://victorsaly.github.io/LilianaBlog/>
+
 ---
 
 ## ✨ What it does
@@ -43,6 +45,42 @@ To make the final files for publishing:
 npm run build      # output goes to dist/
 npm run preview    # preview the built site
 ```
+
+---
+
+## 🧰 Commands & skills
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Run the site locally |
+| `npm run build` | Build to `dist/` |
+| `npm run new-story -- --title "..."` | Scaffold a new story file |
+| `npm run voices` | Generate per-character narration (needs Azure key in `.env`) |
+| `npm run voices:dry` | Preview the speaker-splitting without a key |
+| `npm run illustrate -- <id>` | Make a character illustration (needs Gemini key) |
+| `npm run illustrate -- --scenes <story-slug>` | Make scene illustrations for a story |
+
+**Claude Code skills** (type the slash command):
+- **/new-story** — draft a whole dyslexia-friendly story from an idea
+- **/sketch-to-illustration** — turn a sketch into blog-matching art
+
+Secrets live in `.env` (git-ignored): `GEMINI_API_KEY`, `AZURE_SPEECH_KEY`,
+`AZURE_SPEECH_REGION`.
+
+---
+
+## 🚀 Publish updates
+
+The site is already deployed to **GitHub Pages** at
+<https://victorsaly.github.io/LilianaBlog/> via `.github/workflows/deploy.yml`.
+To publish any change (new story, new art, new voices):
+
+```bash
+git add -A && git commit -m "what changed" && git push
+```
+
+The pipeline rebuilds and republishes automatically (it sets the `/LilianaBlog/`
+base path for you).
 
 ---
 

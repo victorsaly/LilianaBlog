@@ -69,3 +69,20 @@ export const CHARACTERS = {
 export function buildPrompt(body) {
   return `${body}\n\n${STYLE}\n\n${KEEP}`;
 }
+
+// Wide scene/background illustrations (these KEEP a full background — not
+// transparent — and should match the characters' look).
+export const SCENE_STYLE = [
+  'Wide landscape children’s-storybook scene illustration, 4:3 composition,',
+  'bright bold cartoon colours, thick clean outlines, soft cel shading, a rich',
+  'colourful setting that fills the whole frame (a full background, NOT',
+  'transparent), no text or words anywhere. Keep the same cheerful cartoon art',
+  'style as the attached character reference images so the characters look the',
+  'same as the rest of the book.',
+].join(' ');
+
+/** Build a scene prompt from a story page's "draw this" hint + title. */
+export function buildScenePrompt(title, draw) {
+  const hint = String(draw || '').replace(/^draw this:?\s*/i, '').trim();
+  return `Illustrate this page of a children's storybook. Scene: "${title}". ${hint}\n\n${SCENE_STYLE}`;
+}
