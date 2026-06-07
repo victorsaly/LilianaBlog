@@ -1,0 +1,48 @@
+/* =========================================================================
+   Design tokens — the foundation of the look. One place for the type scale,
+   spacing scale and colour ramp so the whole site stays consistent.
+   (Loaded before global.css, which consumes these.)
+   ========================================================================= */
+:root {
+  /* ---- spacing scale (0.25rem base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* ---- fluid type scale ---- */
+  --text-xs: 0.8rem;
+  --text-sm: 0.95rem;
+  --text-base: 1.05rem;
+  --text-md: 1.2rem;
+  --text-lg: clamp(1.25rem, 1rem + 1.2vw, 1.6rem);
+  --text-xl: clamp(1.6rem, 1.1rem + 2.4vw, 2.3rem);
+  --text-2xl: clamp(2rem, 1.2rem + 3.6vw, 3rem);
+  --text-3xl: clamp(2.4rem, 1.3rem + 5vw, 4.4rem);
+
+  /* ---- colour ramp (brand, with tints/shades) ---- */
+  --teal-100: #d6f6f1;
+  --teal-300: #6fe0d3;
+  --teal-500: #12b3a6;
+  --teal-700: #0c8378;
+  --purple-100: #ece4ff;
+  --purple-300: #b9a0fb;
+  --purple-500: #8b5cf6;
+  --purple-700: #6d3bdc;
+  --sun-300: #ffd86b;
+  --sun-500: #ffb703;
+  --coral-300: #ff9b9b;
+  --coral-500: #ff6b6b;
+
+  /* ---- content widths ---- */
+  --w-page: min(1120px, 92vw);
+  --w-prose: 38ch;        /* short lines = easier reading */
+  --w-reader: min(840px, 94vw);
+
+  /* section vertical rhythm */
+  --section-gap: var(--space-7);
+}

@@ -22,6 +22,11 @@ const drawn = characters.filter((c) => c.sketch).map((c) => ({
 const donePairs = drawn.filter((p) => p.illoUrl);
 const sketches = drawn.slice(0, 4);
 
+// Full cast for the "meet the cast" strip (illustration if available, else sketch).
+const cast = characters
+  .map((c) => ({ name: c.name, url: illustrationUrl(c.id, base) || artUrl(c.sketch, 'character', base) }))
+  .filter((c) => c.url);
+
 // Hero star: Lily's illustration if she has one, else her sketch.
 const lily = drawn.find((d) => d.name === 'Lily');
 const heroImg = lily?.illoUrl || lily?.sketchUrl;
@@ -100,6 +105,18 @@ const firstStory = stories[0];
       </div>
     )}
   </section>
+
+  {cast.length > 0 && (
+    <section class="wrap">
+      <div class="section-title">
+        <span aria-hidden="true" style="font-size:1.8rem">🎭</span>
+        <h2>Meet the cast</h2>
+      </div>
+      <a class="cast-strip" href={`${base}characters/`} aria-label="Meet all the characters">
+        {cast.map((c) => <img src={c.url} alt={c.name} loading="lazy" />)}
+      </a>
+    </section>
+  )}
 
   <section class="wrap center" style="margin:2rem 0 1rem">
     <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Meet the characters</a>

@@ -103,7 +103,7 @@ img { max-width: 100%; display: block; }
 .skip-link:focus { left: 12px; top: 12px; }
 
 /* ---- Layout helpers ---------------------------------------------------- */
-.wrap { width: min(1120px, 92vw); margin-inline: auto; }
+.wrap { width: var(--w-page, min(1120px, 92vw)); margin-inline: auto; }
 .center { text-align: center; }
 
 /* ---- Buttons ----------------------------------------------------------- */
@@ -151,11 +151,11 @@ img { max-width: 100%; display: block; }
 /* ---- Hero (home) ------------------------------------------------------- */
 .hero-wide { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; align-items: center; padding: 1.5rem 0 1rem; }
 .hero-copy h1 {
-  font-size: clamp(2.4rem, 6vw, 4.2rem); letter-spacing: -0.5px;
+  font-size: var(--text-3xl); letter-spacing: -0.5px;
   background: linear-gradient(120deg, var(--purple-deep), var(--teal-deep) 55%, var(--coral));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.hero-copy p { font-size: 1.3rem; color: var(--ink-soft); max-width: 42ch; margin: 0.4rem 0 1.4rem; }
+.hero-copy p { font-size: var(--text-md); color: var(--ink-soft); max-width: 42ch; margin: var(--space-2) 0 var(--space-5); }
 .hero-cta { display: flex; gap: 0.7rem; flex-wrap: wrap; }
 .hero-figure { position: relative; display: grid; place-items: center; }
 .hero-figure .blob {
@@ -177,9 +177,15 @@ img { max-width: 100%; display: block; }
 .hero-art img { width: 96px; height: 124px; object-fit: cover; object-position: top center; border-radius: var(--r-sm); background:#fff; padding:6px; box-shadow: var(--shadow-sm); transform: rotate(-3deg); }
 .hero-art img:nth-child(even) { transform: rotate(3deg); }
 
-.section-title { display: flex; align-items: center; gap: 0.6rem; margin: 2.4rem 0 1.1rem; }
-.section-title h2 { margin: 0; font-size: 1.9rem; }
+.section-title { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-7) 0 var(--space-5); }
+.section-title h2 { margin: 0; font-size: var(--text-xl); }
 .section-title::after { content: ""; flex: 1; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--sunny), transparent); }
+
+/* "Meet the cast" — transparent character cut-outs floating in a row */
+.cast-strip { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: var(--space-3); text-decoration: none; padding: var(--space-3) 0; }
+.cast-strip img { height: 130px; width: auto; filter: drop-shadow(0 10px 12px rgba(43, 37, 51, 0.18)); transition: transform 0.16s ease; }
+.cast-strip img:hover { transform: translateY(-8px) rotate(-2deg); }
+@media (max-width: 560px) { .cast-strip img { height: 92px; } }
 
 /* ---- Bookshelf --------------------------------------------------------- */
 .shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.6rem; }
@@ -253,7 +259,7 @@ img { max-width: 100%; display: block; }
 /* =========================================================================
    THE READER  (read-along page)
    ========================================================================= */
-.reader { width: min(840px, 94vw); margin: 0 auto; }
+.reader { width: var(--w-reader, min(840px, 94vw)); margin: 0 auto; }
 .reader-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
 .reader-title { font-size: 1.55rem; }
 .scene-count { font-weight: 800; color: var(--ink-soft); font-family: var(--font-display); }
@@ -283,7 +289,7 @@ html[data-bg='night'] .page-scene-title { color: #7be0d4; }
 .page-text {
   font-family: var(--read-font); font-size: var(--read-size); line-height: var(--read-line);
   letter-spacing: var(--read-letter); word-spacing: var(--read-word);
-  white-space: pre-wrap; text-align: left; max-width: 38ch; margin-inline: auto;
+  white-space: pre-wrap; text-align: left; max-width: var(--w-prose, 38ch); margin-inline: auto;
 }
 .page-text .w { border-radius: 6px; padding: 0 0.04em; cursor: pointer; transition: background 0.08s ease, color 0.08s ease; }
 .page-text .w:hover { background: rgba(139, 92, 246, 0.18); }
