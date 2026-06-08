@@ -352,6 +352,28 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   border: 2px solid #fff; box-shadow: var(--shadow-sm); margin-top: 0.15rem;
 }
 
+/* storyteller (Lili) — a still face close-up with a code-drawn mouth that opens
+   and closes while reading (no frame-swap → no flicker) */
+.storyteller {
+  position: fixed; left: 16px; bottom: 16px; z-index: 6; width: 132px;
+  pointer-events: none; filter: drop-shadow(0 8px 14px rgba(43, 37, 51, 0.28));
+  transform-origin: bottom center; animation: teller-bob 3s ease-in-out infinite;
+}
+.storyteller .teller { position: relative; }
+.storyteller-img { display: block; width: 100%; height: auto; }
+/* the vector mouth, positioned over Lili's lips (tuned to the generated face) */
+.mouth { position: absolute; left: 43.5%; top: 58.5%; width: 18%; height: 13%; opacity: 0; transition: opacity 0.12s; }
+.mouth .m-lips { fill: #6f2b2b; }
+.mouth .m-teeth { fill: #fff; }
+.mouth .m-tongue { fill: #df6f86; }
+/* mouth openness is driven per-word from JS (natural sync); CSS just eases it */
+.mouth-g { transform-box: fill-box; transform-origin: center; transform: scaleY(0.1); transition: transform 0.08s ease-out; }
+.storyteller.talking .mouth { opacity: 1; }
+#fox-btn.off { opacity: 0.45; }
+@keyframes teller-bob { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-4px) rotate(0.6deg); } }
+@media (prefers-reduced-motion: reduce) { .storyteller { animation: none; } }
+@media (max-width: 819px) { .storyteller { width: 104px; left: 8px; bottom: 8px; } }
+
 /* =========================================================================
    Scene "slide": a text-only column + a STAGE picture that swaps as the
    reading passes each point. Desktop = side-by-side; mobile = picture above,
@@ -429,7 +451,15 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   .reader .reader-bar .btn { font-size: 0.92rem; padding: 0.45em 0.8em; min-height: 42px; }
   .reader .reader-bar .play-btn { font-size: 1rem; padding: 0.5em 0.95em; flex: 0 1 auto; justify-content: center; }
   .reader .reader-bar .nav-arrow { padding: 0.45em 0.7em; }
-  .hint { position: relative; z-index: 2; margin-bottom: 76px; }
+  /* the footer would overlap the full-screen picture on the reader — hide it there */
+  body[data-page='story'] .site-footer { display: none; }
+  /* tip sits over the picture, so give it a readable frosted pill + clear the bar */
+  body[data-page='story'] .hint {
+    position: relative; z-index: 2; max-width: 34ch; margin: 0.6rem auto 88px;
+    background: color-mix(in srgb, var(--read-bg) 86%, transparent);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border-radius: var(--r-lg); padding: 0.55rem 0.9rem; box-shadow: var(--shadow-sm);
+  }
 
   /* while reading, hide the bar down to just a floating Pause button so the
      story (words + picture) isn't clashing with the controls */

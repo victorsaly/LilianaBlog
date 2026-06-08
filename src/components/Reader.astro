@@ -18,6 +18,9 @@ function portraitFor(paraText: string): { speaker: string; src: string } | null 
   if (!seg || !fs.existsSync(path.join(illoDir, `${seg.speaker}.png`))) return null;
   return { speaker: seg.speaker, src: `${base}art/illustrations/${seg.speaker}.png` };
 }
+// the storyteller (Lili) animates with a gentle talk-bob while reading.
+// One image (no frame-swap → no flicker).
+const storytellerSrc = fs.existsSync(path.join(illoDir, 'lili-face.png')) ? `${base}art/illustrations/lili-face.png` : null;
 
 // Generated sound effects + ambience (npm run sfx) — names without .mp3.
 const sfxDir = path.join(process.cwd(), 'public', 'audio', 'sfx');
@@ -148,11 +151,27 @@ function view(scene: (typeof story.scenes)[number]) {
     <label class="speed" title="Reading speed">🐢 <input type="range" id="speed-quick" min="0.6" max="1.3" step="0.05" aria-label="Reading speed" /> 🐇</label>
     <button class="btn btn-teal nav-arrow" id="next-btn" type="button">Next ▶</button>
     <button class="btn btn-ghost" id="sound-btn" type="button" aria-label="Sound on or off" aria-pressed="true">🔊</button>
+    {storytellerSrc && <button class="btn btn-ghost" id="fox-btn" type="button" aria-label="Storyteller on or off" aria-pressed="true">🗣️</button>}
     <input type="checkbox" id="autoplay" hidden />
   </div>
 
   <p class="hint" id="tap-hint">👆 Tip: tap any <span class="tapword-demo">underlined</span> word to hear it on its own.</p>
   <p class="hint" id="no-speech" hidden>Reading-aloud isn't available in this browser, but you can still read the story and flip the pages. Try Chrome, Edge or Safari for the voice. 💛</p>
+
+  {storytellerSrc && (
+    <div class="storyteller" id="fox" hidden aria-hidden="true">
+      <div class="teller">
+        <img class="storyteller-img" src={storytellerSrc} alt="" />
+        <svg class="mouth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <g class="mouth-g">
+            <ellipse class="m-lips" cx="50" cy="50" rx="34" ry="30" />
+            <rect class="m-teeth" x="22" y="20" width="56" height="16" rx="7" />
+            <ellipse class="m-tongue" cx="50" cy="74" rx="20" ry="13" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  )}
 </div>
 
 <script>
@@ -394,6 +413,36 @@ function view(scene: (typeof story.scenes)[number]) {
       else if (playing) { ensureCtx(); resumeCtx(); startAmbient(scenes[current].title); }
     });
 
+    // ---- storyteller (Lili) — a still face with a code-drawn mouth driven
+    // per-word (natural sync, no frame-swap → no flicker). ----
+    const fox = document.getElementById('fox');
+    const foxBtn = document.getElementById('fox-btn') as HTMLButtonElement | null;
+    const mouthG = fox?.querySelector('.mouth-g') as SVGGElement | null;
+    let foxOn = localStorage.getItem('lili-fox') !== 'off';
+    let mouthCloseT = 0;
+    function setMouth(open: number) { if (mouthG) mouthG.style.transform = `scaleY(${open})`; }
+    // called on each new spoken word: pop the mouth open a (varied) amount, then ease shut
+    function foxSpeakWord() {
+      if (!fox || fox.hidden || !mouthG) return;
+      const open = 0.42 + Math.random() * 0.42;        // 0.42–0.84, varies so it looks natural
+      setMouth(open);
+      clearTimeout(mouthCloseT);
+      mouthCloseT = window.setTimeout(() => setMouth(0.1), 90 + Math.random() * 70);
+    }
+    function showFox(on: boolean) {
+      if (!fox) return;
+      const show = on && foxOn;
+      fox.hidden = !show;
+      fox.classList.toggle('talking', show);
+      if (!show) { clearTimeout(mouthCloseT); setMouth(0.1); }
+    }
+    function setFoxIcon() { if (foxBtn) { foxBtn.setAttribute('aria-pressed', String(foxOn)); foxBtn.classList.toggle('off', !foxOn); } }
+    setFoxIcon();
+    foxBtn?.addEventListener('click', () => {
+      foxOn = !foxOn; localStorage.setItem('lili-fox', foxOn ? 'on' : 'off'); setFoxIcon();
+      showFox(playing);
+    });
+
     // ---- state ----
     let current = 0, playing = false, paused = false;
     let mode: 'audio' | 'tts' = 'tts';
@@ -441,6 +490,7 @@ function view(scene: (typeof story.scenes)[number]) {
         }
         if (ws[nowIdx]) { ws[nowIdx].el.classList.add('now'); ws[nowIdx].el.classList.remove('read'); ensureVisible(ws[nowIdx].el); }
         lastNow = nowIdx;
+        foxSpeakWord();   // open Lili's mouth on each new word (natural lip-sync)
       }
       updateStage(s, nowIdx);
       // per-paragraph sound cue when we enter a new paragraph
@@ -473,6 +523,7 @@ function view(scene: (typeof story.scenes)[number]) {
     function setBtn(state: 'play' | 'pause' | 'idle' | 'loading') {
       playBtn.disabled = state === 'loading';
       root!.classList.toggle('is-reading', state === 'play');
+      showFox(state === 'play');
       if (state === 'loading') { playBtn.textContent = '⏳ Loading…'; playBtn.classList.remove('is-playing'); }
       else if (state === 'play') { playBtn.textContent = '⏸ Pause'; playBtn.classList.add('is-playing'); }
       else if (state === 'pause') { playBtn.textContent = '▶ Continue'; playBtn.classList.remove('is-playing'); }
