@@ -27,6 +27,13 @@ const canonical = `${origin}${base}`;
     <link rel="icon" href={`${base}favicon.svg`} />
     <meta name="theme-color" content="#12b3a6" />
 
+    <!-- Installable app (PWA) -->
+    <link rel="manifest" href={`${base}manifest.webmanifest`} />
+    <link rel="apple-touch-icon" href={`${base}icons/icon-180.png`} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Lili's Stories" />
+
     <!-- Social share previews -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -61,6 +68,15 @@ const canonical = `${origin}${base}`;
         el.style.setProperty('--read-line', String(s.line));
         el.style.setProperty('--read-word', s.word + 'em');
       })();
+    </script>
+
+    <!-- register the service worker so the app works offline + is installable -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {});
+        });
+      }
     </script>
   </head>
   <body data-page={active}>

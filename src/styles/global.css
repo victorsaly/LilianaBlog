@@ -363,9 +363,10 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 .storyteller-img { display: block; width: 100%; height: auto; }
 /* the vector mouth, positioned over Lili's lips (tuned to the generated face) */
 .mouth { position: absolute; left: 43.5%; top: 58.5%; width: 18%; height: 13%; opacity: 0; transition: opacity 0.12s; }
-.mouth .m-lips { fill: #6f2b2b; }
-.mouth .m-teeth { fill: #fff; }
-.mouth .m-tongue { fill: #df6f86; }
+.mouth .m-rim { fill: #c97b75; }       /* soft lip frame */
+.mouth .m-lips { fill: #4a1d24; }      /* dark mouth interior */
+.mouth .m-teeth { fill: #fffdf8; }
+.mouth .m-tongue { fill: #e58198; }
 /* mouth openness is driven per-word from JS (natural sync); CSS just eases it */
 .mouth-g { transform-box: fill-box; transform-origin: center; transform: scaleY(0.1); transition: transform 0.08s ease-out; }
 .storyteller.talking .mouth { opacity: 1; }
