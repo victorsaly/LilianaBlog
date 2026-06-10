@@ -148,7 +148,7 @@ function view(scene: (typeof story.scenes)[number]) {
     <button class="btn btn-ghost nav-arrow" id="prev-btn" type="button">◀ Back</button>
     <button class="btn play-btn" id="play-btn" type="button">▶ Read to me</button>
     <button class="btn btn-ghost" id="restart-btn" type="button" aria-label="Start again">↺</button>
-    <label class="speed" title="Reading speed">🐢 <input type="range" id="speed-quick" min="0.6" max="1.3" step="0.05" aria-label="Reading speed" /> 🐇</label>
+    <button class="btn btn-ghost speed-btn" id="speed-btn" type="button" aria-label="Reading speed" title="Reading speed">🌟</button>
     <button class="btn btn-teal nav-arrow" id="next-btn" type="button">Next ▶</button>
     <button class="btn btn-ghost" id="sound-btn" type="button" aria-label="Sound on or off" aria-pressed="true">🔊</button>
     {storytellerSrc && <button class="btn btn-ghost" id="fox-btn" type="button" aria-label="Storyteller on or off" aria-pressed="true">🗣️</button>}
@@ -201,7 +201,7 @@ function view(scene: (typeof story.scenes)[number]) {
     const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
     const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
     const autoplayBox = document.getElementById('autoplay') as HTMLInputElement;
-    const speedQuick = document.getElementById('speed-quick') as HTMLInputElement;
+    const speedBtn = document.getElementById('speed-btn') as HTMLButtonElement;
     const sceneNow = document.getElementById('scene-now') as HTMLElement;
     const progressFill = document.getElementById('scene-progress-fill') as HTMLElement | null;
 
@@ -681,21 +681,28 @@ function view(scene: (typeof story.scenes)[number]) {
 
     autoplayBox.checked = localStorage.getItem('lili-autoplay') !== 'off';
     autoplayBox.addEventListener('change', () => localStorage.setItem('lili-autoplay', autoplayBox.checked ? 'on' : 'off'));
-    function syncSpeed() { speedQuick.value = String(settings().rate || 0.9); }
-    speedQuick.addEventListener('input', () => {
-      const cur = settings(); cur.rate = parseFloat(speedQuick.value);
-      localStorage.setItem('lili-reading-v1', JSON.stringify(cur));
-      if (mode === 'audio') audio.playbackRate = clampRate(cur.rate);
-      document.dispatchEvent(new CustomEvent('lili:reading-change', { detail: cur }));
-    });
-    document.addEventListener('lili:reading-change', () => { syncSpeed(); if (mode === 'audio') audio.playbackRate = clampRate(settings().rate); });
-    syncSpeed();
+    // reading speed: a simple icon button cycling Slow → Just right (mum's pick) → Fast
+    const SPEEDS = [
+      { r: 0.78, icon: '🐢', name: 'Slow' },
+      { r: 0.92, icon: '🌟', name: "Just right (mum's pick)" },
+      { r: 1.12, icon: '🐇', name: 'Fast' },
+    ];
+    function nearestSpeed(r: number) { let bi = 1, bd = 9; SPEEDS.forEach((s, i) => { const d = Math.abs(s.r - (r || 0.92)); if (d < bd) { bd = d; bi = i; } }); return bi; }
+    let speedIdx = nearestSpeed(settings().rate);
+    function applySpeed(save: boolean) {
+      const s = SPEEDS[speedIdx];
+      if (speedBtn) { speedBtn.textContent = s.icon; speedBtn.title = `Reading speed: ${s.name}`; }
+      if (save) { const cur = settings(); cur.rate = s.r; localStorage.setItem('lili-reading-v1', JSON.stringify(cur)); }
+      if (mode === 'audio') audio.playbackRate = clampRate(s.r);
+    }
+    applySpeed(false);
+    speedBtn?.addEventListener('click', () => { speedIdx = (speedIdx + 1) % SPEEDS.length; applySpeed(true); });
 
     if (!canRead) {
       document.getElementById('no-speech')?.removeAttribute('hidden');
       document.getElementById('tap-hint')?.setAttribute('hidden', '');
       playBtn.disabled = true; restartBtn.disabled = true;
-      speedQuick.closest('.speed')?.setAttribute('hidden', '');
+      speedBtn?.setAttribute('hidden', '');
     }
     if (!ttsSupport) document.getElementById('tap-hint')?.setAttribute('hidden', '');
     if (synth) synth.onvoiceschanged = () => {};

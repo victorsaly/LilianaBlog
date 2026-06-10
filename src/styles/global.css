@@ -160,6 +160,10 @@ img { max-width: 100%; display: block; }
 .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform 0.2s ease; }
 .nav a:hover::after, .nav a[aria-current='page']::after { transform: scaleX(1); }
 .nav a[aria-current='page'] { color: var(--teal-deep); }
+.app-refresh { background: none; border: none; cursor: pointer; font-size: 1.2rem; line-height: 1; color: var(--ink-soft); padding: 0.15em 0.35em; border-radius: var(--r-pill); }
+.app-refresh:hover { color: var(--teal-deep); background: rgba(43,37,51,0.06); }
+.app-refresh.spinning { animation: app-spin 0.6s linear infinite; }
+@keyframes app-spin { to { transform: rotate(360deg); } }
 /* the ⚙️ Reading settings button — a quiet outline pill */
 .nav .nav-settings { min-height: 0; padding: 0.4em 0.9em; font-size: 0.95rem; font-weight: 700; background: #fff; color: var(--ink); border: 1px solid var(--paper-edge); border-radius: var(--r-pill); box-shadow: none; }
 .nav .nav-settings:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
@@ -445,10 +449,10 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
     margin: 0; border-radius: 0; border-left: none; border-right: none;
     background: color-mix(in srgb, var(--page-bg) 92%, transparent);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    gap: 0.4rem; padding: 0.4rem 0.5rem; flex-wrap: nowrap;
+    gap: 0.4rem; padding: 0.4rem 0.5rem; flex-wrap: wrap;
   }
-  /* compact controls on phones: one tidy row (Back · Read · Next · 🔊) */
-  .reader .reader-bar #restart-btn, .reader .reader-bar .speed { display: none; }
+  /* compact controls on phones; keep the speed icon, drop restart to save room */
+  .reader .reader-bar #restart-btn { display: none; }
   .reader .reader-bar .btn { font-size: 0.92rem; padding: 0.45em 0.8em; min-height: 42px; }
   .reader .reader-bar .play-btn { font-size: 1rem; padding: 0.5em 0.95em; flex: 0 1 auto; justify-content: center; }
   .reader .reader-bar .nav-arrow { padding: 0.45em 0.7em; }
@@ -485,8 +489,7 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 .play-btn { font-size: 1.2rem; padding: 0.6em 1.4em; background: var(--teal); color: #fff; border-color: transparent; box-shadow: var(--shadow-sm); }
 .play-btn.is-playing { background: var(--coral); }
 
-.speed { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.8); padding: 0.4rem 0.9rem; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); }
-.speed input { width: 120px; accent-color: var(--purple); }
+.speed-btn { font-size: 1.15rem; line-height: 1; }
 
 .hint { text-align: center; color: var(--ink-soft); font-size: 0.95rem; margin-top: 0.7rem; }
 
