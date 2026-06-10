@@ -1,0 +1,18 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Lili and Leo were still arguing — they didn&apos;t even notice the world had changed, until Mum and Dad pointed around them.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Wait,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Lili, looking up.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;This is the video game I was just playing!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">And then their clothes began to change — and so did something deeper inside them. Each of them had a power. Dad stamped his foot and the ground rumbled — he had Earth power, and his tie became a cape, his coffee mug glowing. Mum lifted her hand and the air swirled — she had Wind power, with a golden battle-cloak and a frying-pan shield. Leo clenched his fists and sparks crackled — he had Fire power, in blocky diamond-blue armour with a pickaxe that could break anything. But Lili? Lili got her glowing silver armour and her stylus-sword... and when she tried to feel her power — nothing happened. She felt scared.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Why don&apos;t I have a power?&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">she whispered. Even the pets had been pulled in! Pip the hedgehog could now curl into a super-fast spiky speed-ball, and Blaze the parrot burst into bright flame-coloured feathers that lit up the dark and shot little sparks. Suddenly an army of tall, crispy French Fry Guards came marching, each holding a little ketchup-blaster.</prosody></voice>
+  <voice name="en-GB-NoahNeural"><prosody pitch="-14%" rate="-4%">&quot;By order of the Great Potato — surrender and play forever!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">they shouted. Lili looked at Leo. Leo looked at Lili. They were still a little mad... but they both knew what they had to do.</prosody></voice>
+  <voice name="en-GB-RyanNeural"><prosody pitch="+16%" rate="+4%">&quot;Truce?&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Leo.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Truce,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Lili.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Let&apos;s mash some fries.&quot;</prosody></voice>
+</speak>

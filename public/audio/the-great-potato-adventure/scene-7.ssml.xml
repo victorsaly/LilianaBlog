@@ -1,0 +1,17 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">There he was, floating in the air, spinning his nunchucks.</prosody></voice>
+  <voice name="en-GB-EthanNeural"><prosody pitch="-18%" rate="-6%">&quot;You&apos;ll never beat me!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">the potato laughed. And he was strong — too strong. His nunchucks knocked Dad&apos;s earth walls to dust, blew past Mum&apos;s wind, and snuffed out Leo&apos;s fire. One by one, the family was knocked back. Lili tried the restart — she tapped her stylus-sword three times — but it wasn&apos;t enough. She felt small and alone. Then her family gathered close around her.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;You don&apos;t need to do this by yourself,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Dad, and his earth power flowed into her.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;We&apos;re with you,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Mum, and her wind power swirled into her.</prosody></voice>
+  <voice name="en-GB-RyanNeural"><prosody pitch="+16%" rate="+4%">&quot;You&apos;ve got this, sis,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Leo, and his fire power blazed into her. And as Lili felt how much her family loved her — how much they cared, and how much she cared about them — a warm light began to glow in her chest. It grew brighter and brighter. The earth, the wind, and the fire all spun together inside her and became something brand new: pure Energy — the Ultimate Power. This was Lili&apos;s wonder power all along. It didn&apos;t come from armour or a sword. It came from her love and caring — and it only woke up when her family stood together. Glowing from head to toe, Lili raised her stylus-sword high.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Game over, Potato,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">she said — and hit the final Restart. A wave of bright energy washed through the cave. The potato spun faster and faster —</prosody></voice>
+  <voice name="en-GB-EthanNeural"><prosody pitch="-18%" rate="-6%">&quot;Nooo, not the reset!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">— until poof! He turned back into a plain, ordinary, harmless little potato, sitting on the cave floor.</prosody></voice>
+</speak>

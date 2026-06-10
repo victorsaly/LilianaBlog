@@ -1,0 +1,12 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;Lili! Breakfast!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Mum called. No answer. Lili was too deep in her game. So Leo did what big brothers do — he shook her chair to get her attention, and bumped her Nintendo right off the table and onto the floor. Lili lost the game she was about to win. &quot;Leo!&quot; she yelled. And just like that, the two of them were fighting.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;Stop it, both of you!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Mum. Then Dad came out of the office.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;Breakfast&apos;s ready,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">he said.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;Come on — let&apos;s just get this settled.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">What nobody noticed was this: when the Nintendo hit the floor, it cracked... and that crack sent a tiny secret signal — bzzzt — far, far away.</prosody></voice>
+</speak>

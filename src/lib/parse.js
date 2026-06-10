@@ -136,6 +136,8 @@ const NAME_TO_SPEAKER = {
   lili: 'lily', lily: 'lily', leo: 'leo', mum: 'mum', mom: 'mum', mummy: 'mum',
   dad: 'dad', daddy: 'dad', pip: 'pip', blaze: 'blaze',
   potato: 'potato',
+  // Luna Across the Galaxy
+  luna: 'luna', cheeto: 'cheeto', tito: 'cheeto', guard: 'guard', guards: 'guard',
 };
 
 // The name CLOSEST to the quote wins. In the words after a quote

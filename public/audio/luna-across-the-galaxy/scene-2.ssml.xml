@@ -1,0 +1,8 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">But far across space, hungry aliens were looking for Luna&apos;s power. They wanted it for themselves. So, to keep her safe, Mum did a very hard thing. She sent Luna far away, to a quiet boarding school on planet Earth, where nobody would ever think to look. On Earth, Luna lived a normal life. And she was happiest just being herself. She wore a comfy grey hoodie and her favourite jeans. She kept her long hair in one long plait. She did Not like dresses, even though her dad was always trying to make her wear them. (Luna&apos;s mum and dad had split up a long time ago, and they were very different.) Best of all, Luna was brilliant with computers. Her fingers flew across the keys. She could open any locked door and crack any secret code. Luna was a hacker — the best one at school. And Cheeto? Cheeto hid in her backpack and went everywhere with her.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Stay quiet, Cheeto,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Luna whispered with a grin.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Nobody can know about us.&quot;</prosody></voice>
+</speak>

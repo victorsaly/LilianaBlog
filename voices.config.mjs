@@ -27,6 +27,13 @@ export const VOICES = {
   potato: { voice: 'en-GB-EthanNeural', pitch: '-18%', rate: '-6%' }, // deep, dramatic villain
   fries:  { voice: 'en-GB-NoahNeural', pitch: '+6%' },               // the marching minions
 
+  // ---- Luna Across the Galaxy ----
+  luna:   { voice: 'en-GB-MaisieNeural', pitch: '-7%' },             // brave 15-yo hero, a touch older than Lili
+  cheeto: { voice: 'en-GB-MaisieNeural', pitch: '+34%', rate: '+8%' }, // squeaky, zappy little bunny
+  guard:  { voice: 'en-GB-NoahNeural', pitch: '-14%', rate: '-4%' }, // stiff, blocky palace guard
+  // Luna's mum (a kind queen) and dad (a strict galaxy-king) reuse the warm
+  // `mum` and steady `dad` voices above via the name map in src/lib/parse.js.
+
   // safety net if a speaker can't be worked out
   unknown: { voice: 'en-GB-SoniaNeural' },
 };

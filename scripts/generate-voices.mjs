@@ -27,6 +27,9 @@ import { parseScenes, segmentScene, wordList, normWord } from '../src/lib/parse.
 import { VOICES, OUTPUT_FORMAT, GLOBAL_RATE } from '../voices.config.mjs';
 
 const DRY = process.argv.includes('--dry');
+// Optional: limit to specific story slugs (e.g. `npm run voices -- luna-across-the-galaxy`).
+// With no slugs given, every story is (re)generated, as before.
+const ONLY_SLUGS = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const STORIES_DIR = path.join(ROOT, 'src', 'stories');
@@ -140,7 +143,8 @@ function synthesize(sdk, ssml, mp3Path) {
 // ------------------------------------------------------------------- main
 async function main() {
   if (!fs.existsSync(STORIES_DIR)) { console.error('No src/stories/ folder.'); process.exit(1); }
-  const storyFiles = fs.readdirSync(STORIES_DIR).filter((f) => f.endsWith('.md'));
+  let storyFiles = fs.readdirSync(STORIES_DIR).filter((f) => f.endsWith('.md'));
+  if (ONLY_SLUGS.length) storyFiles = storyFiles.filter((f) => ONLY_SLUGS.includes(f.replace(/\.md$/, '')));
   if (!storyFiles.length) { console.log('No stories found.'); return; }
 
   let sdkBundle = null;

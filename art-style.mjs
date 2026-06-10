@@ -63,6 +63,28 @@ export const CHARACTERS = {
     sketch: null,
     body: 'A little army of golden-yellow French-fry soldiers with simple faces and arms, marching in a wobbly row, each holding a small red ketchup-blaster.',
   },
+
+  // ---- Luna Across the Galaxy (Lily's second story) ----
+  luna: {
+    sketch: 'luna-sketch.jpeg',
+    body: "A brave, clever 15-year-old girl named Luna — this is her real, happy self. Keep her VERY long dark plait, her big sparkly eyes and calm little half-smile. She wears comfy clothes she loves: a casual grey hoodie with the hood down, a simple top, and blue jeans (NOT a dress — she hates dresses). Relaxed, confident standing pose. A faint glow of unstoppable starlight power around her hands, like little sparks she was born with. Colours: cool grey hoodie + denim blue + soft silver-white starlight glow.",
+  },
+  cheeto: {
+    sketch: 'cheeto-sketch.jpeg',
+    body: "A cute, round little bunny called Cheeto — Luna's loyal best friend. Keep his big floppy ears that fade from white at the top down to bright pink at the very tips, the tiny glowing yellow star on top of his head, and a small collar with a little round camera on it. Big friendly eyes, a tiny cheeky grin, little arms and feet. Small crackles of electric sparkle at his ear-tips (he can give a buzzy zap). Soft, huggable and brave. Colours: cream-white fur + pink ear-tips + a yellow star + a small teal collar.",
+  },
+  'luna-mum': {
+    sketch: 'luna-mum-sketch.jpeg',
+    body: "A kind, graceful queen — Luna's mum, who loves her exactly as she is. Keep her long flowing wavy dark hair (the SAME hair as Luna), her warm friendly eyes and gentle smile, a tall pointed gold crown, and a long flowing royal cape. One hand raised in a warm, welcoming wave. A soft golden lion's glow around her (she can turn into a gentle lion). Colours: warm gold crown + deep royal-purple cape + soft golden glow.",
+  },
+  'luna-dad': {
+    sketch: 'luna-dad-sketch.jpeg',
+    body: "A grand, strict king who rules the whole galaxy — Luna's dad. Keep his spiky pointed crown, his round face, a smart black tuxedo under a long dramatic dark cape, and a tall royal sceptre topped with one huge sparkling space-diamond. Proud and stern with a raised eyebrow — storybook-strict and a tiny bit silly, NOT truly frightening. Colours: black tuxedo + dark cape + gold crown + bright white diamond sparkle.",
+  },
+  guards: {
+    sketch: 'guards-sketch.jpeg',
+    body: "Two tall, blocky palace guards in matching armour, standing to attention side by side. Keep their helmets, the diamond emblem on their chest-plates, the wavy belt line, and the long pointed spears they each hold upright. Meant to look a bit scary but in a rounded, toy-like cartoon way that isn't really frightening. Colours: steel-grey armour + dark blue + silver spear tips.",
+  },
 };
 
 /** Build the full prompt for a character (or a custom description). */

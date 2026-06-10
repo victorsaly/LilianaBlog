@@ -1,0 +1,13 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">The kingdom woke up. The lights came back on. Everyone cheered for the brave girl who had saved them all. And Luna finally understood what Mum had always told her. Her power was never just the starlight in her hands. Her real power was being herself — and the love she had for Cheeto and her mum.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;You don&apos;t have to wear a single dress,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">laughed Mum.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;Be exactly who you are.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">So Luna became the kindest Queen the galaxy had ever known. She wore her royal cape — but always over her favourite hoodie. She kept her long plait. And Cheeto rode everywhere on her shoulder, ears fading white to pink. Together, Luna and Cheeto flew their rocket all across space, from planet to planet and star to star — helping wherever they could, and having the greatest adventures of all.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Ready, Cheeto?&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna. Cheeto wiggled his ears. Bzzzt!</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Then let&apos;s go,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna. And off they flew, across the whole galaxy. The End.</prosody></voice>
+</speak>

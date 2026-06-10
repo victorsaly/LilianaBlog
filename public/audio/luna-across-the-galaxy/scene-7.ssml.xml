@@ -1,0 +1,14 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">But when Luna&apos;s rocket landed back on Zootellia, her heart went cold. The shining planet was dark. The lights were out. The whole kingdom was fast asleep — and sneaky aliens were creeping everywhere. While Luna was away, they had finally found their way in. They had caught the Queen and put the whole world to sleep.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;They wanted my power,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">whispered Luna.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;And they hurt my home to try and get it. Not any more.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Luna did not need to fight them. She was far too clever for that. She crept through the shadows with Cheeto, hacking every alien lock as she went. She found Mum trapped inside a glowing cage. Tap-tap-tap went Luna&apos;s clever fingers — and the cage clicked open.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;My brave girl,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Mum.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;You came back.&quot;</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Always,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna. Then they showed the aliens what a team they were. Cheeto zapped — bzzzt! — and switched all the sleepy lights back on. Luna became a tiger, and Mum became a great golden lion, and side by side they roared so loud the aliens dropped their nets, jumped in their ships, and zoomed away across the galaxy, never to come back.</prosody></voice>
+</speak>

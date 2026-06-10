@@ -15,21 +15,27 @@ const cards = characters.map((c) => ({
   illoUrl: illustrationUrl(c.id, base),
 }));
 const doneCount = cards.filter((c) => c.illoUrl).length;
+
+// Group the cast by the book they belong to, keeping first-seen order.
+const stories = [...new Set(cards.map((c) => c.story))];
+const byStory = stories.map((story) => ({ story, cast: cards.filter((c) => c.story === story) }));
 ---
 
 <Base title="Meet the Characters · Lili's Story World" active="characters">
   <section class="wrap hero" style="padding-bottom:0">
     <h1>🎭 Meet the Characters</h1>
-    <p>Everyone from <b>The Great Potato Adventure</b> — drawn by Lili.
+    <p>Everyone from Lili's stories — drawn by Lili herself.
       {doneCount > 0
         ? <span>Tap <b>✏️ Sketch</b> / <b>🎨 Colour</b> to see how a drawing came to life!</span>
         : <span>Her sketches are here now — the colourful illustrations are coming next!</span>}
     </p>
   </section>
 
+  {byStory.map(({ story, cast }) => (
   <section class="wrap" style="margin-top:1.5rem">
+    <h2 class="cast-heading">{cast[0].emoji} {story}</h2>
     <div class="char-grid">
-      {cards.map((c) => (
+      {cast.map((c) => (
         <div class="char" style={`--tint:${c.color}`}>
           {c.illoUrl && c.sketchUrl ? (
             <div class="frame flip" data-show="art">
@@ -56,6 +62,7 @@ const doneCount = cards.filter((c) => c.illoUrl).length;
       ))}
     </div>
   </section>
+  ))}
 
   <section class="wrap center" style="margin:2.5rem 0 1rem">
     <a class="btn btn-teal btn-big" href={base}>🏠 Back to the bookshelf</a>

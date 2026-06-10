@@ -129,14 +129,27 @@ async function makeOne(id, body, sketchName) {
 }
 
 // Which characters appear in a scene's text (so we can attach their art as refs).
+// The default map is The Great Potato Adventure's cast.
 const NAME_RX = {
   lily: /\blil[iy]\b/i, leo: /\bleo\b/i, mum: /\bmum\b/i, dad: /\bdad\b/i,
   pip: /\bpip\b/i, blaze: /\bblaze\b/i, potato: /\bpotato\b/i, fries: /\b(fries|fry)\b/i,
 };
-function refsForScene(text) {
+// Per-story name→character-art maps, so a story only references ITS OWN cast
+// (e.g. Luna's queen "Mum" must not pull the other story's family Mum art).
+const STORY_REFS = {
+  'luna-across-the-galaxy': {
+    luna: /\bluna\b/i,
+    cheeto: /\b(cheeto|tito)\b/i,
+    'luna-mum': /\b(queen|mum|mother)\b/i,
+    'luna-dad': /\b(king|dad|father)\b/i,
+    guards: /\bguard/i,
+  },
+};
+function refsForScene(text, slug) {
+  const map = STORY_REFS[slug] || NAME_RX;
   const refs = [];
-  for (const id of Object.keys(CHARACTERS)) {
-    if (NAME_RX[id]?.test(text)) {
+  for (const id of Object.keys(map)) {
+    if (map[id]?.test(text)) {
       const p = path.join(OUT_DIR, `${id}.png`);
       if (fs.existsSync(p)) refs.push(p);
     }
@@ -160,7 +173,7 @@ async function generateScenes(slug) {
   console.log(`🎬 ${slug} — ${scenes.length} pages`);
   for (const scene of scenes) {
     if (flags.only && scene.n !== flags.only) continue;
-    const refs = refsForScene(scene.text);
+    const refs = refsForScene(scene.text, slug);
 
     // 0) per-paragraph pictures: one illustration per paragraph (the picture the
     //    reader's stage shows while that paragraph is read). Skips existing.
@@ -170,7 +183,7 @@ async function generateScenes(slug) {
         const P = p + 1;
         const exists = ['png', 'jpg', 'jpeg', 'webp'].some((e) => fs.existsSync(path.join(outDir, `scene-${scene.n}-p${P}.${e}`)));
         if (exists) continue;
-        const prompt = `A storybook illustration of this exact moment from "The Great Potato Adventure" (scene: "${scene.title}"). Show: ${paras[p].text}\n\n${SCENE_STYLE}`;
+        const prompt = `A storybook illustration of this exact moment (scene: "${scene.title}"). Show: ${paras[p].text}\n\n${SCENE_STYLE}`;
         if (flags.promptOnly || !KEY) {
           console.log(`\n=== scene ${scene.n} para ${P} ===\n${prompt}\nSave as: public/art/scenes/${slug}/scene-${scene.n}-p${P}.png`);
           continue;

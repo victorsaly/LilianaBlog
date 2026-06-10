@@ -1,0 +1,15 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Luna found Cheeto in a little cage at the end of the palace. The moment she opened it, he leapt into her arms.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;I&apos;ve got you,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;We&apos;re going home.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">But the two big guards spotted them.</prosody></voice>
+  <voice name="en-GB-NoahNeural"><prosody pitch="-14%" rate="-4%">&quot;Stop!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">they shouted, stomping closer.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Cheeto,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna,</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;show them your ears.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Cheeto wiggled his floppy ears as hard as he could — Bzzzzt! A buzzy zap zinged through the air. The guards&apos; clanky armour locked up tight — then they wobbled, yawned a big sleepy yawn, and flopped over, snoring like babies. Luna laughed. Then she turned into a tiger again, scooped Cheeto onto her back, and ran for the launch pad, where a shiny rocket was waiting. Up, up, up — Whoosh! The rocket roared into space, away from the palace, all the way home to Mum.</prosody></voice>
+</speak>

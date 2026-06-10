@@ -1,0 +1,22 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">The pod did not go to Mum. It zoomed all the way across the galaxy and landed somewhere cold and grand. This was Dad&apos;s palace. And Luna&apos;s dad was the strict King who ruled the whole galaxy. Two enormous guards stomped over and marched Luna inside.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;Well, well, well,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Dad, tapping his diamond sceptre.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;Who is This? My own daughter, at last.&quot;</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Hi, Dad,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;It was an accident. I just want to go home.&quot;</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;Nonsense,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Dad.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;You will stay here. One day you will be Queen of the whole universe — so you must learn to be a proper princess. Pretty dresses. Fancy balls. Perfect manners.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Luna&apos;s heart sank.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;But I don&apos;t Want to wear dresses,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">she said.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;You will go to my royal school,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Dad.</prosody></voice>
+  <voice name="en-GB-ThomasNeural"><prosody pitch="0%" rate="-2%">&quot;And that animal cannot stay. We do not keep pets here. Guards — take the bunny away.&quot;</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;No! Not Cheeto!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">cried Luna. But the guards carried her wriggling bunny off down the hall.</prosody></voice>
+</speak>

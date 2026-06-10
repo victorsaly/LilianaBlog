@@ -1,0 +1,17 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">The portal opened, and the family tumbled back into their kitchen, right where they&apos;d started. The Nintendo was fixed. Breakfast was still warm. And best of all — Lili and Leo weren&apos;t fighting anymore.</prosody></voice>
+  <voice name="en-GB-LibbyNeural"><prosody pitch="0%" rate="-4%">&quot;You saved everyone, Lili,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Mum.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;No,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Lili, smiling at all of them.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;We did. Teamwork.&quot;</prosody></voice>
+  <voice name="en-GB-RyanNeural"><prosody pitch="+16%" rate="+4%">&quot;Teamwork,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Leo.</prosody></voice>
+  <voice name="en-GB-RyanNeural"><prosody pitch="+16%" rate="+4%">&quot;Want to play a game together later? A real one?&quot;</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Yeah,&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Lili.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="0%" rate="-4%">&quot;Just... no potatoes this time.&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">And they all sat down and ate breakfast together — the happiest family in any world, real or video game. The End.</prosody></voice>
+</speak>

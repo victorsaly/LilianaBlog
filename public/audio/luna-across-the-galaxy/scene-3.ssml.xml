@@ -1,0 +1,11 @@
+<speak version="1.0"
+  xmlns="http://www.w3.org/2001/10/synthesis"
+  xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">For a while, the secret was safe. But one day, Luna&apos;s power sparkled out of her hands by mistake — right in the middle of class. Her teacher saw it. And her teacher was not kind. &quot;So,&quot; said the teacher, with a cold little smile. &quot;You&apos;re the girl with the powers. I think I&apos;ll keep you.&quot; The teacher locked the classroom door. But she forgot one thing: Luna could open Any door.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Cheeto!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">cried Luna.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;It&apos;s time to go!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">Cheeto wiggled his ears — bzzzt! — and the lock popped open. Then Luna did something amazing. She took a deep breath... and turned into a tiger! A real, stripy, springy tiger. Luna the tiger and Cheeto the bunny raced down the hall and dived into a tiny silver escape pod.</prosody></voice>
+  <voice name="en-GB-MaisieNeural"><prosody pitch="-7%" rate="-4%">&quot;Take us home to Mum!&quot;</prosody></voice>
+  <voice name="en-GB-SoniaNeural"><prosody pitch="0%" rate="-4%">said Luna, and she pressed the big green button. But the pod gave a wobble and a fizz. Something went wrong. The map glitched — and the little pod shot off the Wrong way.</prosody></voice>
+</speak>

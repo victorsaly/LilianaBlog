@@ -234,6 +234,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* ---- Character cards --------------------------------------------------- */
+.cast-heading { font-size: 1.35rem; margin: 0 0 1rem; padding-bottom: .4rem; border-bottom: 2px dashed var(--card-ring); }
 .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.6rem; }
 .char {
   background: var(--card-bg); border-radius: var(--r-lg); box-shadow: var(--shadow);
