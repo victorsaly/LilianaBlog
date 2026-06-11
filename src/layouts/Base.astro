@@ -73,8 +73,21 @@ const canonical = `${origin}${base}`;
     <!-- register the service worker (offline + installable) + wire the refresh button -->
     <script>
       window.addEventListener('load', () => {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {});
+        if (import.meta.env.PROD) {
+          // Production: register the service worker for offline support.
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {});
+          }
+        } else if ('serviceWorker' in navigator) {
+          // Development: a previously-installed service worker caches CSS/JS
+          // cache-first and would serve STALE assets — hiding your edits. Remove
+          // it, clear its caches, and reload once so you always see the latest.
+          navigator.serviceWorker.getRegistrations().then((rs) => {
+            if (!rs.length) return;
+            Promise.all(rs.map((r) => r.unregister()))
+              .then(() => (window.caches ? caches.keys().then((ks) => Promise.all(ks.map((k) => caches.delete(k)))) : null))
+              .then(() => location.reload());
+          });
         }
         document.getElementById('app-refresh')?.addEventListener('click', async () => {
           document.getElementById('app-refresh')?.classList.add('spinning');

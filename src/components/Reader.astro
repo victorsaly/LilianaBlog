@@ -513,8 +513,11 @@ function view(scene: (typeof story.scenes)[number]) {
       const useScroller = !!scroller && scroller.scrollHeight > scroller.clientHeight + 4;
       const r = el.getBoundingClientRect();
       let top: number, bottom: number;
-      if (useScroller) { const s = scroller!.getBoundingClientRect(); top = s.top + 70; bottom = s.bottom - 70; }
-      else { top = 110; bottom = window.innerHeight - 150; } // leave room for the fixed bottom bar
+      if (useScroller) {
+        const s = scroller!.getBoundingClientRect();
+        const m = Math.min(70, s.height * 0.3); // smaller margin on a short strip (mobile) so it doesn't over-scroll
+        top = s.top + m; bottom = s.bottom - m;
+      } else { top = 110; bottom = window.innerHeight - 150; } // leave room for the fixed bottom bar
       if (r.top < top || r.bottom > bottom) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
     function cancelRaf() { if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; } }
@@ -652,9 +655,9 @@ function view(scene: (typeof story.scenes)[number]) {
     // ---- navigation ----
     function showScene(idx: number) {
       sceneEls.forEach((el, i) => { el.hidden = i !== idx; });
-      sceneNow.textContent = String(idx + 1);
-      prevBtn.disabled = idx === 0;
-      nextBtn.disabled = idx === total - 1;
+      if (sceneNow) sceneNow.textContent = String(idx + 1);
+      if (prevBtn) prevBtn.disabled = idx === 0;
+      if (nextBtn) nextBtn.disabled = idx === total - 1;
       if (progressFill) progressFill.style.width = `${((idx + 1) / total) * 100}%`;
     }
     function goTo(idx: number) {
@@ -667,20 +670,22 @@ function view(scene: (typeof story.scenes)[number]) {
       root!.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 
-    playBtn.addEventListener('click', () => { if (!canRead) return; if (playing) pause(); else if (paused) resume(); else startScene(current); });
-    restartBtn.addEventListener('click', () => { if (canRead) startScene(current); });
-    prevBtn.addEventListener('click', () => goTo(current - 1));
-    nextBtn.addEventListener('click', () => goTo(current + 1));
+    playBtn?.addEventListener('click', () => { if (!canRead) return; if (playing) pause(); else if (paused) resume(); else startScene(current); });
+    restartBtn?.addEventListener('click', () => { if (canRead) startScene(current); });
+    prevBtn?.addEventListener('click', () => goTo(current - 1));
+    nextBtn?.addEventListener('click', () => goTo(current + 1));
     document.addEventListener('keydown', (e) => {
       const tag = (document.activeElement && document.activeElement.tagName) || '';
       if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
       if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
-      else if (e.key === ' ') { e.preventDefault(); playBtn.click(); }
+      else if (e.key === ' ') { e.preventDefault(); playBtn?.click(); }
     });
 
-    autoplayBox.checked = localStorage.getItem('lili-autoplay') !== 'off';
-    autoplayBox.addEventListener('change', () => localStorage.setItem('lili-autoplay', autoplayBox.checked ? 'on' : 'off'));
+    if (autoplayBox) {
+      autoplayBox.checked = localStorage.getItem('lili-autoplay') !== 'off';
+      autoplayBox.addEventListener('change', () => localStorage.setItem('lili-autoplay', autoplayBox.checked ? 'on' : 'off'));
+    }
     // reading speed: a simple icon button cycling Slow → Just right (mum's pick) → Fast
     const SPEEDS = [
       { r: 0.78, icon: '🐢', name: 'Slow' },
@@ -701,7 +706,8 @@ function view(scene: (typeof story.scenes)[number]) {
     if (!canRead) {
       document.getElementById('no-speech')?.removeAttribute('hidden');
       document.getElementById('tap-hint')?.setAttribute('hidden', '');
-      playBtn.disabled = true; restartBtn.disabled = true;
+      if (playBtn) playBtn.disabled = true;
+      if (restartBtn) restartBtn.disabled = true;
       speedBtn?.setAttribute('hidden', '');
     }
     if (!ttsSupport) document.getElementById('tap-hint')?.setAttribute('hidden', '');

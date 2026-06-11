@@ -168,9 +168,14 @@ img { max-width: 100%; display: block; }
 .nav .nav-settings { min-height: 0; padding: 0.4em 0.9em; font-size: 0.95rem; font-weight: 700; background: #fff; color: var(--ink); border: 1px solid var(--paper-edge); border-radius: var(--r-pill); box-shadow: none; }
 .nav .nav-settings:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 @media (max-width: 560px) {
-  .header-inner { flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
-  .brand { font-size: 1.25rem; }
-  .nav { gap: 1rem; }
+  /* keep the header a slim SINGLE row so the story gets more of the screen */
+  .header-inner { gap: 0.5rem; padding: 0.3rem 0; }
+  .brand { font-size: 1.04rem; gap: 0.3rem; white-space: nowrap; }
+  .brand .logo { font-size: 1.05rem; }
+  .nav { gap: 0.7rem; }
+  .nav a { font-size: 0.92rem; }
+  .nav .nav-settings { padding: 0.3em 0.7em; font-size: 0.88rem; }
+  .app-refresh { font-size: 1.05rem; padding: 0.1em 0.3em; }
 }
 
 .site-footer { text-align: center; color: var(--ink-soft); padding: 2.5rem 0 3rem; font-size: 0.95rem; }
@@ -382,7 +387,9 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 #fox-btn.off { opacity: 0.45; }
 @keyframes teller-bob { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-4px) rotate(0.6deg); } }
 @media (prefers-reduced-motion: reduce) { .storyteller { animation: none; } }
-@media (max-width: 819px) { .storyteller { width: 104px; left: 8px; bottom: 8px; } }
+/* on phones the picture + subtitle strip own the screen, so the floating
+   talking-face would collide with the controls — hide it on narrow screens */
+@media (max-width: 819px) { .storyteller { display: none; } }
 
 /* =========================================================================
    Scene "slide": a text-only column + a STAGE picture that swaps as the
@@ -414,38 +421,61 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 /* --- mobile: picture is the full background; words scroll over it in a
        readable panel (space is tight, so we overlay rather than stack) --- */
 @media (max-width: 819px) {
-  .reader { width: 100%; }
+  .reader { width: 100%; --strip-h: clamp(132px, 23vh, 208px); --bar-h: 64px; }
   .page { background: transparent; box-shadow: none; border: none; }
   .page::after { display: none; }
   .page-art::before { display: none; }
 
-  /* current scene's picture = FIXED full-screen background; the words scroll
-     up over it as the story is read (fixed fills the viewport reliably) */
+  /* current scene's picture = FIXED across the TOP of the screen, big and clear
+     ("as it is"); the words sit in a strip below and scroll as the story reads */
   .scene:not([hidden]) { animation: none; }
-  .scene:not([hidden]) .page-art.stage { position: fixed; inset: 0; z-index: 0; height: auto; overflow: hidden; border-radius: 0; }
-  .scene .page-art.stage .stage-img {
-    position: absolute; inset: 0; transform: none;
-    width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; border-radius: 0;
+  .scene:not([hidden]) .page-art.stage {
+    position: fixed; top: 0; left: 0; right: 0; bottom: calc(var(--strip-h) + var(--bar-h)); z-index: 0;
+    overflow: hidden; border-radius: 0; background: var(--read-bg);
   }
+  /* soft blurred fill behind the contained picture so any shape looks intentional */
+  .scene:not([hidden]) .page-art.stage::before {
+    content: ""; position: absolute; inset: 0; display: block;
+    background-image: var(--scene-bg); background-size: cover; background-position: center;
+    filter: blur(26px) brightness(0.96) saturate(1.1); transform: scale(1.2); opacity: 0.5;
+  }
+  .scene .page-art.stage .stage-img {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: auto; height: auto; max-width: 94%; max-height: 92%; object-fit: contain;
+    border-radius: 14px; filter: drop-shadow(0 10px 18px rgba(43, 37, 51, 0.28));
+  }
+  /* a soft scrim at the very top (keeps the title readable) and a gentle fade at
+     the bottom where the picture meets the text strip */
   .scene .page-art.stage::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(43,37,51,0.18) 0%, rgba(43,37,51,0.32) 45%, rgba(43,37,51,0.5) 100%);
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(43,37,51,0.30) 0%, transparent 15%, transparent 84%, color-mix(in srgb, var(--read-bg) 88%, transparent) 100%);
   }
 
   /* everything else sits above the fixed picture */
   .reader-top, .scene-progress { position: relative; z-index: 2; }
-  .reader-title, .scene-count, .back-all { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.55); }
+  .reader-title, .scene-count, .back-all { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.65); }
+  /* tidy reading header: "All stories" + page count share one row, big story
+     title sits on its own line below */
+  .reader-top { align-items: baseline; row-gap: 0.1rem; margin-bottom: 0.3rem; }
+  .reader-top .back-all { order: 1; font-size: 0.9rem; }
+  .reader-top .scene-count { order: 2; margin-left: auto; font-size: 0.9rem; }
+  .reader-top .reader-title { order: 3; flex-basis: 100%; font-size: 1.2rem; line-height: 1.2; margin: 0.05rem 0 0; }
 
+  /* the text strip: pinned at the bottom (above the controls), showing ~2-3
+     lines, scrolling internally as the read-along moves — the picture stays put */
   .page-body {
-    position: relative; z-index: 2; margin: 52vh 0.6rem 0;
-    background: color-mix(in srgb, var(--read-bg) 60%, transparent);  /* more see-through */
-    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);   /* light blur so the picture stays visible */
+    position: fixed; left: 0; right: 0; bottom: var(--bar-h); z-index: 2;
+    height: var(--strip-h); overflow-y: auto; -webkit-overflow-scrolling: touch;
+    margin: 0; padding: 0.7rem 1rem 0.9rem;
+    background: color-mix(in srgb, var(--read-bg) 94%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     border-radius: var(--r-lg) var(--r-lg) 0 0;
-    box-shadow: 0 -8px 30px rgba(43, 37, 51, 0.3);
-    padding: 1.1rem 1rem 30vh;
+    box-shadow: 0 -10px 26px rgba(43, 37, 51, 0.22);
   }
-  /* keep the words crisp on the see-through panel */
-  .page-body .page-text { text-shadow: 0 1px 2px rgba(255, 253, 246, 0.7); }
+  .page-body .page-scene-title { font-size: 1.02rem; margin-bottom: 0.45rem; }
+  .page-body .page-text { text-shadow: none; max-width: none; }
+  .page-body .say { margin: 0.7em 0; }
+  .page-body .speaker-pip { width: 34px; height: 34px; }
 
   /* keep the controls reachable: pinned to the bottom over the picture.
      (.reader prefix raises specificity so it beats the later base .reader-bar) */
@@ -454,7 +484,7 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
     margin: 0; border-radius: 0; border-left: none; border-right: none;
     background: color-mix(in srgb, var(--page-bg) 92%, transparent);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    gap: 0.4rem; padding: 0.4rem 0.5rem; flex-wrap: wrap;
+    gap: 0.4rem; padding: 0.4rem 0.5rem; flex-wrap: nowrap; overflow-x: auto;
   }
   /* compact controls on phones; keep the speed icon, drop restart to save room */
   .reader .reader-bar #restart-btn { display: none; }
@@ -463,23 +493,16 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   .reader .reader-bar .nav-arrow { padding: 0.45em 0.7em; }
   /* the footer would overlap the full-screen picture on the reader — hide it there */
   body[data-page='story'] .site-footer { display: none; }
-  /* tip sits over the picture, so give it a readable frosted pill + clear the bar */
-  body[data-page='story'] .hint {
-    position: relative; z-index: 2; max-width: 34ch; margin: 0.6rem auto 88px;
-    background: color-mix(in srgb, var(--read-bg) 86%, transparent);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  /* the "tap a word" tip would float over the picture here — hide it on phones
+     (tapping a word still works); the no-speech fallback stays styled if shown */
+  body[data-page='story'] #tap-hint { display: none; }
+  body[data-page='story'] #no-speech {
+    position: relative; z-index: 2; max-width: 34ch; margin: 0.6rem auto;
+    background: color-mix(in srgb, var(--read-bg) 88%, transparent);
     border-radius: var(--r-lg); padding: 0.55rem 0.9rem; box-shadow: var(--shadow-sm);
   }
-
-  /* while reading, hide the bar down to just a floating Pause button so the
-     story (words + picture) isn't clashing with the controls */
-  #reader.is-reading .reader-bar {
-    left: auto; right: 12px; bottom: 12px; width: auto;
-    padding: 0; background: transparent; box-shadow: none;
-    -webkit-backdrop-filter: none; backdrop-filter: none;
-  }
-  #reader.is-reading .reader-bar > :not(.play-btn) { display: none; }
-  #reader.is-reading .play-btn { box-shadow: var(--shadow-lg); border-radius: var(--r-pill); }
+  /* the picture stays clearly visible, so the controls bar simply stays put
+     under the text strip while reading (no collapse to a floating button) */
 }
 
 /* ---- Reader controls -------------------------------------------------- */
