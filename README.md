@@ -64,6 +64,7 @@ npm run preview      # preview the built site
 | `npm run new-story -- --title "..." --emoji "🐉"` | Scaffold a new story file |
 | `npm run illustrate -- --scenes <slug> --per-paragraph` | Make one illustration per paragraph (Gemini) |
 | `npm run illustrate -- <id>` | Make/append a single character illustration (Gemini) |
+| `npm run optimize` | Shrink new art for the web (scenes → JPG, cut-outs resized) |
 | `npm run voices` | Generate the per-character narration + word-timings (Azure) |
 | `npm run sfx` | Generate the sound effects + background music (ElevenLabs) |
 | `npm run remove-bg` | Cut out an image background → transparent PNG (rembg) |
@@ -160,6 +161,10 @@ they're correct on iPhone too (iOS ignores plain audio volume).
   used on the Characters page and as the little speaker portraits.
 - Lili's original sketches live in `public/art/characters/` (untouched copies in
   `_originals/`). See **`ILLUSTRATION-GUIDE.md`** to turn a sketch into art.
+- **After generating art, run `npm run optimize`** — it converts heavy scene PNGs
+  to web-sized JPGs and shrinks the character cut-outs, keeping the whole site
+  fast to load and quick to share. (Safe to re-run; it skips already-optimised
+  files.)
 
 ---
 
@@ -199,9 +204,21 @@ public/
   audio/<slug>/       ← narration mp3 + word-timing json (npm run voices)
   audio/sfx/          ← music + sound effects (npm run sfx)
   fonts/              ← reading fonts (bundled, work offline)
-scripts/              ← new-story, illustrate, voices, sfx, remove-bg
+scripts/              ← new-story, illustrate, optimize, voices, sfx, remove-bg
 VOICES-GUIDE.md · ILLUSTRATION-GUIDE.md · DESIGN-SYSTEM.md · character-bible.md
 ```
+
+---
+
+## 📄 License
+
+The **code** (the read-along engine, scripts, styling) is released under the
+**MIT License** — see [`LICENSE`](LICENSE). Fork it, build your own family
+storybook, share it. 💛
+
+The **stories and artwork** are Liliana's own creative work and are **not**
+covered by the MIT license — please don't republish her stories or illustrations
+as your own. Bring your own tales instead!
 
 ---
 

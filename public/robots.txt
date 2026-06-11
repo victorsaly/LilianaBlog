@@ -1,0 +1,3 @@
+# Lili's Story World — everyone's welcome to read and index.
+User-agent: *
+Allow: /

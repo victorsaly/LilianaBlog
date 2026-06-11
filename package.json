@@ -15,10 +15,13 @@
     "sfx": "node scripts/generate-sfx.mjs",
     "storyteller": "node scripts/generate-storyteller.mjs",
     "illustrate": "node scripts/illustrate.mjs",
+    "optimize": "node scripts/optimize-images.mjs",
+    "share-card": "node scripts/make-share-card.mjs",
     "remove-bg": "python3 scripts/remove-bg.py",
     "new-story": "node scripts/new-story.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^5.2.5",
     "gray-matter": "^4.0.3"
   },

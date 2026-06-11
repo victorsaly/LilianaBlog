@@ -71,7 +71,7 @@ The teacher locked the classroom door. But she forgot one thing: Luna could open
 ![Cheeto](/art/illustrations/cheeto.png)
 
 Cheeto wiggled his ears — bzzzt! — and the lock popped open. Then Luna did something amazing. She took a deep breath... and turned into a tiger! A real, stripy, springy tiger.
-![Luna leaps up as a striped tiger while sparks fly from the lock, a dramatic storybook moment](/art/scenes/luna-across-the-galaxy/scene-3-illo-1.png)
+![Luna leaps up as a striped tiger while sparks fly from the lock, a dramatic storybook moment](/art/scenes/luna-across-the-galaxy/scene-3-illo-1.jpg)
 
 Luna the tiger and Cheeto the bunny raced down the hall and dived into a tiny silver escape pod.
 
@@ -138,7 +138,7 @@ Cheeto wiggled his floppy ears as hard as he could — BZZZZT!
 A buzzy zap zinged through the air. The guards' clanky armour locked up tight — then they wobbled, yawned a big sleepy yawn, and flopped over, snoring like babies.
 
 Luna laughed. Then she turned into a tiger again, scooped Cheeto onto her back, and ran for the launch pad, where a shiny rocket was waiting.
-![A girl-turned-tiger with a bunny on her back leaping into a silver rocket as it blasts off a grand palace planet](/art/scenes/luna-across-the-galaxy/scene-6-illo-1.png)
+![A girl-turned-tiger with a bunny on her back leaping into a silver rocket as it blasts off a grand palace planet](/art/scenes/luna-across-the-galaxy/scene-6-illo-1.jpg)
 
 Up, up, up — WHOOSH! The rocket roared into space, away from the palace, all the way home to Mum.
 
@@ -161,7 +161,7 @@ She found Mum trapped inside a glowing cage. Tap-tap-tap went Luna's clever fing
 "Always," said Luna.
 
 Then they showed the aliens what a team they were. Cheeto zapped — bzzzt! — and switched all the sleepy lights back on. Luna became a tiger, and Mum became a great golden lion, and side by side they roared so loud the aliens dropped their nets, jumped in their ships, and zoomed away across the galaxy, never to come back.
-![A girl-tiger and a golden lion roaring together as little alien ships flee across a starry sky, bright and triumphant](/art/scenes/luna-across-the-galaxy/scene-7-illo-1.png)
+![A girl-tiger and a golden lion roaring together as little alien ships flee across a starry sky, bright and triumphant](/art/scenes/luna-across-the-galaxy/scene-7-illo-1.jpg)
 
 ## Scene 8 — Queen of the Galaxy
 > Draw this: Luna grown up and happy, wearing her cape OVER her hoodie, a small crown on her head, Cheeto on her shoulder, flying her rocket past planets and stars.

@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // When GitHub Actions builds a *project* page (served at
 // https://USER.github.io/REPO/), it sets BASE_PATH=/REPO/ for us.
@@ -13,6 +14,9 @@ export default defineConfig({
   site,
   // Plain static site — perfect for GitHub Pages.
   output: 'static',
+  // Generate sitemap-index.xml + sitemap-0.xml at build (helps the site be found
+  // when shared/searched). Uses `site` + `base` above for the URLs.
+  integrations: [sitemap()],
   // Keep CSS as an external file so the @font-face path (relative to /_astro/)
   // resolves correctly on deep routes and under a "/repo/" base path.
   build: { inlineStylesheets: 'never' },
