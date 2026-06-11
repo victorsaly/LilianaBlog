@@ -17,9 +17,23 @@ const base = import.meta.env.BASE_URL;
 const scenesDir = path.join(process.cwd(), 'public', 'art', 'scenes', story.slug);
 const sceneExt = ['jpg', 'jpeg', 'png', 'webp'].find((e) => fs.existsSync(path.join(scenesDir, `scene-1.${e}`)));
 const ogImage = sceneExt ? `art/scenes/${story.slug}/scene-1.${sceneExt}` : undefined;
+
+// schema.org Book for this story (richer search/share cards)
+const origin = Astro.site ? Astro.site.origin : '';
+const bookLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Book',
+  name: story.title,
+  author: { '@type': 'Person', name: story.author || 'Lili' },
+  url: `${origin}${base}stories/${story.slug}/`,
+  image: ogImage ? `${origin}${base}${ogImage}` : `${origin}${base}share-card.png`,
+  description: story.tagline,
+  inLanguage: 'en',
+  isPartOf: { '@type': 'WebSite', name: "Lili's Story World", url: `${origin}${base}` },
+};
 ---
 
-<Base title={`${story.title} · Lili's Story World`} active="story" description={story.tagline} ogImage={ogImage}>
+<Base title={`${story.title} · Lili's Story World`} active="story" description={story.tagline} ogImage={ogImage} jsonLd={bookLd} preloadImage={ogImage}>
   <section style="margin-top:0.6rem">
     <Reader story={story} />
   </section>

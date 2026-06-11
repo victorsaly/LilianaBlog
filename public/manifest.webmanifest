@@ -1,7 +1,11 @@
 {
   "name": "Lili's Story World",
   "short_name": "Lili's Stories",
+  "id": "/",
+  "lang": "en",
+  "dir": "ltr",
   "description": "Illustrated read-along storybooks — every page reads itself aloud with the words lighting up.",
+  "categories": ["education", "books", "kids", "entertainment"],
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -11,5 +15,14 @@
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/reading-mobile.jpg",
+      "sizes": "390x844",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Reading a story aloud — the words light up as they're spoken"
+    }
   ]
 }

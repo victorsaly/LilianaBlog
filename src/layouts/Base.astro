@@ -7,15 +7,28 @@ interface Props {
   description?: string;
   active?: 'home' | 'characters' | 'story';
   ogImage?: string;
+  jsonLd?: object | object[];   // extra schema.org structured data for this page
+  preloadImage?: string;        // base-relative path of the LCP image to preload
 }
-const { title, description = "Lili's Story World — read-along illustrated stories.", active, ogImage } = Astro.props;
+const { title, description = "Lili's Story World — read-along illustrated stories.", active, ogImage, jsonLd, preloadImage } = Astro.props;
 const base = import.meta.env.BASE_URL; // ends with "/"
 const origin = Astro.site ? Astro.site.origin : '';
 // absolute URL for the share-preview image (the branded 1200×630 card by default,
 // or a per-page image such as a story's opening scene)
 const shareImg = `${origin}${base}share-card.png`;
 const ogImageUrl = ogImage ? `${origin}${base}${ogImage}` : shareImg;
-const canonical = `${origin}${base}`;
+// this page's own absolute URL (so each page self-canonicalizes correctly)
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+
+// schema.org: the site itself, plus anything this page adds (e.g. a story Book)
+const siteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: "Lili's Story World",
+  url: `${origin}${base}`,
+  description: 'Illustrated read-along storybooks — every page reads itself aloud with the words lighting up.',
+};
+const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])];
 ---
 
 <!doctype html>
@@ -25,6 +38,8 @@ const canonical = `${origin}${base}`;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+    {preloadImage && <link rel="preload" as="image" href={`${base}${preloadImage}`} />}
     <link rel="icon" href={`${base}favicon.svg`} />
     <meta name="theme-color" content="#12b3a6" />
 
@@ -52,14 +67,45 @@ const canonical = `${origin}${base}`;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <!-- Reading fonts: a reading-optimised font, a literacy font, and a
-         highly-legible font. OpenDyslexic is loaded locally in global.css. -->
+    <!-- Structured data (schema.org) for richer search + share results -->
+    {ldBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
+
+    <!-- Fonts actually used everywhere: Baloo 2 (display), Fraunces (headings),
+         Lexend (the default reading font). Loaded non-render-blocking so first
+         paint is fast. Andika (an optional reading font) is fetched on demand
+         below, and OpenDyslexic is a local @font-face in global.css. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Lexend:wght@400;500;700&family=Andika:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Lexend:wght@400;500;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Lexend:wght@400;500;700&display=swap"
+      />
+    </noscript>
+    <!-- Andika is only needed when the reader picks it — fetch it then (and on
+         first load if it's the saved choice), not for everyone. -->
+    <script is:inline>
+      (function () {
+        var ANDIKA = 'https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap';
+        function ensure() {
+          if (document.documentElement.dataset.font === 'andika' && !document.getElementById('font-andika')) {
+            var l = document.createElement('link');
+            l.id = 'font-andika'; l.rel = 'stylesheet'; l.href = ANDIKA;
+            document.head.appendChild(l);
+          }
+        }
+        ensure();
+        new MutationObserver(ensure).observe(document.documentElement, { attributes: true, attributeFilter: ['data-font'] });
+      })();
+    </script>
 
     <!-- Apply the saved reading settings BEFORE the page paints (no flicker). -->
     <script is:inline>
