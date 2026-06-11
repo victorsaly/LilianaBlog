@@ -152,6 +152,19 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
           } catch (e) {}
           location.reload();
         });
+
+        // Share this page — native share sheet on mobile, copy-link on desktop.
+        const shareBtn = document.getElementById('app-share');
+        shareBtn?.addEventListener('click', async () => {
+          const url = location.href;
+          if (navigator.share) { try { await navigator.share({ title: document.title, url }); } catch (e) {} return; }
+          try {
+            await navigator.clipboard.writeText(url);
+            const prev = shareBtn.textContent;
+            shareBtn.textContent = '✅';
+            window.setTimeout(() => { shareBtn.textContent = prev; }, 1400);
+          } catch (e) {}
+        });
       });
     </script>
   </head>
@@ -166,6 +179,7 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
         <nav class="nav" aria-label="Main">
           <a href={base} aria-current={active === 'home' ? 'page' : undefined}>Home</a>
           <a href={`${base}characters/`} aria-current={active === 'characters' ? 'page' : undefined}>Characters</a>
+          <button id="app-share" class="app-refresh" type="button" title="Share this page" aria-label="Share this page">🔗</button>
           <button id="app-refresh" class="app-refresh" type="button" title="Refresh the app" aria-label="Refresh the app">↻</button>
         </nav>
       </div>

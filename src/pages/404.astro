@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Base
+  title="Lost in space · Lili's Story World"
+  description="This page floated off — let's get you back to the bookshelf."
+>
+  <section class="wrap center notfound">
+    <img
+      class="notfound-img"
+      src={`${base}art/illustrations/cheeto.png`}
+      alt="Cheeto the bunny looking puzzled"
+      loading="lazy"
+    />
+    <h1>Oops — this page floated off into space! 🌙</h1>
+    <p class="notfound-text">
+      Even Cheeto looked <em>everywhere</em> and couldn't find it. Let's hop back
+      and pick a story to read.
+    </p>
+    <a class="btn btn-teal btn-big" href={base}>🏠 Back to the bookshelf</a>
+  </section>
+</Base>
+
+<style>
+  .notfound { max-width: 640px; padding: 3rem 1rem 2.5rem; }
+  .notfound-img {
+    height: 150px; width: auto; margin: 0 auto 1rem; display: block;
+    filter: drop-shadow(0 10px 18px rgba(43, 37, 51, 0.2));
+  }
+  .notfound-text { font-size: 1.15rem; color: var(--ink-soft); margin: 0.6rem 0 1.6rem; }
+</style>
