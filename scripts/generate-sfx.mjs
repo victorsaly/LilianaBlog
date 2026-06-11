@@ -40,7 +40,17 @@ const CUES = {
   chime:   { text: 'a happy bright success chime, cheerful ascending bells, short, magical', duration: 1.6 },
   thud:    { text: 'a soft cartoon stomp, a gentle rumbly thud, short, not scary', duration: 1.0 },
   villain: { text: 'a short comedic villain sting, low playful dramatic brass, cartoonish, not frightening', duration: 1.4 },
-  laugh:   { text: 'a short playful cartoon villain laugh, mischievous ha-ha-ha, silly not scary, child-friendly', duration: 1.8 },
+  // Laughs — one general one plus a distinct laugh per character. The reader
+  // picks `laugh-<who>` when it can tell who is laughing (falling back to
+  // `laugh`), and plays each at its own volume (see CUE_VOL in the Reader).
+  laugh:          { text: 'a playful mischievous cartoon laugh, a clear lively ha-ha-ha-ha, silly and bright, child-friendly, not scary', duration: 2.6 },
+  'laugh-luna':   { text: 'a bright cheerful teenage girl laughing happily out loud, a genuine warm ha-ha-ha, joyful and clear, child-friendly', duration: 2.6 },
+  'laugh-mum':    { text: 'a warm gentle motherly laugh, a soft kind loving chuckle, ha-ha-ha, tender and happy, child-friendly', duration: 2.4 },
+  'laugh-cheeto': { text: 'a tiny cute squeaky little bunny giggling, high-pitched playful hee-hee-hee, adorable and short, cartoon', duration: 2.2 },
+  'laugh-king':   { text: 'a big deep booming theatrical villain king laugh, a grand dramatic mwa-ha-ha-ha-ha, loud and silly, cartoonish, not frightening for children', duration: 3.6 },
+  'laugh-potato': { text: 'a goofy comedic cartoon villain laugh, a bouncy mischievous heh-heh-ha-ha-ha, silly and playful, child-friendly, not scary', duration: 2.9 },
+  'laugh-lily':   { text: "a happy little girl giggling brightly, a joyful sweet hee-hee-hee laugh, child-friendly", duration: 2.5 },
+  'laugh-leo':    { text: 'a goofy excited young boy laughing, a playful bright cartoon ha-ha-ha, fun and silly', duration: 2.5 },
   cheer:   { text: "a short happy little children's cheer, a warm yay, bright and joyful", duration: 1.4 },
   sizzle:  { text: 'a gentle cooking sizzle, breakfast frying softly in a pan, short, cosy', duration: 1.2 },
   squawk:  { text: 'a friendly cartoon parrot squawk, short, playful and bright', duration: 1.0 },
