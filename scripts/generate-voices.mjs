@@ -61,7 +61,10 @@ function voiceFor(speaker) {
 // Make the SPOKEN text sound right without changing word count (so word-timings
 // stay aligned to the on-screen text): say all-caps words as words ("LEO!" -> "Leo!"
 // instead of "L-E-O"), and fix onomatopoeia the TTS mangles.
-const SPOKEN_FIX = { zzzt: 'bzzzt', poof: 'poof' };
+// Keys are used as regex fragments (\b<key>\b, case-insensitive), so "bz+t"
+// covers bzzt / bzzzt / bzzzzt etc. — all read aloud as a friendly "buzz"
+// instead of being spelled out or mangled by the voice.
+const SPOKEN_FIX = { 'zz+t': 'buzz', 'bz+t': 'buzz', poof: 'poof' };
 function titleCase(w) { return w.charAt(0) + w.slice(1).toLowerCase(); }
 function speakable(text) {
   let t = String(text).replace(/\b[A-Z]{2,}\b/g, titleCase);

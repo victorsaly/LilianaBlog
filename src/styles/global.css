@@ -343,7 +343,11 @@ html[data-bg='night'] .page-scene-title { color: #7be0d4; }
 .page-text.is-playing .w { text-decoration-color: transparent; }
 .tapword-demo { text-decoration: underline dotted color-mix(in srgb, var(--teal) 60%, transparent); text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
 .page-text .w.read { color: var(--hl-read); }
-.page-text .w.now { background: var(--hl-now-bg); color: var(--hl-now-fg); font-weight: 700; box-shadow: 0 0 0 3px var(--hl-now-bg); }
+/* The active word is shown with a bright colour pill (background + a 3px ring
+   that reads as padding but takes no layout space). We deliberately do NOT make
+   it bold: a heavier weight is wider — especially in OpenDyslexic — which would
+   change the word's width and re-wrap the line as the reader moves along. */
+.page-text .w.now { background: var(--hl-now-bg); color: var(--hl-now-fg); box-shadow: 0 0 0 3px var(--hl-now-bg); }
 html[data-calm='on'] .page-text.is-playing .w { color: color-mix(in srgb, var(--read-fg) 38%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.read { color: color-mix(in srgb, var(--hl-read) 70%, transparent); }
 html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
