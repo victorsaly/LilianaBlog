@@ -114,7 +114,7 @@ function view(scene: (typeof story.scenes)[number]) {
           {stage.length ? (
             <div class="page-art stage" style={`--scene-bg:url('${stage[0].src}')`}>
               {stage.map((im, i) => (
-                <img class={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} />
+                <img class={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
               ))}
             </div>
           ) : (
@@ -132,7 +132,7 @@ function view(scene: (typeof story.scenes)[number]) {
               {text.map((t) => (
                 t.portrait ? (
                   <div class="say">
-                    <img class="speaker-pip" src={t.portrait} alt={t.speaker} loading="lazy" />
+                    <img class="speaker-pip" src={t.portrait} alt={t.speaker} loading="lazy" decoding="async" />
                     <p class="page-text">{t.text}</p>
                   </div>
                 ) : <p class="page-text">{t.text}</p>
@@ -161,7 +161,7 @@ function view(scene: (typeof story.scenes)[number]) {
   {storytellerSrc && (
     <div class="storyteller" id="fox" hidden aria-hidden="true">
       <div class="teller">
-        <img class="storyteller-img" src={storytellerSrc} alt="" />
+        <img class="storyteller-img" src={storytellerSrc} alt="" loading="lazy" decoding="async" />
         <svg class="mouth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <g class="mouth-g">
             <ellipse class="m-rim" cx="50" cy="50" rx="39" ry="34" />
