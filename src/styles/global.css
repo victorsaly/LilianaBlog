@@ -177,6 +177,11 @@ img { max-width: 100%; display: block; }
   .nav .nav-settings { padding: 0.3em 0.7em; font-size: 0.88rem; }
   .app-refresh { font-size: 1.05rem; padding: 0.1em 0.3em; }
 }
+@media (max-width: 430px) {
+  /* tiny phones: show just the 📖 (still links home) so Home/Characters/🔗/↻ all fit */
+  .brand span:not(.logo) { display: none; }
+  .nav { gap: 0.55rem; }
+}
 
 .site-footer { text-align: center; color: var(--ink-soft); padding: 2.5rem 0 3rem; font-size: 0.95rem; }
 .site-footer::before { content: "✦ ✦ ✦"; display: block; color: var(--sunny); letter-spacing: 0.8rem; margin-bottom: 0.8rem; opacity: 0.7; }
@@ -396,8 +401,12 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
    reading passes each point. Desktop = side-by-side; mobile = picture above,
    words on a paper panel over it. Each page is sized to fit the screen.
    ========================================================================= */
-.scene:not([hidden]) { animation: scene-in 0.4s ease both; }
-@keyframes scene-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+/* page-turn: the new page slides in from the side you're heading (next = from
+   the right, back = from the left) so it feels like turning a page */
+.scene.turn-next { animation: turn-in-next 0.44s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.scene.turn-back { animation: turn-in-back 0.44s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes turn-in-next { from { opacity: 0; transform: translateX(7%) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes turn-in-back { from { opacity: 0; transform: translateX(-7%) scale(0.98); } to { opacity: 1; transform: none; } }
 
 /* the stage: pictures stacked; only the current one is shown (cross-fade) */
 .page-art.stage { position: relative; overflow: hidden; }
@@ -428,7 +437,11 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 
   /* current scene's picture = FIXED across the TOP of the screen, big and clear
      ("as it is"); the words sit in a strip below and scroll as the story reads */
-  .scene:not([hidden]) { animation: none; }
+  /* on mobile the scene mustn't transform (it holds the fixed background) —
+     slide the words panel instead so it still feels like a page turn */
+  .scene.turn-next, .scene.turn-back { animation: none; }
+  .scene.turn-next .page-body { animation: turn-in-next 0.44s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .scene.turn-back .page-body { animation: turn-in-back 0.44s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
   .scene:not([hidden]) .page-art.stage {
     position: fixed; top: 0; left: 0; right: 0; bottom: calc(var(--strip-h) + var(--bar-h)); z-index: 0;
     overflow: hidden; border-radius: 0; background: var(--read-bg);
@@ -488,6 +501,9 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
   }
   /* compact controls on phones; keep the speed icon, drop restart to save room */
   .reader .reader-bar #restart-btn { display: none; }
+  /* on phones the control bar stays icon-only (compact); the text labels show
+     on tablet/desktop where there's room and they help parents read the buttons */
+  .reader .reader-bar .lbl { display: none; }
   .reader .reader-bar .btn { font-size: 0.92rem; padding: 0.45em 0.8em; min-height: 42px; }
   .reader .reader-bar .play-btn { font-size: 1rem; padding: 0.5em 0.95em; flex: 0 1 auto; justify-content: center; }
   .reader .reader-bar .nav-arrow { padding: 0.45em 0.7em; }

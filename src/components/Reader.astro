@@ -147,11 +147,11 @@ function view(scene: (typeof story.scenes)[number]) {
   <div class="reader-bar">
     <button class="btn btn-ghost nav-arrow" id="prev-btn" type="button">◀ Back</button>
     <button class="btn play-btn" id="play-btn" type="button">▶ Read to me</button>
-    <button class="btn btn-ghost" id="restart-btn" type="button" aria-label="Start again">↺</button>
+    <button class="btn btn-ghost" id="restart-btn" type="button" aria-label="Start again">↺<span class="lbl"> Again</span></button>
     <button class="btn btn-ghost speed-btn" id="speed-btn" type="button" aria-label="Reading speed" title="Reading speed">🌟</button>
     <button class="btn btn-teal nav-arrow" id="next-btn" type="button">Next ▶</button>
     <button class="btn btn-ghost" id="sound-btn" type="button" aria-label="Sound on or off" aria-pressed="true">🔊</button>
-    {storytellerSrc && <button class="btn btn-ghost" id="fox-btn" type="button" aria-label="Storyteller on or off" aria-pressed="true">🗣️</button>}
+    {storytellerSrc && <button class="btn btn-ghost" id="fox-btn" type="button" aria-label="Storyteller on or off" aria-pressed="true">🗣️<span class="lbl"> Storyteller</span></button>}
     <input type="checkbox" id="autoplay" hidden />
   </div>
 
@@ -433,7 +433,7 @@ function view(scene: (typeof story.scenes)[number]) {
       else if (name === 'thud') tone(82, 0.35, 'sine', 0.13, 0);
       else if (name === 'villain') [196, 165, 131].forEach((f, i) => tone(f, 0.5, 'triangle', 0.06, i * 0.09));
     }
-    function setSoundIcon() { if (soundBtn) { soundBtn.textContent = soundOn ? '🔊' : '🔇'; soundBtn.setAttribute('aria-pressed', String(soundOn)); } }
+    function setSoundIcon() { if (soundBtn) { soundBtn.innerHTML = (soundOn ? '🔊' : '🔇') + '<span class="lbl"> Sound</span>'; soundBtn.setAttribute('aria-pressed', String(soundOn)); } }
     setSoundIcon();
     soundBtn?.addEventListener('click', () => {
       soundOn = !soundOn; localStorage.setItem('lili-sound', soundOn ? 'on' : 'off'); setSoundIcon();
@@ -476,6 +476,7 @@ function view(scene: (typeof story.scenes)[number]) {
     let current = 0, playing = false, paused = false;
     let mode: 'audio' | 'tts' = 'tts';
     let lastNow = -1;
+    let turnDir: 'next' | 'back' = 'next';   // page-turn direction for the transition
     let rafId: number | null = null;
     let chunks: { text: string; start: number }[] = [];
     let chunkIdx = 0, usedBoundary = false;
@@ -646,7 +647,7 @@ function view(scene: (typeof story.scenes)[number]) {
       playing = false; paused = false;
       paintAllRead(scenes[current]); dim(scenes[current], false);
       setBtn('idle');
-      if (autoplayBox.checked && current < total - 1) window.setTimeout(() => startScene(current + 1), 550);
+      if (autoplayBox.checked && current < total - 1) window.setTimeout(() => { turnDir = 'next'; startScene(current + 1); }, 550);
     }
     function stop() {
       stopFallback(); cancelRaf(); stopAmbient();
@@ -683,6 +684,8 @@ function view(scene: (typeof story.scenes)[number]) {
     // ---- navigation ----
     function showScene(idx: number) {
       sceneEls.forEach((el, i) => { el.hidden = i !== idx; });
+      const cur = sceneEls[idx];
+      if (cur) { cur.classList.remove('turn-next', 'turn-back'); void cur.offsetWidth; cur.classList.add(`turn-${turnDir}`); }
       if (sceneNow) sceneNow.textContent = String(idx + 1);
       if (prevBtn) prevBtn.disabled = idx === 0;
       if (nextBtn) nextBtn.disabled = idx === total - 1;
@@ -690,6 +693,7 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     function goTo(idx: number) {
       if (idx < 0 || idx >= total) return;
+      turnDir = idx >= current ? 'next' : 'back';
       const wasPlaying = playing || paused;
       stop();
       current = idx;
@@ -716,15 +720,15 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     // reading speed: a simple icon button cycling Slow → Just right (mum's pick) → Fast
     const SPEEDS = [
-      { r: 0.78, icon: '🐢', name: 'Slow' },
-      { r: 0.92, icon: '🌟', name: "Just right (mum's pick)" },
-      { r: 1.12, icon: '🐇', name: 'Fast' },
+      { r: 0.78, icon: '🐢', name: 'Slow', short: 'Slow' },
+      { r: 0.92, icon: '🌟', name: "Just right (mum's pick)", short: 'Just right' },
+      { r: 1.12, icon: '🐇', name: 'Fast', short: 'Fast' },
     ];
     function nearestSpeed(r: number) { let bi = 1, bd = 9; SPEEDS.forEach((s, i) => { const d = Math.abs(s.r - (r || 0.92)); if (d < bd) { bd = d; bi = i; } }); return bi; }
     let speedIdx = nearestSpeed(settings().rate);
     function applySpeed(save: boolean) {
       const s = SPEEDS[speedIdx];
-      if (speedBtn) { speedBtn.textContent = s.icon; speedBtn.title = `Reading speed: ${s.name}`; }
+      if (speedBtn) { speedBtn.innerHTML = s.icon + '<span class="lbl"> ' + s.short + '</span>'; speedBtn.title = `Reading speed: ${s.name}`; }
       if (save) { const cur = settings(); cur.rate = s.r; localStorage.setItem('lili-reading-v1', JSON.stringify(cur)); }
       if (mode === 'audio') audio.playbackRate = clampRate(s.r);
     }

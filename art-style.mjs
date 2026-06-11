@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------
-   art-style.mjs — the ONE source of truth for how Lily's Story World art looks.
+   art-style.mjs — the ONE source of truth for how Lili's Story World art looks.
    Used by:
      • scripts/illustrate.mjs        (turns sketches into illustrations)
      • the /sketch-to-illustration skill
@@ -17,7 +17,7 @@ export const STYLE = [
 
 // Always preserve the child's own drawing.
 export const KEEP = [
-  'This is based on a real pencil drawing by Lily, age 9.',
+  'This is based on a real pencil drawing by Lili, age 9.',
   'Keep her pose, her proportions and ALL her special details —',
   'just bring them to life with colour and clean lines.',
   'Do NOT make a generic character; keep it recognisably HER drawing.',
@@ -33,7 +33,7 @@ export const PALETTE = {
 export const CHARACTERS = {
   lily: {
     sketch: 'lily-sketch.jpeg',
-    body: "A brave, cheerful 9-year-old girl hero named Lily. Keep her cat-ear headband, big sparkly happy eyes and open smile, and her dynamic pose with one arm raised holding a glowing silver stylus-sword pointing up. Keep the 'A+' emblem on her top, her checkered/plaid trousers, and the cape flowing behind her. Surround her with swirling golden-white energy: a floating heart, a small flame, spiral wind swirls, and bright energy rays bursting up from beneath her feet (her 'love and caring' power awakening). Glowing silver armour with teal accents. Colours: bright teal + glowing silver + golden energy glow.",
+    body: "A brave, cheerful 9-year-old girl hero named Lili. Keep her cat-ear headband, big sparkly happy eyes and open smile, and her dynamic pose with one arm raised holding a glowing silver stylus-sword pointing up. Keep the 'A+' emblem on her top, her checkered/plaid trousers, and the cape flowing behind her. Surround her with swirling golden-white energy: a floating heart, a small flame, spiral wind swirls, and bright energy rays bursting up from beneath her feet (her 'love and caring' power awakening). Glowing silver armour with teal accents. Colours: bright teal + glowing silver + golden energy glow.",
   },
   leo: {
     sketch: 'leo-sketch.jpeg',
@@ -64,7 +64,7 @@ export const CHARACTERS = {
     body: 'A little army of golden-yellow French-fry soldiers with simple faces and arms, marching in a wobbly row, each holding a small red ketchup-blaster.',
   },
 
-  // ---- Luna Across the Galaxy (Lily's second story) ----
+  // ---- Luna Across the Galaxy (Lili's second story) ----
   luna: {
     sketch: 'luna-sketch.jpeg',
     body: "A brave, clever 15-year-old girl named Luna — this is her real, happy self. Keep her VERY long dark plait, her big sparkly eyes and calm little half-smile. She wears comfy clothes she loves: a casual grey hoodie with the hood down, a simple top, and blue jeans (NOT a dress — she hates dresses). Relaxed, confident standing pose. A faint glow of unstoppable starlight power around her hands, like little sparks she was born with. Colours: cool grey hoodie + denim blue + soft silver-white starlight glow.",

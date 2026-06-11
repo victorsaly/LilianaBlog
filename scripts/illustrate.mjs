@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* -------------------------------------------------------------------------
-   illustrate.mjs — turn Lily's sketches into finished illustrations that match
+   illustrate.mjs — turn Lili's sketches into finished illustrations that match
    the blog, using Google's Gemini image model ("Nano Banana").
 
    Get a FREE key at https://aistudio.google.com/apikey, then put it in .env:
@@ -248,7 +248,7 @@ async function main() {
 
   // custom one-off sketch (used by the skill for brand-new characters)
   if (flags.id) {
-    const body = flags.desc || `A character drawn by Lily.`;
+    const body = flags.desc || `A character drawn by Lili.`;
     await makeOne(flags.id, body, null);
     return;
   }

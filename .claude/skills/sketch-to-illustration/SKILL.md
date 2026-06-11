@@ -1,12 +1,12 @@
 ---
 name: sketch-to-illustration
-description: Turn one of Lily's pencil sketches into a finished cartoon illustration that matches the Lily's Story World blog. Use when the user wants to colour/illustrate a character sketch, "bring a drawing to life", add art for a new character, or generate the cast illustrations. Works for known characters (lily, leo, mum, dad, pip, blaze, potato, fries) and brand-new drawings.
+description: Turn one of Lili's pencil sketches into a finished cartoon illustration that matches the Lili's Story World blog. Use when the user wants to colour/illustrate a character sketch, "bring a drawing to life", add art for a new character, or generate the cast illustrations. Works for known characters (lily, leo, mum, dad, pip, blaze, potato, fries) and brand-new drawings.
 ---
 
 # Sketch → Illustration (matches the blog style)
 
 Convert a child's pencil sketch into a finished illustration that matches the
-look of the **Lily's Story World** website. The house style lives in
+look of the **Lili's Story World** website. The house style lives in
 `art-style.mjs` (STYLE + KEEP + per-character bodies) — always use it so every
 result is consistent. The generator is `scripts/illustrate.mjs`
 (`npm run illustrate`). Finished art goes in `public/art/illustrations/<id>.png`
@@ -57,7 +57,7 @@ Give the user the prompt and tell them: paste it into **Google Gemini
 `public/art/illustrations/<id>.png`**. (Free key: https://aistudio.google.com/apikey)
 
 ## Step 3 — make it faithful + on-brand (important)
-- The whole point is it stays **Lily's drawing, levelled up** — keep her pose
+- The whole point is it stays **Lili's drawing, levelled up** — keep her pose
   and the quirky details (cat ears, zigzag shirts, energy swirls, etc.). When
   writing a description for a new sketch, describe what SHE drew, don't invent.
 - Ask for a **transparent background PNG** (the STYLE already does) so it drops
@@ -81,7 +81,7 @@ doesn't have one yet.
 ## Step 4 — show it on the site
 The Characters page and the home "sketchbook" showcase pick up
 `public/art/illustrations/<id>.png` automatically, and the story cover upgrades
-to Lily's illustration once it exists. Offer to run:
+to Lili's illustration once it exists. Offer to run:
 ```bash
 npm run dev      # preview
 ```

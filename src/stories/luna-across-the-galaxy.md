@@ -1,6 +1,6 @@
 ---
 title: Luna Across the Galaxy
-author: Lily
+author: Lili
 emoji: "🌙"
 cover: luna-sketch.jpeg
 tagline: A girl, her zappy bunny, and a whole galaxy to cross.

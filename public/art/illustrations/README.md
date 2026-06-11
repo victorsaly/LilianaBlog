@@ -1,6 +1,6 @@
 # Finished illustrations go here 🎨
 
-Drop the coloured-in versions of Lily's characters in this folder, named after
+Drop the coloured-in versions of Lili's characters in this folder, named after
 each character. The website finds them **automatically** — no code changes.
 
 ```

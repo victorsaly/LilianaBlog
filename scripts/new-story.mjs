@@ -44,7 +44,7 @@ fs.mkdirSync(STORIES_DIR, { recursive: true });
 const existing = fs.readdirSync(STORIES_DIR).filter((f) => f.endsWith('.md')).length;
 const order = opt.order || existing + 1;
 const emoji = opt.emoji || '📖';
-const author = opt.author || 'Lily';
+const author = opt.author || 'Lili';
 const tagline = opt.tagline || 'A brand-new adventure.';
 const accent = opt.accent || '#12b3a6';
 const cover = opt.cover || 'lily-sketch.jpeg';
@@ -60,10 +60,10 @@ order: ${order}
 ---
 
 <!--
-  Hi Lily! 💛  This is a brand-new story.
+  Hi Lili! 💛  This is a brand-new story.
   • Each "## Scene" is one page of the book.
   • Put a picture RIGHT WHERE it belongs in the words. As many as you like!
-      - Use a picture we already have:  ![Lily](/art/illustrations/lily.png)
+      - Use a picture we already have:  ![Lili](/art/illustrations/lily.png)
       - Use a new picture you saved:    ![what it shows](my-picture.png)
       - Or let the computer draw it:     ![a tall purple castle at night](auto)
         then run:  npm run illustrate -- --scenes ${slug}

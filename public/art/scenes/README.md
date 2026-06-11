@@ -1,6 +1,6 @@
 # Scene pictures go here 🎨
 
-When Lily draws a picture for a page, save it in **this folder** and use the
+When Lili draws a picture for a page, save it in **this folder** and use the
 file name in the story.
 
 For example, save `scene-1.png` here, then in
