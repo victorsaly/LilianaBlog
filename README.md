@@ -61,6 +61,8 @@ npm run preview      # preview the built site
 |---|---|
 | `npm run dev` | Run the site locally |
 | `npm run build` | Build to `dist/` |
+| `npm run check-assets` | Fail if story art, narration files or character sketches are missing |
+| `npm run check-sync` | Fail if committed narration timings drift from the story text |
 | `npm run new-story -- --title "..." --emoji "🐉"` | Scaffold a new story file |
 | `npm run illustrate -- --scenes <slug> --per-paragraph` | Make one illustration per paragraph (Gemini) |
 | `npm run illustrate -- <id>` | Make/append a single character illustration (Gemini) |
@@ -180,6 +182,10 @@ git add -A && git commit -m "what changed" && git push
 The pipeline rebuilds and republishes automatically (it sets the `/LilianaBlog/`
 base path). The site is live at
 **https://victorsaly.github.io/LilianaBlog/**.
+
+Before each deploy, CI now runs `npm run check-assets` and `npm run check-sync`
+so missing art or out-of-date narration fails with a clear message before the
+site is published.
 
 > Publishing at the root (e.g. a `USERNAME.github.io` repo or a custom domain)?
 > Delete the `BASE_PATH` `env:` block in `.github/workflows/deploy.yml`.
