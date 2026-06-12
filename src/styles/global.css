@@ -112,6 +112,8 @@ body > * { position: relative; z-index: 1; }
 h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; line-height: 1.14; color: var(--ink); margin: 0 0 0.4em; }
 a { color: var(--teal-deep); }
 img { max-width: 100%; display: block; }
+.responsive-picture { display: block; }
+.img-contents { display: contents; }
 
 :focus-visible { outline: 4px solid var(--purple); outline-offset: 3px; border-radius: 8px; }
 

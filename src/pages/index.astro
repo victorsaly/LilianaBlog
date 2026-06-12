@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PublicImage from '../components/PublicImage.astro';
 import { getStories, artUrl } from '../lib/stories';
 import { characters } from '../data/characters';
 import { illustrationUrl, idFromCover } from '../lib/art';
@@ -49,7 +50,7 @@ const firstStory = stories[0];
         <span class="spark s1" aria-hidden="true">✨</span>
         <span class="spark s2" aria-hidden="true">⭐</span>
         <span class="spark s3" aria-hidden="true">💛</span>
-        <img src={heroImg} alt="Lili the hero" fetchpriority="high" decoding="async" />
+        <PublicImage src={heroImg} base={base} alt="Lili the hero" loading="eager" fetchpriority="high" decoding="async" />
       </div>
     )}
   </section>
@@ -66,7 +67,7 @@ const firstStory = stories[0];
         return (
           <a class="book" href={`${base}stories/${story.slug}/`} style={`--accent:${story.accent}`}>
             {cover
-              ? <img class="cover" src={cover} alt={`Cover of ${story.title}`} loading="lazy" decoding="async" />
+              ? <PublicImage imgClass="cover" src={cover} base={base} alt={`Cover of ${story.title}`} loading="lazy" decoding="async" />
               : <div class="cover-emoji" style={`background:${story.accent}22`}>{story.emoji}</div>}
             <div class="meta">
               <h3>{story.emoji} {story.title}</h3>
@@ -90,16 +91,16 @@ const firstStory = stories[0];
       <div class="showcase">
         {donePairs.map((p) => (
           <figure class="ba">
-            <img src={p.sketchUrl} alt={`${p.name} sketch`} loading="lazy" decoding="async" />
+            <PublicImage src={p.sketchUrl} base={base} alt={`${p.name} sketch`} loading="lazy" decoding="async" />
             <span class="arrow" aria-hidden="true">➜</span>
-            <img src={p.illoUrl} alt={`${p.name} illustration`} loading="lazy" decoding="async" />
+            <PublicImage src={p.illoUrl} base={base} alt={`${p.name} illustration`} loading="lazy" decoding="async" />
           </figure>
         ))}
       </div>
     ) : (
       <div class="showcase-teaser">
         <div class="teaser-strip">
-          {sketches.map((c) => <img src={c.sketchUrl} alt={`${c.name} sketch`} loading="lazy" decoding="async" />)}
+          {sketches.map((c) => <PublicImage src={c.sketchUrl} base={base} alt={`${c.name} sketch`} loading="lazy" decoding="async" />)}
         </div>
         <p class="tag">🎨 Colour versions are coming soon — Lili's sketches become bright illustrations next!</p>
       </div>
@@ -113,7 +114,7 @@ const firstStory = stories[0];
         <h2>Meet the cast</h2>
       </div>
       <a class="cast-strip" href={`${base}characters/`} aria-label="Meet all the characters">
-        {cast.map((c) => <img src={c.url} alt={c.name} loading="lazy" />)}
+        {cast.map((c) => <PublicImage src={c.url} base={base} alt={c.name} loading="lazy" />)}
       </a>
     </section>
   )}

@@ -2,7 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Story } from '../lib/stories';
+import PublicImage from './PublicImage.astro';
 import { artUrl } from '../lib/stories';
+import { illustrationFile, illustrationUrl } from '../lib/art';
 import { segmentScene } from '../lib/parse.js';
 
 interface Props { story: Story; }
@@ -15,12 +17,13 @@ const total = story.scenes.length;
 const illoDir = path.join(process.cwd(), 'public', 'art', 'illustrations');
 function portraitFor(paraText: string): { speaker: string; src: string } | null {
   const seg = (segmentScene(paraText) as any[]).find((s) => s.speaker && s.speaker !== 'narrator' && s.speaker !== 'unknown');
-  if (!seg || !fs.existsSync(path.join(illoDir, `${seg.speaker}.png`))) return null;
-  return { speaker: seg.speaker, src: `${base}art/illustrations/${seg.speaker}.png` };
+  if (!seg || !illustrationFile(seg.speaker)) return null;
+  return { speaker: seg.speaker, src: illustrationUrl(seg.speaker, base)! };
 }
 // the storyteller (Lili) animates with a gentle talk-bob while reading.
 // One image (no frame-swap → no flicker).
-const storytellerSrc = fs.existsSync(path.join(illoDir, 'lili-face.png')) ? `${base}art/illustrations/lili-face.png` : null;
+const storytellerFace = illustrationFile('lili-face');
+const storytellerSrc = storytellerFace ? `${base}art/illustrations/${storytellerFace}` : null;
 
 // Generated sound effects + ambience (npm run sfx) — names without .mp3.
 const sfxDir = path.join(process.cwd(), 'public', 'audio', 'sfx');
@@ -114,7 +117,7 @@ function view(scene: (typeof story.scenes)[number]) {
           {stage.length ? (
             <div class="page-art stage" style={`--scene-bg:url('${stage[0].src}')`}>
               {stage.map((im, i) => (
-                <img class={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+                <PublicImage pictureClass="img-contents" imgClass={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} base={base} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
               ))}
             </div>
           ) : (
@@ -132,7 +135,7 @@ function view(scene: (typeof story.scenes)[number]) {
               {text.map((t) => (
                 t.portrait ? (
                   <div class="say">
-                    <img class="speaker-pip" src={t.portrait} alt={t.speaker} loading="lazy" decoding="async" />
+                    <PublicImage imgClass="speaker-pip" src={t.portrait} base={base} alt={t.speaker} loading="lazy" decoding="async" />
                     <p class="page-text">{t.text}</p>
                   </div>
                 ) : <p class="page-text">{t.text}</p>
@@ -161,7 +164,7 @@ function view(scene: (typeof story.scenes)[number]) {
   {storytellerSrc && (
     <div class="storyteller" id="fox" hidden aria-hidden="true">
       <div class="teller">
-        <img class="storyteller-img" src={storytellerSrc} alt="" loading="lazy" decoding="async" />
+        <PublicImage imgClass="storyteller-img" src={storytellerSrc} base={base} alt="" loading="lazy" decoding="async" />
         <svg class="mouth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <g class="mouth-g">
             <ellipse class="m-rim" cx="50" cy="50" rx="39" ry="34" />

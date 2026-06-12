@@ -20,6 +20,10 @@ function normalizedWords(text) {
   return wordList(text).map(normWord).filter(Boolean);
 }
 
+function rawWords(text) {
+  return wordList(text);
+}
+
 function compareWordSequence(expected, actual) {
   if (expected.length !== actual.length) {
     return `expected ${expected.length} words but found ${actual.length}`;
@@ -53,18 +57,27 @@ for (const file of fs.readdirSync(STORIES_DIR).filter((name) => name.endsWith('.
       continue;
     }
 
-    const expected = normalizedWords(scene.text);
+    const expectedRaw = rawWords(scene.text);
+    const expected = expectedRaw.map(normWord).filter(Boolean);
     const timing = JSON.parse(fs.readFileSync(timingPath, 'utf8'));
     const starts = Array.isArray(timing?.starts) ? timing.starts : null;
     if (!starts) {
       fail(`${slug} scene ${scene.n} timing file does not contain a starts array`);
       continue;
     }
-    if (starts.length !== expected.length) {
-      fail(`${slug} scene ${scene.n} timing count mismatch (${starts.length} timings for ${expected.length} words) — run \`npm run voices -- ${slug}\``);
+    if (starts.length !== expectedRaw.length) {
+      fail(`${slug} scene ${scene.n} timing count mismatch (${starts.length} timings for ${expectedRaw.length} tokens) — run \`npm run voices -- ${slug}\``);
     }
-    if (starts.some((value) => value == null)) {
-      fail(`${slug} scene ${scene.n} has null word timings — run \`npm run voices -- ${slug}\``);
+    for (let i = 0; i < Math.min(starts.length, expectedRaw.length); i++) {
+      const spoken = normWord(expectedRaw[i]);
+      if (spoken && typeof starts[i] !== 'number') {
+        fail(`${slug} scene ${scene.n} is missing a spoken-word timing at token ${i + 1} (${JSON.stringify(expectedRaw[i])}) — run \`npm run voices -- ${slug}\``);
+        break;
+      }
+      if (!spoken && starts[i] != null) {
+        fail(`${slug} scene ${scene.n} has a punctuation-only token with a numeric timing at token ${i + 1}`);
+        break;
+      }
     }
     for (let i = 1; i < starts.length; i++) {
       if (typeof starts[i - 1] === 'number' && typeof starts[i] === 'number' && starts[i] < starts[i - 1]) {

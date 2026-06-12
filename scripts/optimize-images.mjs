@@ -2,24 +2,18 @@
 /* -------------------------------------------------------------------------
    optimize-images.mjs — shrink the art so the site is fast to load and share.
 
-   Raw illustrations from the image model are big (1–3 MB PNGs). For the web we:
-     • Scenes  (full backgrounds, no transparency): PNG → JPG, max 1200px, q82.
-       The PNG is removed and any `/art/scenes/.../x.png` link in the matching
-       story markdown is rewritten to `.jpg`.
-     • Character cut-outs (need transparency): downscale the PNG in place to
-       max 768px, keeping the same filename so nothing else has to change.
+   Raw illustrations are often huge. For the web we:
+     • Scenes: convert PNG scenes to JPG, resize to max 1200px, and emit WebP.
+     • Illustrations: resize to max 768px in-place and emit WebP siblings.
 
    Run it after `npm run illustrate` (and before committing):
      npm run optimize
-
-   Needs macOS `sips` (built in). Re-running is safe — already-small images and
-   already-converted scenes are skipped.
    ------------------------------------------------------------------------- */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import { execFileSync } from 'node:child_process';
+import sharp from 'sharp';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -27,59 +21,99 @@ const SCENES = path.join(ROOT, 'public', 'art', 'scenes');
 const ILLOS = path.join(ROOT, 'public', 'art', 'illustrations');
 const STORIES = path.join(ROOT, 'src', 'stories');
 
-const SCENE_MAXDIM = 1200, SCENE_Q = 82, ILLO_MAXDIM = 768;
+const SCENE_MAXDIM = 1200;
+const SCENE_JPEG_Q = 82;
+const SCENE_WEBP_Q = 78;
+const ILLO_MAXDIM = 768;
+const ILLO_WEBP_Q = 82;
+const IMAGE_RE = /\.(png|jpe?g|webp)$/i;
 
-function sips(args) { execFileSync('sips', args, { stdio: 'ignore' }); }
-function maxDimOf(p) {
-  try {
-    const out = execFileSync('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', p], { encoding: 'utf8' });
-    const w = parseInt((out.match(/pixelWidth:\s*(\d+)/) || [])[1] || '0', 10);
-    const h = parseInt((out.match(/pixelHeight:\s*(\d+)/) || [])[1] || '0', 10);
-    return Math.max(w, h);
-  } catch { return 0; }
-}
 const kb = (p) => (fs.statSync(p).size / 1024).toFixed(0);
 let saved = 0;
 
-// 1) Scenes: PNG -> JPG (resized), then delete the PNG.
+async function metadata(file) {
+  try { return await sharp(file).metadata(); } catch { return null; }
+}
+
+async function resizeInside(image, maxDim) {
+  const meta = await image.metadata();
+  const width = meta.width || maxDim;
+  const height = meta.height || maxDim;
+  if (Math.max(width, height) <= maxDim) return image;
+  return image.resize({ width: maxDim, height: maxDim, fit: 'inside', withoutEnlargement: true });
+}
+
+async function writeSceneJpeg(inputFile, outputFile) {
+  const before = fs.statSync(inputFile).size;
+  const resized = await resizeInside(sharp(inputFile), SCENE_MAXDIM);
+  await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(outputFile);
+  return before;
+}
+
+async function writeSceneWebp(inputFile, outputFile) {
+  const resized = await resizeInside(sharp(inputFile), SCENE_MAXDIM);
+  await resized.webp({ quality: SCENE_WEBP_Q }).toFile(outputFile);
+}
+
+async function optimiseIllustration(file) {
+  const before = fs.statSync(file).size;
+  const ext = path.extname(file).toLowerCase();
+  const resized = await resizeInside(sharp(file), ILLO_MAXDIM);
+  if (ext === '.png') await resized.png({ compressionLevel: 9 }).toFile(file);
+  else if (ext === '.jpg' || ext === '.jpeg') await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(file);
+  const after = fs.statSync(file).size;
+  saved += before - after;
+
+  const webp = file.replace(/\.[^.]+$/, '.webp');
+  await resized.webp({ quality: ILLO_WEBP_Q }).toFile(webp);
+  console.log(`  🎨 ${path.basename(file)}: ${(before / 1024).toFixed(0)}KB → ${kb(file)}KB (+ ${path.basename(webp)})`);
+}
+
 const changedSlugs = new Set();
 if (fs.existsSync(SCENES)) {
   for (const slug of fs.readdirSync(SCENES)) {
     const dir = path.join(SCENES, slug);
     if (!fs.statSync(dir).isDirectory()) continue;
     for (const f of fs.readdirSync(dir)) {
-      if (!f.toLowerCase().endsWith('.png')) continue;
-      const png = path.join(dir, f);
-      const jpg = png.replace(/\.png$/i, '.jpg');
-      const before = fs.statSync(png).size;
-      sips(['-Z', String(SCENE_MAXDIM), '-s', 'format', 'jpeg', '-s', 'formatOptions', String(SCENE_Q), png, '--out', jpg]);
-      fs.unlinkSync(png);
-      saved += before - fs.statSync(jpg).size;
-      changedSlugs.add(slug);
-      console.log(`  🎬 ${slug}/${f}: ${(before / 1024 / 1024).toFixed(1)}MB → ${kb(jpg)}KB`);
+      if (!IMAGE_RE.test(f)) continue;
+      const input = path.join(dir, f);
+      const ext = path.extname(f).toLowerCase();
+      const stem = input.replace(/\.[^.]+$/, '');
+
+      if (ext === '.png') {
+        const jpg = `${stem}.jpg`;
+        const before = await writeSceneJpeg(input, jpg);
+        await writeSceneWebp(jpg, `${stem}.webp`);
+        fs.unlinkSync(input);
+        saved += before - fs.statSync(jpg).size;
+        changedSlugs.add(slug);
+        console.log(`  🎬 ${slug}/${f}: ${(before / 1024 / 1024).toFixed(1)}MB → ${kb(jpg)}KB (+ ${path.basename(stem)}.webp)`);
+      } else if (ext === '.jpg' || ext === '.jpeg') {
+        const before = fs.statSync(input).size;
+        await writeSceneJpeg(input, input);
+        await writeSceneWebp(input, `${stem}.webp`);
+        saved += before - fs.statSync(input).size;
+        console.log(`  🎬 ${slug}/${f}: ${(before / 1024).toFixed(0)}KB → ${kb(input)}KB (+ ${path.basename(stem)}.webp)`);
+      }
     }
   }
 }
 
-// 2) Rewrite the matching story markdown so `/art/scenes/.../x.png` -> `.jpg`.
 for (const slug of changedSlugs) {
   const md = path.join(STORIES, `${slug}.md`);
   if (!fs.existsSync(md)) continue;
   const s = fs.readFileSync(md, 'utf8');
   const next = s.replace(/(\/art\/scenes\/[^)\s]+)\.png/gi, '$1.jpg');
-  if (next !== s) { fs.writeFileSync(md, next); console.log(`  ✏️  rewrote scene links in src/stories/${slug}.md`); }
+  if (next !== s) {
+    fs.writeFileSync(md, next);
+    console.log(`  ✏️  rewrote scene links in src/stories/${slug}.md`);
+  }
 }
 
-// 3) Character cut-outs: downscale PNGs in place (keep transparency + filename).
 if (fs.existsSync(ILLOS)) {
   for (const f of fs.readdirSync(ILLOS)) {
-    if (!f.toLowerCase().endsWith('.png')) continue;
-    const p = path.join(ILLOS, f);
-    if (maxDimOf(p) <= ILLO_MAXDIM) continue;
-    const before = fs.statSync(p).size;
-    sips(['-Z', String(ILLO_MAXDIM), p]);
-    saved += before - fs.statSync(p).size;
-    console.log(`  🎨 ${f}: ${(before / 1024).toFixed(0)}KB → ${kb(p)}KB`);
+    if (!IMAGE_RE.test(f) || f.toLowerCase().endsWith('.webp')) continue;
+    await optimiseIllustration(path.join(ILLOS, f));
   }
 }
 
