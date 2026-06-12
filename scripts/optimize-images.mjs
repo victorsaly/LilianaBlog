@@ -43,10 +43,16 @@ async function resizeInside(image, maxDim) {
   return image.resize({ width: maxDim, height: maxDim, fit: 'inside', withoutEnlargement: true });
 }
 
+function tempFileFor(file) {
+  return `${file}.tmp-${process.pid}`;
+}
+
 async function writeSceneJpeg(inputFile, outputFile) {
   const before = fs.statSync(inputFile).size;
   const resized = await resizeInside(sharp(inputFile), SCENE_MAXDIM);
-  await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(outputFile);
+  const temp = inputFile === outputFile ? tempFileFor(outputFile) : outputFile;
+  await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(temp);
+  if (temp !== outputFile) fs.renameSync(temp, outputFile);
   return before;
 }
 
@@ -59,8 +65,15 @@ async function optimiseIllustration(file) {
   const before = fs.statSync(file).size;
   const ext = path.extname(file).toLowerCase();
   const resized = await resizeInside(sharp(file), ILLO_MAXDIM);
-  if (ext === '.png') await resized.png({ compressionLevel: 9 }).toFile(file);
-  else if (ext === '.jpg' || ext === '.jpeg') await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(file);
+  if (ext === '.png') {
+    const temp = tempFileFor(file);
+    await resized.png({ compressionLevel: 9 }).toFile(temp);
+    fs.renameSync(temp, file);
+  } else if (ext === '.jpg' || ext === '.jpeg') {
+    const temp = tempFileFor(file);
+    await resized.jpeg({ quality: SCENE_JPEG_Q, mozjpeg: true }).toFile(temp);
+    fs.renameSync(temp, file);
+  }
   const after = fs.statSync(file).size;
   saved += before - after;
 
