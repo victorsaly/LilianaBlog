@@ -1,0 +1,45 @@
+---
+import { getPublicImage } from '../lib/public-image';
+
+interface Props {
+  src: string;
+  alt: string;
+  base: string;
+  pictureClass?: string;
+  imgClass?: string;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'sync' | 'auto';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  [key: string]: unknown;
+}
+
+const {
+  src,
+  alt,
+  base,
+  pictureClass = 'responsive-picture',
+  imgClass,
+  width,
+  height,
+  sizes,
+  ...imgAttrs
+} = Astro.props;
+
+const info = await getPublicImage(src, base);
+---
+
+<picture class={pictureClass}>
+  {info.webpSrc && <source srcset={info.webpSrc} type="image/webp" sizes={sizes} />}
+  <img
+    src={src}
+    alt={alt}
+    class={imgClass}
+    width={width ?? info.width}
+    height={height ?? info.height}
+    sizes={sizes}
+    {...imgAttrs}
+  />
+</picture>

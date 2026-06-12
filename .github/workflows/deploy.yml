@@ -24,6 +24,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Check story assets
+        run: npm run check-assets
+      - name: Check narration sync
+        run: npm run check-sync
       - name: Build site
         run: npm run build
         # For a PROJECT page (https://USER.github.io/REPO/) this sets the

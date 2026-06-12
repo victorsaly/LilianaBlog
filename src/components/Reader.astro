@@ -2,7 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Story } from '../lib/stories';
+import PublicImage from './PublicImage.astro';
 import { artUrl } from '../lib/stories';
+import { illustrationFile, illustrationUrl } from '../lib/art';
 import { segmentScene } from '../lib/parse.js';
 
 interface Props { story: Story; }
@@ -15,12 +17,13 @@ const total = story.scenes.length;
 const illoDir = path.join(process.cwd(), 'public', 'art', 'illustrations');
 function portraitFor(paraText: string): { speaker: string; src: string } | null {
   const seg = (segmentScene(paraText) as any[]).find((s) => s.speaker && s.speaker !== 'narrator' && s.speaker !== 'unknown');
-  if (!seg || !fs.existsSync(path.join(illoDir, `${seg.speaker}.png`))) return null;
-  return { speaker: seg.speaker, src: `${base}art/illustrations/${seg.speaker}.png` };
+  if (!seg || !illustrationFile(seg.speaker)) return null;
+  return { speaker: seg.speaker, src: illustrationUrl(seg.speaker, base)! };
 }
 // the storyteller (Lili) animates with a gentle talk-bob while reading.
 // One image (no frame-swap → no flicker).
-const storytellerSrc = fs.existsSync(path.join(illoDir, 'lili-face.png')) ? `${base}art/illustrations/lili-face.png` : null;
+const storytellerFace = illustrationFile('lili-face');
+const storytellerSrc = storytellerFace ? `${base}art/illustrations/${storytellerFace}` : null;
 
 // Generated sound effects + ambience (npm run sfx) — names without .mp3.
 const sfxDir = path.join(process.cwd(), 'public', 'audio', 'sfx');
@@ -94,13 +97,29 @@ function view(scene: (typeof story.scenes)[number]) {
   });
   return { stage, text };
 }
+
+const offlineAssets = Array.from(new Set([
+  `${base}stories/${story.slug}/`,
+  ...story.scenes.flatMap((scene) => {
+    const { stage, text } = view(scene);
+    const audio = sceneAudio(scene.n);
+    return [
+      ...stage.map((im) => im.src),
+      ...text.map((t) => t.portrait).filter(Boolean),
+      audio?.audio,
+      audio?.timings,
+    ].filter(Boolean);
+  }),
+  storytellerSrc,
+].filter(Boolean)));
 ---
 
-<div class="reader" id="reader" data-total={total} data-sfx={sfxFiles.join(',')} data-sfxbase={`${base}audio/sfx/`}>
+<div class="reader" id="reader" data-total={total} data-sfx={sfxFiles.join(',')} data-sfxbase={`${base}audio/sfx/`} data-offline={JSON.stringify(offlineAssets)}>
   <div class="reader-top">
     <a class="back-all" href={base}>◀ All stories</a>
     <h1 class="reader-title">{story.emoji} {story.title}</h1>
     <span class="scene-count">Page <b id="scene-now">1</b> of {total}</span>
+    <button class="btn btn-ghost offline-btn" id="offline-btn" type="button">📥 Save this story offline</button>
   </div>
 
   <div class="scene-progress" aria-hidden="true"><div class="scene-progress-fill" id="scene-progress-fill"></div></div>
@@ -114,7 +133,7 @@ function view(scene: (typeof story.scenes)[number]) {
           {stage.length ? (
             <div class="page-art stage" style={`--scene-bg:url('${stage[0].src}')`}>
               {stage.map((im, i) => (
-                <img class={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
+                <PublicImage pictureClass="img-contents" imgClass={`stage-img${i === 0 ? ' on' : ''}`} data-anchor={im.anchor} src={im.src} base={base} alt={im.alt} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} decoding="async" />
               ))}
             </div>
           ) : (
@@ -132,7 +151,7 @@ function view(scene: (typeof story.scenes)[number]) {
               {text.map((t) => (
                 t.portrait ? (
                   <div class="say">
-                    <img class="speaker-pip" src={t.portrait} alt={t.speaker} loading="lazy" decoding="async" />
+                    <PublicImage imgClass="speaker-pip" src={t.portrait} base={base} alt={t.speaker} loading="lazy" decoding="async" />
                     <p class="page-text">{t.text}</p>
                   </div>
                 ) : <p class="page-text">{t.text}</p>
@@ -161,7 +180,7 @@ function view(scene: (typeof story.scenes)[number]) {
   {storytellerSrc && (
     <div class="storyteller" id="fox" hidden aria-hidden="true">
       <div class="teller">
-        <img class="storyteller-img" src={storytellerSrc} alt="" loading="lazy" decoding="async" />
+        <PublicImage imgClass="storyteller-img" src={storytellerSrc} base={base} alt="" loading="lazy" decoding="async" />
         <svg class="mouth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <g class="mouth-g">
             <ellipse class="m-rim" cx="50" cy="50" rx="39" ry="34" />
@@ -200,10 +219,15 @@ function view(scene: (typeof story.scenes)[number]) {
     const restartBtn = document.getElementById('restart-btn') as HTMLButtonElement;
     const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
     const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+    const offlineBtn = document.getElementById('offline-btn') as HTMLButtonElement | null;
     const autoplayBox = document.getElementById('autoplay') as HTMLInputElement;
     const speedBtn = document.getElementById('speed-btn') as HTMLButtonElement;
     const sceneNow = document.getElementById('scene-now') as HTMLElement;
     const progressFill = document.getElementById('scene-progress-fill') as HTMLElement | null;
+    const offlineUrls = (() => {
+      try { return JSON.parse(root.dataset.offline || '[]') as string[]; }
+      catch { return []; }
+    })();
 
     interface Word { start: number; end: number; el: HTMLElement; }
     interface Stage { anchor: number; el: HTMLElement; }
@@ -563,6 +587,38 @@ function view(scene: (typeof story.scenes)[number]) {
       else { playBtn.textContent = '▶ Read to me'; playBtn.classList.remove('is-playing'); }
     }
 
+    // ============================ OFFLINE SAVE ============================
+    let savingOffline = false;
+    function setOfflineState(label: string, disabled = false) {
+      if (!offlineBtn) return;
+      offlineBtn.textContent = label;
+      offlineBtn.disabled = disabled;
+    }
+    async function saveOfflineStory() {
+      if (!offlineBtn || savingOffline) return;
+      if (!('serviceWorker' in navigator)) { setOfflineState('⚠️ Offline not supported', true); return; }
+      savingOffline = true;
+      setOfflineState('⏳ Saving story…', true);
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const worker = reg.active || reg.waiting || reg.installing;
+        if (!worker) throw new Error('No service worker is ready yet.');
+        const urls = Array.from(new Set([location.href, ...offlineUrls]));
+        const channel = new MessageChannel();
+        const done = new Promise<{ ok?: boolean; count?: number; error?: string }>((resolve) => {
+          channel.port1.onmessage = (event) => resolve(event.data || {});
+        });
+        worker.postMessage({ type: 'CACHE_STORY', urls }, [channel.port2]);
+        const result = await done;
+        if (!result.ok) throw new Error(result.error || 'Could not save the story offline.');
+        setOfflineState(`✅ Saved for offline (${result.count || urls.length})`, true);
+      } catch (err) {
+        setOfflineState('⚠️ Try again', false);
+      } finally {
+        savingOffline = false;
+      }
+    }
+
     // ============================ STUDIO AUDIO ============================
     async function playAudio(s: SceneData) {
       mode = 'audio';
@@ -734,6 +790,8 @@ function view(scene: (typeof story.scenes)[number]) {
     }
     applySpeed(false);
     speedBtn?.addEventListener('click', () => { speedIdx = (speedIdx + 1) % SPEEDS.length; applySpeed(true); });
+    if (!('serviceWorker' in navigator)) setOfflineState('⚠️ Offline not supported', true);
+    else offlineBtn?.addEventListener('click', () => { saveOfflineStory(); });
 
     if (!canRead) {
       document.getElementById('no-speech')?.removeAttribute('hidden');

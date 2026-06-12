@@ -16,6 +16,8 @@
     "storyteller": "node scripts/generate-storyteller.mjs",
     "illustrate": "node scripts/illustrate.mjs",
     "optimize": "node scripts/optimize-images.mjs",
+    "check-assets": "node scripts/check-assets.mjs",
+    "check-sync": "node scripts/check-sync.mjs",
     "share-card": "node scripts/make-share-card.mjs",
     "remove-bg": "python3 scripts/remove-bg.py",
     "new-story": "node scripts/new-story.mjs"
@@ -26,6 +28,7 @@
     "gray-matter": "^4.0.3"
   },
   "devDependencies": {
-    "microsoft-cognitiveservices-speech-sdk": "^1.40.0"
+    "microsoft-cognitiveservices-speech-sdk": "^1.40.0",
+    "sharp": "^0.34.5"
   }
 }
