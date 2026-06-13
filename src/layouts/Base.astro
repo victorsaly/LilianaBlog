@@ -165,6 +165,25 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
             window.setTimeout(() => { shareBtn.textContent = prev; }, 1400);
           } catch (e) {}
         });
+
+        // Full screen toggle — hides the browser's UI for an app-like feel.
+        // Shown only when NOT already running standalone and the API exists.
+        const fsBtn = document.getElementById('app-fullscreen');
+        const docEl = document.documentElement;
+        const reqFs = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen;
+        const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+        const standalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true;
+        if (fsBtn && reqFs && !standalone) {
+          fsBtn.hidden = false;
+          const inFs = () => document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+          const sync = () => { fsBtn.textContent = inFs() ? '🡼' : '⛶'; fsBtn.title = inFs() ? 'Exit full screen' : 'Full screen'; };
+          fsBtn.addEventListener('click', () => {
+            try { if (inFs()) exitFs.call(document); else reqFs.call(docEl); } catch (e) {}
+          });
+          document.addEventListener('fullscreenchange', sync);
+          document.addEventListener('webkitfullscreenchange', sync);
+          sync();
+        }
       });
     </script>
   </head>
@@ -179,6 +198,7 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
         <nav class="nav" aria-label="Main">
           <a href={base} aria-current={active === 'home' ? 'page' : undefined}>Home</a>
           <a href={`${base}characters/`} aria-current={active === 'characters' ? 'page' : undefined}>Characters</a>
+          <button id="app-fullscreen" class="app-refresh" type="button" title="Full screen" aria-label="Full screen" hidden>⛶</button>
           <button id="app-share" class="app-refresh" type="button" title="Share this page" aria-label="Share this page">🔗</button>
           <button id="app-refresh" class="app-refresh" type="button" title="Refresh the app" aria-label="Refresh the app">↻</button>
         </nav>

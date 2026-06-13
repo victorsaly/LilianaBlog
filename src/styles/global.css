@@ -79,6 +79,13 @@ html[data-font='plain']    { --read-font: system-ui, -apple-system, sans-serif; 
 /* ---- Base ------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+/* native-app feel: no grey tap-flash, no rubber-band overscroll, and the UI
+   chrome isn't text-selectable on long-press (the story words still read aloud) */
+html { -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+.site-header, .nav, .reader-bar, .reader-top, .btn, .app-refresh, .storyteller {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
 
 body {
   margin: 0;
