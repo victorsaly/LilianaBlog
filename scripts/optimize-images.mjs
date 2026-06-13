@@ -61,6 +61,24 @@ if (fs.existsSync(SCENES)) {
   }
 }
 
+// 1b) Existing scene JPGs that came in oversized (skipped step 1 because they
+//     were never PNGs) — downscale + recompress them in place to the same cap.
+if (fs.existsSync(SCENES)) {
+  for (const slug of fs.readdirSync(SCENES)) {
+    const dir = path.join(SCENES, slug);
+    if (!fs.statSync(dir).isDirectory()) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (!/\.jpe?g$/i.test(f)) continue;
+      const jpg = path.join(dir, f);
+      if (maxDimOf(jpg) <= SCENE_MAXDIM) continue;
+      const before = fs.statSync(jpg).size;
+      sips(['-Z', String(SCENE_MAXDIM), '-s', 'format', 'jpeg', '-s', 'formatOptions', String(SCENE_Q), jpg]);
+      saved += before - fs.statSync(jpg).size;
+      console.log(`  🎬 ${slug}/${f}: ${(before / 1024).toFixed(0)}KB → ${kb(jpg)}KB`);
+    }
+  }
+}
+
 // 2) Rewrite the matching story markdown so `/art/scenes/.../x.png` -> `.jpg`.
 for (const slug of changedSlugs) {
   const md = path.join(STORIES, `${slug}.md`);

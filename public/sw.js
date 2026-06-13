@@ -1,7 +1,11 @@
 /* Lili's Story World — service worker (offline + installable).
    Pages: network-first (so updates show), fall back to cache, then start page.
-   Assets (art/audio/css/js/fonts): cache-first (cached on first use → offline). */
-const VERSION = 'lili-v3';
+   Art images: stale-while-revalidate (instant from cache, but always refetched
+     in the background → a re-uploaded image shows on the next visit, no version
+     bump needed). This is what fixes "still seeing the old picture".
+   Other assets (audio/css/js/fonts): cache-first (cached on first use → offline).
+   Bump VERSION on any release to wipe the old cache immediately. */
+const VERSION = 'lili-v4';
 const CACHE = VERSION + '-cache';
 
 self.addEventListener('install', () => self.skipWaiting());
@@ -42,6 +46,19 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
+  // Art images: stale-while-revalidate. Return the cached copy immediately for
+  // speed, but kick off a network fetch in the background to refresh the cache,
+  // so a re-uploaded image (same filename) appears on the next load.
+  if (url.pathname.startsWith('/art/')) {
+    e.respondWith((async () => {
+      const cached = await caches.match(req);
+      const network = fetch(req).then((fresh) => { cachePut(req, fresh); return fresh; }).catch(() => null);
+      return cached || (await network) || Response.error();
+    })());
+    return;
+  }
+
+  // Everything else (audio/css/js/fonts): cache-first.
   e.respondWith((async () => {
     const cached = await caches.match(req);
     if (cached) return cached;
