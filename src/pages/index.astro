@@ -7,72 +7,119 @@ import { illustrationUrl, idFromCover } from '../lib/art';
 const base = import.meta.env.BASE_URL;
 const stories = getStories();
 
-// A book cover automatically upgrades to Lili's illustration once it exists.
 function coverFor(story: (typeof stories)[number]): string | null {
   const id = idFromCover(story.cover);
   return (id && illustrationUrl(id, base)) || artUrl(story.cover, 'character', base);
 }
 
-// "From Lili's sketchbook" — show before/after for any character drawn by her.
 const drawn = characters.filter((c) => c.sketch).map((c) => ({
-  name: c.name,
+  id: c.id, name: c.name,
   sketchUrl: artUrl(c.sketch, 'character', base),
   illoUrl: illustrationUrl(c.id, base),
 }));
 const donePairs = drawn.filter((p) => p.illoUrl);
 const sketches = drawn.slice(0, 4);
 
-// Full cast for the "meet the cast" strip (illustration if available, else sketch).
 const cast = characters
   .map((c) => ({ name: c.name, url: illustrationUrl(c.id, base) || artUrl(c.sketch, 'character', base) }))
   .filter((c) => c.url);
 
-// Hero star: Lili's illustration if she has one, else her sketch.
 const lily = drawn.find((d) => d.name === 'Lili');
-const heroImg = lily?.illoUrl || lily?.sketchUrl;
+const heroImg = illustrationUrl('lili-hero', base) || lily?.illoUrl || lily?.sketchUrl;
 const firstStory = stories[0];
+
+// dreamy magical landscape behind the hero (parallax), + floating cast cut-outs
+const heroWorld = `${base}art/hero/world.jpg`;
+const cut = (id: string) => illustrationUrl(id, base);
+const floatIds = ['pip', 'blaze', 'fries'];
+const floaters = floatIds.map((id) => cut(id)).filter(Boolean) as string[];
 ---
 
 <Base title="Lili's Story World" active="home">
-  <section class="wrap hero-wide">
-    <div class="hero-copy">
-      <h1>Lili's Story World</h1>
-      <p>Magical stories written and drawn by Lili — that read themselves out loud while the words light up. 💛</p>
-      <div class="hero-cta">
-        {firstStory && <a class="btn btn-teal btn-big" href={`${base}stories/${firstStory.slug}/`}>▶ Read a story</a>}
-        <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Characters</a>
-      </div>
+  <!-- ===================== CINEMATIC HERO ===================== -->
+  <section class="v-hero" id="vhero">
+    <div class="v-hero__scene" data-parallax="0.14" style={`background-image:url(${heroWorld})`}></div>
+    <div class="v-hero__wash"></div>
+    <span class="v-blob bl1" data-parallax="0.05" aria-hidden="true"></span>
+    <span class="v-blob bl2" data-parallax="0.09" aria-hidden="true"></span>
+    <div class="v-hero__glow" data-parallax="0.06" aria-hidden="true"></div>
+    <!-- a starfield across the top (behind the copy), drifting with scroll -->
+    <div class="starfield" aria-hidden="true">
+      <span class="star" data-parallax="0.10" style="top:8%;left:6%;font-size:1.5rem">⭐</span>
+      <span class="star" data-parallax="0.22" style="top:5%;left:24%;font-size:1.05rem">✨</span>
+      <span class="star" data-parallax="0.15" style="top:16%;left:40%;font-size:0.85rem">⭐</span>
+      <span class="star" data-parallax="0.30" style="top:6%;left:52%;font-size:1.3rem">🌟</span>
+      <span class="star" data-parallax="0.12" style="top:13%;left:66%;font-size:0.95rem">✨</span>
+      <span class="star" data-parallax="0.25" style="top:4%;left:80%;font-size:1.5rem">⭐</span>
+      <span class="star" data-parallax="0.18" style="top:20%;left:90%;font-size:1.1rem">✨</span>
+      <span class="star" data-parallax="0.34" style="top:24%;left:14%;font-size:0.8rem">🌟</span>
     </div>
-    {heroImg && (
-      <div class="hero-figure">
-        <div class="blob" aria-hidden="true"></div>
-        <span class="spark s1" aria-hidden="true">✨</span>
-        <span class="spark s2" aria-hidden="true">⭐</span>
-        <span class="spark s3" aria-hidden="true">💛</span>
-        <img src={heroImg} alt="Lili the hero" fetchpriority="high" decoding="async" />
+    <span class="float spark sp1" data-tilt="55" aria-hidden="true">✨</span>
+    <span class="float spark sp2" data-tilt="70" aria-hidden="true">⭐</span>
+
+    <div class="wrap v-hero__inner">
+      <div class="v-hero__copy" data-reveal="up">
+        <p class="eyebrow">📖✨ A read-along storybook</p>
+        <h1 class="v-title">Lili's<br />Story World</h1>
+        <p class="v-lede">Magical stories <b>written and drawn by&nbsp;Lili</b>&nbsp;— that read
+          themselves out loud while the words light up, one by one.</p>
+        <div class="v-cta">
+          {firstStory && <a class="btn btn-teal btn-big glow-btn" href={`${base}stories/${firstStory.slug}/`}>▶ Read a story</a>}
+          <a class="btn btn-ghost btn-big" href={`${base}characters/`}>🎭 Meet the cast</a>
+        </div>
+        <ul class="v-chips">
+          <li>🔊 Reads aloud</li>
+          <li>✨ Words light up</li>
+          <li>💛 By a 9-year-old</li>
+        </ul>
       </div>
-    )}
+
+      {heroImg && (
+        <div class="v-hero__stage">
+          <span class="hero-pedestal" aria-hidden="true"></span>
+          {cut('mum') && <img class="hero-cast c-back c-mum" data-tilt="-9" src={cut('mum')} alt="" aria-hidden="true" />}
+          {cut('dad') && <img class="hero-cast c-back c-dad" data-tilt="-7" src={cut('dad')} alt="" aria-hidden="true" />}
+          <div class="v-hero__figure" data-tilt="-16">
+            <span class="ring" aria-hidden="true"></span>
+            <img src={heroImg} alt="Lili, the hero of the stories" fetchpriority="high" decoding="async" />
+          </div>
+          {cut('leo') && <img class="hero-cast c-leo" data-tilt="14" src={cut('leo')} alt="" aria-hidden="true" />}
+          {cut('potato') && <img class="hero-cast c-potato" data-tilt="24" src={cut('potato')} alt="" aria-hidden="true" />}
+          {cut('pip') && <img class="hero-cast c-pip" data-tilt="30" src={cut('pip')} alt="" aria-hidden="true" />}
+          {cut('blaze') && <img class="hero-cast c-blaze" data-tilt="36" src={cut('blaze')} alt="" aria-hidden="true" />}
+          <span class="float spark sp4" data-tilt="60" aria-hidden="true">⭐</span>
+          <span class="float spark sp5" data-tilt="46" aria-hidden="true">✨</span>
+        </div>
+      )}
+    </div>
+
+    <a class="scroll-cue" href="#stories" aria-label="Scroll to the stories"><span></span></a>
   </section>
 
-  <section class="wrap">
-    <div class="section-title">
-      <span aria-hidden="true" style="font-size:1.8rem">📚</span>
+  <!-- ===================== STORIES ===================== -->
+  <section class="wrap v-section" id="stories">
+    <header class="v-head" data-reveal="up">
+      <span class="kicker">The bookshelf</span>
       <h2>Pick a story</h2>
-    </div>
+      <p>Tap a book and it reads itself to you.</p>
+    </header>
 
-    <div class="shelf">
-      {stories.map((story) => {
+    <div class="shelf v-shelf">
+      {stories.map((story, i) => {
         const cover = coverFor(story);
         return (
-          <a class="book" href={`${base}stories/${story.slug}/`} style={`--accent:${story.accent}`}>
-            {cover
-              ? <img class="cover" src={cover} alt={`Cover of ${story.title}`} loading="lazy" decoding="async" />
-              : <div class="cover-emoji" style={`background:${story.accent}22`}>{story.emoji}</div>}
+          <a class="book v-book" href={`${base}stories/${story.slug}/`} style={`--accent:${story.accent}`} data-reveal="zoom" data-reveal-delay={i * 90}>
+            <div class="v-book__art">
+              {cover
+                ? <img class="cover" src={cover} alt={`Cover of ${story.title}`} loading="lazy" decoding="async" />
+                : <div class="cover-emoji" style={`background:${story.accent}22`}>{story.emoji}</div>}
+              <span class="v-book__shine" aria-hidden="true"></span>
+            </div>
             <div class="meta">
               <h3>{story.emoji} {story.title}</h3>
               <div class="by">by {story.author}</div>
               {story.tagline && <p class="tag">{story.tagline}</p>}
-              <p class="tag">{story.scenes.length} pages · about {story.wordCount} words</p>
+              <p class="tag dim">{story.scenes.length} pages · about {story.wordCount} words</p>
               <span class="readpill">▶ Read along</span>
             </div>
           </a>
@@ -81,44 +128,286 @@ const firstStory = stories[0];
     </div>
   </section>
 
-  <section class="wrap">
-    <div class="section-title">
-      <span aria-hidden="true" style="font-size:1.8rem">✏️</span>
-      <h2>From Lili's sketchbook</h2>
+  <!-- ===================== HOW IT WORKS ===================== -->
+  <section class="wrap v-section" id="how">
+    <header class="v-head" data-reveal="up">
+      <span class="kicker">Made for reading</span>
+      <h2>How it works</h2>
+    </header>
+    <div class="v-features">
+      <div class="v-feature" data-reveal="up" data-reveal-delay="0"><div class="v-feature__icon">🔊</div><h3>Reads aloud</h3><p>Every page reads itself, and the word being spoken lights up — easy to follow.</p></div>
+      <div class="v-feature" data-reveal="up" data-reveal-delay="90"><div class="v-feature__icon">🖼️</div><h3>A picture per line</h3><p>The illustration changes to match the words, like a moving picture book.</p></div>
+      <div class="v-feature" data-reveal="up" data-reveal-delay="180"><div class="v-feature__icon">🎵</div><h3>Music & sounds</h3><p>Gentle music and little sound effects bring each adventure to life.</p></div>
     </div>
-    {donePairs.length > 0 ? (
-      <div class="showcase">
-        {donePairs.map((p) => (
-          <figure class="ba">
+  </section>
+
+  <!-- ===================== SKETCHBOOK ===================== -->
+  {donePairs.length > 0 && (
+    <section class="wrap v-section" id="sketchbook">
+      <header class="v-head" data-reveal="up">
+        <span class="kicker">Behind the magic</span>
+        <h2>From Lili's sketchbook</h2>
+        <p>Her real pencil drawings, brought to life.</p>
+      </header>
+      <div class="showcase v-showcase">
+        {donePairs.map((p, i) => (
+          <figure class="ba v-ba" data-reveal="up" data-reveal-delay={i * 90}>
             <img src={p.sketchUrl} alt={`${p.name} sketch`} loading="lazy" decoding="async" />
             <span class="arrow" aria-hidden="true">➜</span>
             <img src={p.illoUrl} alt={`${p.name} illustration`} loading="lazy" decoding="async" />
           </figure>
         ))}
       </div>
-    ) : (
-      <div class="showcase-teaser">
-        <div class="teaser-strip">
-          {sketches.map((c) => <img src={c.sketchUrl} alt={`${c.name} sketch`} loading="lazy" decoding="async" />)}
-        </div>
-        <p class="tag">🎨 Colour versions are coming soon — Lili's sketches become bright illustrations next!</p>
-      </div>
-    )}
-  </section>
-
-  {cast.length > 0 && (
-    <section class="wrap">
-      <div class="section-title">
-        <span aria-hidden="true" style="font-size:1.8rem">🎭</span>
-        <h2>Meet the cast</h2>
-      </div>
-      <a class="cast-strip" href={`${base}characters/`} aria-label="Meet all the characters">
-        {cast.map((c) => <img src={c.url} alt={c.name} loading="lazy" />)}
-      </a>
     </section>
   )}
 
-  <section class="wrap center" style="margin:2rem 0 1rem">
-    <a class="btn btn-purple btn-big" href={`${base}characters/`}>🎭 Meet the characters</a>
+  <!-- ===================== CAST ===================== -->
+  {cast.length > 0 && (
+    <section class="wrap v-section" id="cast">
+      <header class="v-head" data-reveal="up">
+        <span class="kicker">The cast</span>
+        <h2>Meet the characters</h2>
+      </header>
+      <div class="v-cast">
+        {cast.map((c, i) => (
+          <a class="v-cast__item" href={`${base}characters/`} data-reveal="zoom" data-reveal-delay={i * 70}>
+            <img src={c.url} alt={c.name} loading="lazy" />
+            <span>{c.name}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- ===================== FINAL CTA ===================== -->
+  <section class="v-final" id="start">
+    <div class="wrap v-final__inner" data-reveal="zoom">
+      <h2>Ready for an adventure?</h2>
+      <p>Open the book and press <b>▶ Read to me</b>.</p>
+      {firstStory && <a class="btn btn-teal btn-big glow-btn" href={`${base}stories/${firstStory.slug}/`}>▶ Start reading</a>}
+    </div>
   </section>
 </Base>
+
+<style>
+  /* ===== Cinematic hero ===== */
+  .v-hero {
+    position: relative; overflow: hidden; isolation: isolate;
+    min-height: clamp(560px, 92svh, 940px);
+    display: flex; align-items: center;
+    margin-top: calc(-1 * var(--space-4, 1rem));
+  }
+  /* dreamy magical landscape, softened so the words stay crisp */
+  .v-hero__scene {
+    position: absolute; inset: -8% -4% 0; z-index: -4;
+    background-size: cover; background-position: center 28%;
+    opacity: 0.62; filter: saturate(1.02) blur(1.5px); transform: scale(1.06);
+    will-change: transform;
+  }
+  /* wash: opaque cream over the copy (left) fading to clear over the scene (right) */
+  .v-hero__wash {
+    position: absolute; inset: 0; z-index: -3;
+    background:
+      radial-gradient(85% 90% at 20% 48%, var(--page-bg) 0%, color-mix(in srgb, var(--page-bg) 72%, transparent) 42%, transparent 76%),
+      linear-gradient(0deg, var(--page-bg) 3%, transparent 58%),
+      linear-gradient(180deg, color-mix(in srgb, var(--page-bg) 55%, transparent) 0%, transparent 30%);
+  }
+  .v-blob { position: absolute; z-index: -2; border-radius: 50%; filter: blur(40px); opacity: 0.55; will-change: transform; }
+  .v-blob.bl1 { width: 42vw; max-width: 520px; aspect-ratio: 1; top: -8%; right: 6%; background: radial-gradient(circle, color-mix(in srgb, var(--sunny) 60%, transparent), transparent 65%); }
+  .v-blob.bl2 { width: 36vw; max-width: 440px; aspect-ratio: 1; bottom: -6%; left: -4%; background: radial-gradient(circle, color-mix(in srgb, var(--purple) 32%, transparent), transparent 65%); }
+  .v-hero__glow {
+    position: absolute; z-index: -1; top: 8%; right: 4%; width: 60vw; max-width: 720px; aspect-ratio: 1;
+    background: radial-gradient(circle, color-mix(in srgb, var(--teal) 38%, transparent) 0%, transparent 62%);
+    filter: blur(18px); opacity: 0.7; will-change: transform;
+  }
+  .v-hero__inner {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(1rem, 3vw, 2.5rem); align-items: center;
+    margin-bottom:20px;
+  }
+  .eyebrow {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3px;
+    color: var(--teal-deep); background: rgba(255,255,255,0.6); display: inline-block;
+    padding: 0.35em 0.9em; border-radius: var(--r-pill); box-shadow: var(--shadow-sm); margin: 0 0 0.9rem;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .v-title {
+    font-family: var(--font-serif); font-weight: 700; line-height: 1.04;
+    font-size: clamp(3rem, 8.6vw, 6.6rem); letter-spacing: -1.8px; margin: 0 0 1.1rem; padding-bottom: 0.08em;
+    background: linear-gradient(120deg, var(--teal-deep) 0%, var(--ink) 58%, #4b2f9e 104%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .v-lede { font-size: clamp(1.14rem, 2.5vw, 1.55rem); line-height: 1.5; font-weight: 500; max-width: min(34ch, 100%); color: var(--ink); margin: 0 0 1.5rem; }
+  .v-cta { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+  .v-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 0.7rem; padding: 0; margin: 1.4rem 0 0; }
+  .v-chips li {
+    font-family: var(--font-display); font-weight: 700; font-size: 0.86rem; color: var(--ink-soft);
+    background: rgba(255,255,255,0.72); border: 1px solid var(--paper-edge); border-radius: var(--r-pill);
+    padding: 0.38em 0.85em; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  }
+  .glow-btn { box-shadow: 0 10px 26px color-mix(in srgb, var(--teal) 45%, transparent); }
+  .glow-btn:hover { box-shadow: 0 14px 34px color-mix(in srgb, var(--teal) 55%, transparent); }
+
+  /* the stage = Lili surrounded by her cast */
+  .v-hero__stage { position: relative; justify-self: center; width: min(50vw, 500px); aspect-ratio: 5/6; }
+  .v-hero__figure { position: absolute; inset: 0; display: grid; place-items: end center; z-index: 3; will-change: transform; }
+  .v-hero__figure img { width: 74%; height: auto; display: block; filter: drop-shadow(0 24px 40px rgba(43,37,51,0.3)); }
+  .v-hero__figure .ring {
+    position: absolute; left: 50%; top: 42%; translate: -50% -50%; width: 86%; aspect-ratio: 1; z-index: -1; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 60%);
+    animation: pulse 5s ease-in-out infinite;
+  }
+  .hero-pedestal {
+    position: absolute; left: 50%; bottom: 4%; translate: -50% 0; width: 78%; height: 13%; z-index: 1;
+    background: radial-gradient(ellipse at center, color-mix(in srgb, var(--teal) 32%, transparent) 0%, transparent 70%);
+    filter: blur(7px);
+  }
+  .hero-cast { position: absolute; width: 32%; height: auto; object-fit: contain; object-position: bottom center; z-index: 2; will-change: transform; filter: drop-shadow(0 12px 18px rgba(43,37,51,0.22)); }
+  .hero-cast.c-back { z-index: 1; width: 30%; opacity: 0.92; }
+  .c-mum { left: -10%; bottom: 8%; }
+  .c-dad { right: -10%; bottom: 10%; }
+  .c-leo { left: 1%; bottom: 1%; width: 29%; z-index: 4; }
+  .c-potato { right: 2%; bottom: 4%; width: 23%; z-index: 4; }
+  .c-pip { left: 9%; bottom: -1%; width: 16%; z-index: 4; }
+  .c-blaze { right: 9%; top: 9%; width: 15%; z-index: 2; }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.06); opacity: 1; } }
+
+  /* sparkles: hero-level ones tuck behind the copy in the top corners; the
+     stage ones twinkle in front of the cast */
+  /* starfield across the top (behind the copy) */
+  .starfield { position: absolute; inset: 0 0 auto 0; height: 46%; z-index: -1; pointer-events: none; }
+  .star { position: absolute; opacity: 0.85; will-change: transform; animation: twinkle 4s ease-in-out infinite; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
+  .star:nth-child(even) { animation-delay: 1.3s; }
+  .star:nth-child(3n) { animation-delay: 2.2s; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+
+  .float { position: absolute; z-index: -1; will-change: transform; pointer-events: none; }
+  .spark { font-size: clamp(1.4rem, 3vw, 2.4rem); filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+  .v-hero__stage .spark { z-index: 5; }
+  .sp1 { top: 12%; left: 3%; } .sp2 { top: 6%; right: 42%; }
+  .sp4 { top: 2%; left: 12%; } .sp5 { bottom: 22%; right: 3%; }
+
+  .scroll-cue { position: absolute; left: 50%; bottom: 18px; translate: -50% 0; width: 26px; height: 42px; border: 2px solid color-mix(in srgb, var(--ink) 35%, transparent); border-radius: 14px; z-index: 1; }
+  .scroll-cue span { position: absolute; left: 50%; top: 8px; translate: -50% 0; width: 4px; height: 8px; border-radius: 2px; background: var(--ink); opacity: 0.5; animation: cue 1.6s ease-in-out infinite; }
+  @keyframes cue { 0% { transform: translateY(0); opacity: 0.6; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+
+  /* ===== Sections + reveals ===== */
+  .v-section { padding: clamp(2.5rem, 7vw, 5rem) 0 0; }
+  .v-head { text-align: center; margin: 0 auto 1.8rem; max-width: 40ch; }
+  .v-head .kicker { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--coral); margin-bottom: 0.4rem; }
+  .v-head h2 { font-family: var(--font-serif); font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.05; margin: 0; }
+  .v-head p { color: var(--ink-soft); margin: 0.5rem 0 0; }
+
+  [data-reveal] { opacity: 0; transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1), transform 0.7s cubic-bezier(0.2,0.7,0.2,1); }
+  [data-reveal="up"] { transform: translateY(34px); }
+  [data-reveal="zoom"] { transform: scale(0.9); }
+  [data-reveal="left"] { transform: translateX(-40px); }
+  [data-reveal="right"] { transform: translateX(40px); }
+  [data-reveal].is-in { opacity: 1; transform: none; }
+
+  /* ===== Story cards (zoom + tilt) ===== */
+  .v-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.4rem; }
+  .v-book { display: flex; flex-direction: column; border-radius: var(--r-lg); overflow: hidden; background: #fff; border: 1px solid var(--paper-edge); box-shadow: var(--shadow); transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease; }
+  .v-book:hover { transform: translateY(-8px) scale(1.015); box-shadow: 0 26px 50px rgba(43,37,51,0.22); }
+  .v-book__art { position: relative; overflow: hidden; aspect-ratio: 4/3; background: #f3ede1; }
+  .v-book__art .cover, .v-book__art .cover-emoji { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 0.5s cubic-bezier(0.2,0.7,0.2,1); }
+  .v-book:hover .v-book__art .cover { transform: scale(1.08); }
+  .v-book__shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.5) 48%, transparent 60%); transform: translateX(-120%); transition: transform 0.7s ease; }
+  .v-book:hover .v-book__shine { transform: translateX(120%); }
+  .v-book .meta { padding: 1rem 1.1rem 1.2rem; }
+  .v-book .meta h3 { font-family: var(--font-serif); margin: 0 0 0.2rem; }
+  .v-book .tag.dim { color: var(--ink-soft); font-size: 0.85rem; }
+
+  /* ===== Features ===== */
+  .v-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
+  .v-feature { background: #fff; border: 1px solid var(--paper-edge); border-radius: var(--r-lg); padding: 1.6rem 1.4rem; box-shadow: var(--shadow-sm); text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .v-feature:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+  .v-feature__icon { font-size: 2.6rem; line-height: 1; margin-bottom: 0.6rem; display: inline-block; animation: floaty 4s ease-in-out infinite; }
+  .v-feature:nth-child(2) .v-feature__icon { animation-delay: 0.6s; }
+  .v-feature:nth-child(3) .v-feature__icon { animation-delay: 1.2s; }
+  .v-feature h3 { font-family: var(--font-serif); margin: 0 0 0.3rem; }
+  .v-feature p { color: var(--ink-soft); margin: 0; font-size: 0.98rem; }
+  @keyframes floaty { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+
+  /* ===== Cast ===== */
+  .v-cast { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(0.6rem, 2vw, 1.6rem); }
+  .v-cast__item { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; text-decoration: none; color: var(--ink); width: clamp(90px, 13vw, 140px); transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1); }
+  .v-cast__item img { width: 100%; aspect-ratio: 1; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 10px 16px rgba(43,37,51,0.2)); transition: transform 0.3s ease; }
+  .v-cast__item span { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; }
+  .v-cast__item:hover { transform: translateY(-8px); }
+  .v-cast__item:hover img { transform: scale(1.1) rotate(-3deg); }
+
+  /* ===== Final CTA ===== */
+  .v-final { margin-top: clamp(3rem, 8vw, 6rem); padding: clamp(3rem, 9vw, 6rem) 0; text-align: center; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--teal) 10%, var(--page-bg))); }
+  .v-final h2 { font-family: var(--font-serif); font-size: clamp(1.8rem, 5vw, 3rem); margin: 0 0 0.4rem; }
+  .v-final p { color: var(--ink-soft); margin: 0 0 1.4rem; }
+
+  @media (max-width: 860px) {
+    .v-hero__inner { grid-template-columns: 1fr; text-align: center; gap: 0.5rem; padding-top: 1.5rem; }
+    .v-hero__copy { order: 2; }
+    .v-hero__stage { order: 1; width: min(86vw, 380px); }
+    .v-lede { margin-inline: auto; }        /* centre the "Magical stories…" block */
+    .v-cta, .v-chips { justify-content: center; }
+    .v-chips { gap: 0.6rem 0.7rem; }        /* clear spacing between the 3 tags */
+    .float.f1, .float.f3 { display: none; }
+    .scroll-cue { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .v-hero__figure .ring, .v-feature__icon, .scroll-cue span, .star { animation: none; }
+  }
+</style>
+
+<script>
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll-reveal (with optional per-item delay)
+  const reveals = Array.from(document.querySelectorAll('[data-reveal]')) as HTMLElement[];
+  if (rm || !('IntersectionObserver' in window)) {
+    reveals.forEach((el) => el.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target as HTMLElement;
+        const d = parseInt(el.dataset.revealDelay || '0', 10);
+        window.setTimeout(() => el.classList.add('is-in'), d);
+        io.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach((el) => io.observe(el));
+  }
+
+  if (!rm) {
+    // scroll parallax for the hero background layers
+    const pLayers = Array.from(document.querySelectorAll('[data-parallax]')) as HTMLElement[];
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        for (const l of pLayers) {
+          const sp = parseFloat(l.dataset.parallax || '0');
+          l.style.transform = `translate3d(0, ${(y * sp).toFixed(1)}px, 0)` + (l.classList.contains('v-hero__scene') ? ' scale(1.06)' : '');
+        }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // pointer parallax for the floating hero pieces
+    const tilts = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[];
+    const hero = document.getElementById('vhero');
+    if (hero && tilts.length && matchMedia('(pointer: fine)').matches) {
+      hero.addEventListener('pointermove', (e) => {
+        const r = hero.getBoundingClientRect();
+        const cx = (e.clientX - r.left) / r.width - 0.5;
+        const cy = (e.clientY - r.top) / r.height - 0.5;
+        for (const t of tilts) {
+          const d = parseFloat(t.dataset.tilt || '0');
+          t.style.transform = `translate3d(${(cx * d).toFixed(1)}px, ${(cy * d).toFixed(1)}px, 0)`;
+        }
+      });
+    }
+  }
+</script>
