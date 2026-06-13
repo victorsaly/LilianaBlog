@@ -6,9 +6,6 @@ import { illustrationUrl } from '../lib/art';
 
 const base = import.meta.env.BASE_URL;
 
-// Auto-detect a finished illustration for a character: drop a file named
-// <id>.png (or .jpg/.jpeg/.webp) into public/art/illustrations/ and it appears
-// here automatically — with a toggle back to Lili's original sketch.
 const cards = characters.map((c) => ({
   ...c,
   sketchUrl: artUrl(c.sketch, 'character', base),
@@ -16,52 +13,76 @@ const cards = characters.map((c) => ({
 }));
 const doneCount = cards.filter((c) => c.illoUrl).length;
 
-// Group the cast by the book they belong to, keeping first-seen order.
 const stories = [...new Set(cards.map((c) => c.story))];
 const byStory = stories.map((story) => ({ story, cast: cards.filter((c) => c.story === story) }));
+
+// cast cut-outs (illustrations) to float across the hero
+const heroCast = cards.filter((c) => c.illoUrl).slice(0, 7);
 ---
 
 <Base title="Meet the Characters · Lili's Story World" active="characters">
-  <section class="wrap hero" style="padding-bottom:0">
-    <h1>🎭 Meet the Characters</h1>
-    <p>Everyone from Lili's stories — drawn by Lili herself.
-      {doneCount > 0
-        ? <span>Tap <b>✏️ Sketch</b> / <b>🎨 Colour</b> to see how a drawing came to life!</span>
-        : <span>Her sketches are here now — the colourful illustrations are coming next!</span>}
-    </p>
+  <!-- ===================== HERO ===================== -->
+  <section class="cx-hero">
+    <div class="cx-wash"></div>
+    <span class="cx-blob b1" data-parallax="0.06" aria-hidden="true"></span>
+    <span class="cx-blob b2" data-parallax="0.1" aria-hidden="true"></span>
+    <div class="starfield" aria-hidden="true">
+      <span class="star" data-parallax="0.12" style="top:14%;left:8%;font-size:1.3rem">⭐</span>
+      <span class="star" data-parallax="0.24" style="top:8%;left:30%;font-size:0.9rem">✨</span>
+      <span class="star" data-parallax="0.18" style="top:18%;left:62%;font-size:1.1rem">🌟</span>
+      <span class="star" data-parallax="0.28" style="top:10%;left:84%;font-size:1.4rem">⭐</span>
+      <span class="star" data-parallax="0.15" style="top:26%;left:46%;font-size:0.8rem">✨</span>
+    </div>
+
+    <div class="wrap cx-hero__inner" data-reveal="up">
+      <span class="kicker">The cast</span>
+      <h1 class="cx-title">Meet the Characters</h1>
+      <p class="cx-lede">Everyone from Lili's stories — <b>drawn by Lili&nbsp;herself</b>.
+        {doneCount > 0
+          ? <span>Tap <b>✏️ Sketch</b> / <b>🎨 Colour</b> to see a drawing come to life.</span>
+          : <span>Her sketches are here now — the colour versions are coming next!</span>}
+      </p>
+    </div>
+
+    {heroCast.length > 0 && (
+      <div class="cx-parade" aria-hidden="true">
+        {heroCast.map((c, i) => (
+          <img src={c.illoUrl} alt="" class="cx-parade__item" data-tilt={(i % 2 === 0 ? 14 : -12).toString()} style={`--d:${i * 0.35}s`} />
+        ))}
+      </div>
+    )}
   </section>
 
+  <!-- ===================== CAST BY STORY ===================== -->
   {byStory.map(({ story, cast }) => (
-  <section class="wrap" style="margin-top:1.5rem">
-    <h2 class="cast-heading">{cast[0].emoji} {story}</h2>
-    <div class="char-grid">
-      {cast.map((c) => (
-        <div class="char" style={`--tint:${c.color}`}>
-          {c.illoUrl && c.sketchUrl ? (
-            <div class="frame flip" data-show="art">
-              <img class="layer art" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" />
-              <img class="layer sketch" src={c.sketchUrl} alt={`Lili's pencil sketch of ${c.name}`} loading="lazy" />
-              <button class="flip-btn" type="button" data-flip>✏️ Sketch</button>
-            </div>
-          ) : c.illoUrl ? (
-            <div class="frame"><img class="illo" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" /></div>
-          ) : c.sketchUrl ? (
-            <div class="frame"><img src={c.sketchUrl} alt={`Lili's drawing of ${c.name}`} loading="lazy" /></div>
-          ) : (
-            <div class="frame placeholder">
-              <div>
-                <div style="font-size:2.2rem">✏️</div>
-                <b>Draw me, Lili!</b>
+    <section class="wrap v-section">
+      <header class="v-head" data-reveal="up">
+        <span class="kicker">{cast[0].emoji} Story</span>
+        <h2>{story}</h2>
+      </header>
+      <div class="char-grid">
+        {cast.map((c, i) => (
+          <div class="char cx-card" style={`--tint:${c.color}`} data-reveal="zoom" data-reveal-delay={(i % 4) * 80}>
+            {c.illoUrl && c.sketchUrl ? (
+              <div class="frame flip" data-show="art">
+                <img class="layer art" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" />
+                <img class="layer sketch" src={c.sketchUrl} alt={`Lili's pencil sketch of ${c.name}`} loading="lazy" />
+                <button class="flip-btn" type="button" data-flip>✏️ Sketch</button>
               </div>
-            </div>
-          )}
-          <h3>{c.emoji} {c.name}</h3>
-          <span class={`power ${c.powerClass}`}>{c.power}</span>
-          <p class="desc"><span class="swatch" style={`background:${c.color}`}></span>{c.desc}</p>
-        </div>
-      ))}
-    </div>
-  </section>
+            ) : c.illoUrl ? (
+              <div class="frame"><img class="illo" src={c.illoUrl} alt={`Illustration of ${c.name}`} loading="lazy" /></div>
+            ) : c.sketchUrl ? (
+              <div class="frame"><img src={c.sketchUrl} alt={`Lili's drawing of ${c.name}`} loading="lazy" /></div>
+            ) : (
+              <div class="frame placeholder"><div><div style="font-size:2.2rem">✏️</div><b>Draw me, Lili!</b></div></div>
+            )}
+            <h3>{c.emoji} {c.name}</h3>
+            <span class={`power ${c.powerClass}`}>{c.power}</span>
+            <p class="desc"><span class="swatch" style={`background:${c.color}`}></span>{c.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   ))}
 
   <section class="wrap center" style="margin:2.5rem 0 1rem">
@@ -69,8 +90,111 @@ const byStory = stories.map((story) => ({ story, cast: cards.filter((c) => c.sto
   </section>
 </Base>
 
+<style>
+  /* ===== Characters hero ===== */
+  .cx-hero { position: relative; overflow: hidden; isolation: isolate; padding: clamp(1.5rem, 5vw, 3rem) 0 0; }
+  .cx-wash {
+    position: absolute; inset: 0; z-index: -3;
+    background: linear-gradient(180deg, #fff7ea 0%, var(--page-bg) 80%); /* fallback (no color-mix) */
+    background:
+      radial-gradient(80% 60% at 78% 6%, color-mix(in srgb, var(--purple) 14%, transparent) 0%, transparent 60%),
+      radial-gradient(70% 60% at 12% 30%, color-mix(in srgb, var(--teal) 12%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, #fff7ea 0%, var(--page-bg) 80%);
+  }
+  .cx-blob { position: absolute; z-index: -2; border-radius: 50%; filter: blur(42px); opacity: 0.5; will-change: transform; }
+  .cx-blob.b1 { width: 38vw; max-width: 460px; aspect-ratio: 1; top: -10%; right: 4%; background: radial-gradient(circle, color-mix(in srgb, var(--sunny) 55%, transparent), transparent 65%); }
+  .cx-blob.b2 { width: 32vw; max-width: 400px; aspect-ratio: 1; top: 20%; left: -6%; background: radial-gradient(circle, color-mix(in srgb, var(--coral) 30%, transparent), transparent 65%); }
+
+  .cx-hero__inner { text-align: center; max-width: 46ch; margin-inline: auto; }
+  .kicker { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: 0.85rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--coral); margin-bottom: 0.4rem; }
+  .cx-title {
+    font-family: var(--font-serif); font-weight: 700; line-height: 1.04; padding-bottom: 0.06em;
+    font-size: clamp(2.2rem, 6.5vw, 4.4rem); letter-spacing: -1px; margin: 0 0 0.8rem;
+    background: linear-gradient(120deg, var(--teal-deep) 0%, var(--ink) 58%, #4b2f9e 104%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .cx-lede { font-size: clamp(1.05rem, 2.3vw, 1.3rem); line-height: 1.5; color: var(--ink); margin: 0 auto; }
+
+  /* floating cast parade */
+  .cx-parade { display: flex; justify-content: center; align-items: flex-end; gap: clamp(0.4rem, 2vw, 1.4rem); margin-top: clamp(1rem, 3vw, 2rem); flex-wrap: wrap; }
+  .cx-parade__item { width: clamp(74px, 11vw, 128px); height: auto; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 12px 18px rgba(43,37,51,0.22)); will-change: transform; animation: cx-bob 4s ease-in-out infinite; animation-delay: var(--d); }
+  @keyframes cx-bob { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
+
+  .starfield { position: absolute; inset: 0 0 auto 0; height: 40%; z-index: -1; pointer-events: none; }
+  .star { position: absolute; opacity: 0.85; will-change: transform; animation: cx-twinkle 4s ease-in-out infinite; }
+  .star:nth-child(even) { animation-delay: 1.3s; }
+  @keyframes cx-twinkle { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
+
+  /* ===== sections + reveals ===== */
+  .v-section { padding: clamp(2rem, 6vw, 4rem) 0 0; }
+  .v-head { text-align: center; margin: 0 auto 1.6rem; }
+  .v-head .kicker { color: var(--teal-deep); }
+  .v-head h2 { font-family: var(--font-serif); font-size: clamp(1.6rem, 4.5vw, 2.6rem); margin: 0; }
+
+  [data-reveal] { opacity: 0; transition: opacity 0.7s cubic-bezier(0.2,0.7,0.2,1), transform 0.7s cubic-bezier(0.2,0.7,0.2,1); }
+  [data-reveal="up"] { transform: translateY(30px); }
+  [data-reveal="zoom"] { transform: scale(0.92); }
+  [data-reveal].is-in { opacity: 1; transform: none; }
+
+  /* ===== premium character cards ===== */
+  .cx-card { transition: transform 0.3s cubic-bezier(0.2,0.7,0.2,1), box-shadow 0.3s ease; }
+  .cx-card:hover { transform: translateY(-6px); box-shadow: 0 22px 44px color-mix(in srgb, var(--tint) 30%, rgba(43,37,51,0.18)); }
+  .cx-card .frame { transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1); }
+  .cx-card:hover .frame { transform: scale(1.03); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cx-parade__item, .star { animation: none; }
+  }
+</style>
+
 <script>
-  // Flip a card between the finished illustration and Lili's original sketch.
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const reveals = Array.from(document.querySelectorAll('[data-reveal]')) as HTMLElement[];
+  if (rm || !('IntersectionObserver' in window)) {
+    reveals.forEach((el) => el.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target as HTMLElement;
+        window.setTimeout(() => el.classList.add('is-in'), parseInt(el.dataset.revealDelay || '0', 10));
+        io.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach((el) => io.observe(el));
+  }
+
+  if (!rm) {
+    const pLayers = Array.from(document.querySelectorAll('[data-parallax]')) as HTMLElement[];
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        for (const l of pLayers) l.style.transform = `translate3d(0, ${(y * parseFloat(l.dataset.parallax || '0')).toFixed(1)}px, 0)`;
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    const tilts = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[];
+    const hero = document.querySelector('.cx-hero');
+    if (hero && tilts.length && matchMedia('(pointer: fine)').matches) {
+      hero.addEventListener('pointermove', (e) => {
+        const r = (hero as HTMLElement).getBoundingClientRect();
+        const cx = (e.clientX - r.left) / r.width - 0.5;
+        const cy = (e.clientY - r.top) / r.height - 0.5;
+        for (const t of tilts) {
+          const d = parseFloat(t.dataset.tilt || '0');
+          t.style.transform = `translate3d(${(cx * d).toFixed(1)}px, ${(cy * d).toFixed(1)}px, 0)`;
+        }
+      });
+    }
+  }
+
+  // sketch ↔ colour flip
   document.querySelectorAll<HTMLButtonElement>('[data-flip]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const frame = btn.closest('.frame') as HTMLElement;

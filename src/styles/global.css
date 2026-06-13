@@ -540,8 +540,10 @@ html[data-calm='on'] .page-text.is-playing .w.now { color: var(--hl-now-fg); }
 }
 .nav-arrow { font-size: 1rem; padding: 0.55em 1.1em; }
 
-.play-btn { font-size: 1.2rem; padding: 0.6em 1.4em; background: var(--teal); color: #fff; border-color: transparent; box-shadow: var(--shadow-sm); }
-.play-btn.is-playing { background: var(--coral); }
+/* the main "Read to me" button — sunny yellow with dark text, so it stands out
+   from the teal Next and the ghost Back */
+.play-btn { font-size: 1.2rem; padding: 0.6em 1.4em; background: var(--sunny); color: var(--ink); border-color: transparent; box-shadow: var(--shadow-sm); }
+.play-btn.is-playing { background: var(--coral); color: #fff; }
 
 .speed-btn { font-size: 1.15rem; line-height: 1; }
 
