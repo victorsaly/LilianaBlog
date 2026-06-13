@@ -2,7 +2,7 @@
 title: The Teeny Tiny Garden Quest
 author: Lili
 emoji: "🐞"
-cover: lily-sketch.jpeg
+cover: garden-quest.png
 tagline: The family shrinks bug-size — and the garden gets VERY big.
 accent: "#3fa34d"
 order: 3
@@ -14,8 +14,8 @@ order: 3
   • Put a picture RIGHT WHERE it belongs in the words. As many as you like!
       - Use a picture we already have:  ![Lili](/art/illustrations/lily.png)
       - Use a new picture you saved:    ![what it shows](my-picture.png)
-      - Or let the computer draw it:     ![a tall purple castle at night](auto)
-        then run:  npm run illustrate -- --scenes the-teeny-tiny-garden-quest
+      - Or let the computer draw it:     put the word  auto  in the brackets
+        (like a link), then run:  npm run illustrate -- --scenes the-teeny-tiny-garden-quest
     Pictures placed after some words "pop in" as the reading reaches them.
   • The "> Draw this" line is the big picture for the top of the page.
   • Everything else is the words that get read out loud.
@@ -36,6 +36,7 @@ Leo came over for a look. "Don't touch weird glowing things, Lili," he said. The
 ![Leo](/art/illustrations/leo.png)
 
 The mushroom went *PFFT* and puffed out a cloud of silver dust. It floated over the whole family.
+![a tiny glowing mushroom puffing out a sparkly silver cloud of dust over a surprised family in a sunny back garden](/art/scenes/the-teeny-tiny-garden-quest/scene-1-illo-1.png)
 
 "Achoo!" sneezed Mum.
 ![Mum](/art/illustrations/mum.png)
@@ -81,6 +82,7 @@ A bright shadow swooped overhead. It was Blaze the parrot, and he had heard ever
 "Far?" said Leo. "It's right there."
 
 "It's right there for a BIG bird," said Blaze. "For teeny tiny you, it's a giant adventure."
+![a huge bright parrot leaning down to a teeny-tiny family on the grass, pointing one wing across an enormous lawn toward a far-away dripping garden tap](/art/scenes/the-teeny-tiny-garden-quest/scene-3-illo-1.png)
 
 Lili stood up tall — well, as tall as a ladybird can. "Then let's go on a quest," she said. "Team, follow me!"
 
@@ -122,6 +124,7 @@ So they jumped and waved and shouted all together. Pip rolled up and Blaze flapp
 ![Blaze](/art/illustrations/blaze.png)
 
 The frog got such a fright that he hiccupped, went cross-eyed, and hopped away. "Too noisy!" he croaked. "I'll find quieter snacks!"
+![a giant green frog going cross-eyed and hopping away in fright while a tiny brave girl with glowing hands and her family jump, wave and shout together](/art/scenes/the-teeny-tiny-garden-quest/scene-5-illo-1.png)
 
 ## Scene 6 — A Tiny New Friend
 > Draw this: a smiling ladybird with a little leaf, helping the family up a steep flowerpot; warm and friendly.
@@ -154,6 +157,7 @@ So Dad made a strong, steady base. Leo climbed on his shoulders. Mum climbed on 
 ![Lili](/art/illustrations/lily.png)
 
 She stretched out her glowing hands and — *plip, plip, plip* — caught all three silver drops.
+![a teeny-tiny family making a wobbly tower, a brave girl at the very top reaching out glowing hands to catch three sparkling silver dewdrops on a tall shining silver flower](/art/scenes/the-teeny-tiny-garden-quest/scene-7-illo-1.png)
 
 "One for the grown-ups, one for the kids, one for the pets," said Lili. "Everybody ready? Drink up!"
 
