@@ -207,6 +207,10 @@ const floaters = floatIds.map((id) => cut(id)).filter(Boolean) as string[];
   /* wash: opaque cream over the copy (left) fading to clear over the scene (right) */
   .v-hero__wash {
     position: absolute; inset: 0; z-index: -3;
+    /* fallback for older Silk/Chromium (no color-mix) — keeps copy on cream */
+    background:
+      linear-gradient(90deg, var(--page-bg) 0%, var(--page-bg) 24%, transparent 70%),
+      linear-gradient(0deg, var(--page-bg) 4%, transparent 56%);
     background:
       radial-gradient(85% 90% at 20% 48%, var(--page-bg) 0%, color-mix(in srgb, var(--page-bg) 72%, transparent) 42%, transparent 76%),
       linear-gradient(0deg, var(--page-bg) 3%, transparent 58%),

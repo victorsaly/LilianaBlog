@@ -95,6 +95,7 @@ const heroCast = cards.filter((c) => c.illoUrl).slice(0, 7);
   .cx-hero { position: relative; overflow: hidden; isolation: isolate; padding: clamp(1.5rem, 5vw, 3rem) 0 0; }
   .cx-wash {
     position: absolute; inset: 0; z-index: -3;
+    background: linear-gradient(180deg, #fff7ea 0%, var(--page-bg) 80%); /* fallback (no color-mix) */
     background:
       radial-gradient(80% 60% at 78% 6%, color-mix(in srgb, var(--purple) 14%, transparent) 0%, transparent 60%),
       radial-gradient(70% 60% at 12% 30%, color-mix(in srgb, var(--teal) 12%, transparent) 0%, transparent 60%),
