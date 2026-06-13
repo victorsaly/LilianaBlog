@@ -290,6 +290,10 @@ function view(scene: (typeof story.scenes)[number]) {
     function cueForText(t: string): string | null {
       const s = (t || '').toLowerCase();
       if (/laugh|giggl|chuckl|cackle|ha-ha|hee-hee|chortl|mwahaha/.test(s)) return laughCueFor(s);
+      if (/achoo|atishoo|sneez/.test(s)) return 'sneeze';
+      if (/croak|ribbit|\bfrog\b/.test(s)) return 'croak';
+      if (/snail|slimy|\bslime\b|squelch|slither|slid /.test(s)) return 'slime';
+      if (/\bpop\b|popped/.test(s)) return 'pop';
       if (/restart|reset|game over|poof|fixed/.test(s)) return 'chime';
       if (/saved everyone|teamwork|hooray|cheer|happiest|the end/.test(s)) return 'cheer';
       if (/portal|whoosh|pulled inside|vibrate|buzz|swirl/.test(s)) return 'whoosh';
@@ -344,14 +348,14 @@ function view(scene: (typeof story.scenes)[number]) {
     function moodFor(title: string): number[] {
       const t = (title || '').toLowerCase();
       if (/ocean|cave|deep/.test(t)) return [98.0, 146.83, 196.0];
-      if (/portal|inside the game|powers|wonder/.test(t)) return [146.83, 220.0, 293.66];
+      if (/portal|inside the game|powers|wonder|sparkly|teeny|tiny|snail|frog|silver/.test(t)) return [146.83, 220.0, 293.66];
       if (/deeper|great potato/.test(t)) return [110.0, 164.81, 220.0];
       return [130.81, 164.81, 196.0];
     }
     function moodName(title: string): string {
       const t = (title || '').toLowerCase();
       if (/ocean|cave|deep/.test(t)) return 'ocean';
-      if (/portal|inside the game|powers|wonder/.test(t)) return 'magic';
+      if (/portal|inside the game|powers|wonder|sparkly|teeny|tiny|snail|frog|silver/.test(t)) return 'magic';
       if (/deeper|great potato/.test(t)) return 'battle';
       return 'warm';
     }

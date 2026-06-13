@@ -56,6 +56,10 @@ const CUES = {
   squawk:  { text: 'a friendly cartoon parrot squawk, short, playful and bright', duration: 1.0 },
   splat:   { text: 'a soft comedic splat, light squishy cartoon splat, short', duration: 0.8 },
   clang:   { text: 'a light magical sword shing and soft clang, bright and short, heroic', duration: 0.9 },
+  croak:   { text: 'a funny cartoon frog croak, a deep silly ribbit, short and playful, child-friendly, not scary', duration: 1.1 },
+  pop:     { text: 'a cheerful magical pop, a bright bubbly cartoon pop with a tiny sparkle, short and happy', duration: 0.8 },
+  sneeze:  { text: 'a cute little cartoon sneeze, a soft funny achoo, short and gentle, child-friendly', duration: 1.0 },
+  slime:   { text: 'a gentle squishy slimy slide, a soft squelchy snail-shell glide, light and silly, short, not gross', duration: 1.2 },
 };
 // gentle looping ambience per scene mood (names match the reader's moodName())
 const AMBI = {
