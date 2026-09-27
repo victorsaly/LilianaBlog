@@ -160,9 +160,14 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
           if (navigator.share) { try { await navigator.share({ title: document.title, url }); } catch (e) {} return; }
           try {
             await navigator.clipboard.writeText(url);
-            const prev = shareBtn.textContent;
-            shareBtn.textContent = '✅';
-            window.setTimeout(() => { shareBtn.textContent = prev; }, 1400);
+            // The icons both live in the markup; flipping data-state swaps which
+            // one shows, so confirming a copy never rewrites the button's label.
+            shareBtn.dataset.state = 'b';
+            shareBtn.setAttribute('aria-label', 'Link copied');
+            window.setTimeout(() => {
+              delete shareBtn.dataset.state;
+              shareBtn.setAttribute('aria-label', 'Share this page');
+            }, 1400);
           } catch (e) {}
         });
 
@@ -176,7 +181,12 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
         if (fsBtn && reqFs && !standalone) {
           fsBtn.hidden = false;
           const inFs = () => document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-          const sync = () => { fsBtn.textContent = inFs() ? '🡼' : '⛶'; fsBtn.title = inFs() ? 'Exit full screen' : 'Full screen'; };
+          const sync = () => {
+            const on = !!inFs();
+            if (on) fsBtn.dataset.state = 'b'; else delete fsBtn.dataset.state;
+            fsBtn.title = on ? 'Exit full screen' : 'Full screen';
+            fsBtn.setAttribute('aria-label', fsBtn.title);
+          };
           fsBtn.addEventListener('click', () => {
             try { if (inFs()) exitFs.call(document); else reqFs.call(docEl); } catch (e) {}
           });
@@ -192,15 +202,26 @@ const ldBlocks = [siteLd, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd]
     <header class="site-header">
       <div class="wrap header-inner">
         <a class="brand" href={base}>
-          <span class="logo" aria-hidden="true">📖</span>
+          <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 6.5C10.5 5.2 8.6 4.5 6 4.5H3v13h3c2.6 0 4.5.7 6 2 1.5-1.3 3.4-2 6-2h3v-13h-3c-2.6 0-4.5.7-6 2Z" />
+            <path d="M12 6.5v14" />
+          </svg>
           <span>Lili's Story World</span>
         </a>
         <nav class="nav" aria-label="Main">
           <a href={base} aria-current={active === 'home' ? 'page' : undefined}>Home</a>
           <a href={`${base}characters/`} aria-current={active === 'characters' ? 'page' : undefined}>Characters</a>
-          <button id="app-fullscreen" class="app-refresh" type="button" title="Full screen" aria-label="Full screen" hidden>⛶</button>
-          <button id="app-share" class="app-refresh" type="button" title="Share this page" aria-label="Share this page">🔗</button>
-          <button id="app-refresh" class="app-refresh" type="button" title="Refresh the app" aria-label="Refresh the app">↻</button>
+          <button id="app-fullscreen" class="app-refresh" type="button" title="Full screen" aria-label="Full screen" hidden>
+            <svg class="i-a" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+            <svg class="i-b" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>
+          </button>
+          <button id="app-share" class="app-refresh" type="button" title="Share this page" aria-label="Share this page">
+            <svg class="i-a" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a3.5 3.5 0 0 0 5.1.4l3-3a3.5 3.5 0 0 0-5-5l-1.7 1.7" /><path d="M14 10.5a3.5 3.5 0 0 0-5.1-.4l-3 3a3.5 3.5 0 0 0 5 5l1.7-1.7" /></svg>
+            <svg class="i-b" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7" /></svg>
+          </button>
+          <button id="app-refresh" class="app-refresh" type="button" title="Refresh the app" aria-label="Refresh the app">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9" /><path d="M20 4v4.5h-4.5" /></svg>
+          </button>
         </nav>
       </div>
     </header>

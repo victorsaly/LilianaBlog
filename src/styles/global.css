@@ -49,6 +49,15 @@
   --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;  /* editorial headings (Paper) */
   --font-body: 'Lexend', system-ui, sans-serif;
 
+  /* Easing. The built-in CSS curves are too weak to read as intentional:
+     `ease-out` barely differs from linear over 150ms. These are the strong
+     variants — entrances and presses use --ease-out so the movement is
+     immediate, things travelling across the screen use --ease-in-out.
+     Never `ease-in` on an interaction: it delays the first frame, which is
+     exactly the moment the reader is watching. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
   /* ---- READING controls (changed live by the reading-settings panel) --- */
   --read-font: 'Lexend', system-ui, sans-serif;
   --read-size: 1.5rem;
@@ -135,11 +144,16 @@ img { max-width: 100%; display: block; }
   border: 1px solid var(--paper-edge); border-radius: var(--r-pill); padding: 0.7em 1.35em;
   background: #fff; color: var(--ink); box-shadow: var(--shadow-sm);
   cursor: pointer; display: inline-flex; align-items: center; gap: 0.5em;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out);
   line-height: 1; min-height: 48px;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
-.btn:active { transform: translateY(0) scale(0.98); }
+/* Hover behind a real-pointer query: on a touch screen :hover sticks after a
+   tap, so the button stays lifted until you press something else. */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+}
+.btn:active { transform: translateY(0) scale(0.97); }
+.btn svg { width: 1.1em; height: 1.1em; flex: none; }
 .btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; }
 
 .btn-big   { font-size: 1.35rem; padding: 0.85em 1.7em; }
@@ -161,16 +175,30 @@ img { max-width: 100%; display: block; }
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; }
 .brand { display: inline-flex; align-items: center; gap: 0.45rem; font-family: var(--font-serif); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.2px; color: var(--ink); text-decoration: none; }
-.brand .logo { font-size: 1.25rem; }
+.brand .logo { width: 1.3em; height: 1.3em; color: var(--teal-deep); flex: none; }
 .brand:hover { color: var(--teal-deep); }
 .nav { display: flex; gap: 1.2rem; align-items: center; }
 .nav a { text-decoration: none; color: var(--ink); font-family: var(--font-display); font-weight: 700; padding: 0.3em 0; position: relative; }
 .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform 0.2s ease; }
 .nav a:hover::after, .nav a[aria-current='page']::after { transform: scaleX(1); }
 .nav a[aria-current='page'] { color: var(--teal-deep); }
-.app-refresh { background: none; border: none; cursor: pointer; font-size: 1.2rem; line-height: 1; color: var(--ink-soft); padding: 0.15em 0.35em; border-radius: var(--r-pill); }
-.app-refresh:hover { color: var(--teal-deep); background: rgba(43,37,51,0.06); }
-.app-refresh.spinning { animation: app-spin 0.6s linear infinite; }
+/* Header icon buttons. Each holds both of its icons and shows one at a time:
+   .i-a by default, .i-b once data-state="b" is set (copied / in full screen). */
+.app-refresh {
+  background: none; border: none; cursor: pointer; line-height: 1; color: var(--ink-soft);
+  padding: 0.3em; border-radius: var(--r-pill); display: inline-grid; place-items: center;
+  transition: color 0.16s var(--ease-out), background 0.16s var(--ease-out), transform 0.16s var(--ease-out);
+}
+.app-refresh svg { width: 20px; height: 20px; display: block; grid-area: 1 / 1; }
+.app-refresh .i-b { display: none; }
+.app-refresh[data-state='b'] .i-a { display: none; }
+.app-refresh[data-state='b'] .i-b { display: block; }
+.app-refresh[data-state='b'] { color: var(--teal-deep); }
+@media (hover: hover) and (pointer: fine) {
+  .app-refresh:hover { color: var(--teal-deep); background: rgba(43,37,51,0.06); }
+}
+.app-refresh:active { transform: scale(0.92); }
+.app-refresh.spinning svg { animation: app-spin 0.6s linear infinite; }
 @keyframes app-spin { to { transform: rotate(360deg); } }
 /* the ⚙️ Reading settings button — a quiet outline pill */
 .nav .nav-settings { min-height: 0; padding: 0.4em 0.9em; font-size: 0.95rem; font-weight: 700; background: #fff; color: var(--ink); border: 1px solid var(--paper-edge); border-radius: var(--r-pill); box-shadow: none; }
@@ -246,10 +274,11 @@ img { max-width: 100%; display: block; }
 .book .by { color: var(--ink-soft); font-weight: 700; font-size: 0.95rem; }
 .book .tag { color: var(--ink-soft); margin-top: 0.4rem; font-size: 0.95rem; }
 .book .readpill {
-  display: inline-flex; align-items: center; gap: 0.3em; margin-top: 0.7rem;
+  display: inline-flex; align-items: center; gap: 0.4em; margin-top: 0.7rem;
   background: var(--accent, var(--teal)); color: #fff; font-family: var(--font-display);
   font-weight: 800; font-size: 0.85rem; padding: 0.35em 0.9em; border-radius: var(--r-pill);
 }
+.book .readpill svg { width: 0.85em; height: 0.85em; flex: none; }
 
 /* ---- Character cards --------------------------------------------------- */
 .cast-heading { font-size: 1.35rem; margin: 0 0 1rem; padding-bottom: .4rem; border-bottom: 2px dashed var(--card-ring); }
@@ -266,9 +295,13 @@ img { max-width: 100%; display: block; }
   background: linear-gradient(165deg, color-mix(in srgb, var(--tint, #ffffff) 16%, #fff), #fff);
 }
 .char:nth-child(even) .frame { transform: rotate(1.2deg); }
-.char .frame img { border-radius: 8px; width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; }
+.char .frame img { border-radius: 8px; width: 100%; aspect-ratio: 3/4; object-fit: contain; object-position: center; }
 /* finished (transparent) illustrations show in FULL on the tinted panel */
 .char .frame img.illo, .char .frame .layer.art { object-fit: contain; }
+/* The sketch layer is a photo of a sketchbook page, taller than this 3:4 frame.
+   It used to be `cover` from the top, which cropped the drawing's legs off and
+   filled the card with blank paper — the same fault the sketchbook row had. */
+.char .frame .layer.sketch { object-fit: contain; background: #fff; }
 .char .frame.placeholder {
   aspect-ratio: 3/4; display: grid; place-items: center; text-align: center;
   background: repeating-linear-gradient(45deg,#fff,#fff 14px,#fbf6ea 14px,#fbf6ea 28px);
@@ -282,8 +315,15 @@ img { max-width: 100%; display: block; }
   position: absolute; bottom: 14px; right: 14px; border: none; border-radius: var(--r-pill);
   padding: 0.45em 0.85em; font-family: var(--font-display); font-weight: 800; font-size: 0.9rem;
   cursor: pointer; background: rgba(43, 37, 51, 0.82); color: #fff; box-shadow: var(--shadow-sm); min-height: 40px;
+  display: inline-flex; align-items: center; gap: 0.4em;
+  transition: background 0.16s var(--ease-out), transform 0.16s var(--ease-out);
 }
-.char .frame .flip-btn:hover { background: var(--purple); }
+.char .frame .flip-btn svg { width: 15px; height: 15px; flex: none; }
+.char .frame .flip-btn .flip-label { min-width: 3.4em; text-align: left; }
+@media (hover: hover) and (pointer: fine) {
+  .char .frame .flip-btn:hover { background: var(--purple); }
+}
+.char .frame .flip-btn:active { transform: scale(0.96); }
 .char h3 { margin: 0; display: flex; align-items: center; gap: 0.4rem; }
 .char .power { align-self: flex-start; font-weight: 800; font-size: 0.85rem; padding: 0.32em 0.85em; border-radius: var(--r-pill); color: #fff; box-shadow: var(--shadow-sm); }
 .char .desc { color: var(--ink-soft); }
@@ -298,8 +338,17 @@ img { max-width: 100%; display: block; }
 /* ---- "From Lili's sketchbook" ----------------------------------------- */
 .showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; }
 .ba { margin: 0; background: var(--card-bg); border-radius: var(--r); box-shadow: var(--shadow-sm); padding: 0.9rem; display: flex; align-items: center; gap: 0.6rem; border: 1px solid var(--card-ring); }
-.ba img { flex: 1; min-width: 0; aspect-ratio: 3/4; object-fit: cover; object-position: top center; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px var(--card-ring); }
-.ba .arrow { font-size: 1.8rem; color: var(--purple); flex: 0 0 auto; }
+/* Show the WHOLE drawing. These are phone photos of a sketchbook (roughly 9:16)
+   sitting in a 3:4 tile, so `cover` cropped a quarter off the bottom of every
+   one — the pencil figures lost their legs and the tile showed blank paper.
+   `contain` letterboxes them onto the paper ground instead, which is also what
+   the finished cut-out beside it needs to keep its feet. */
+/* 4/7 because that is what both sides actually are — the sketchbook photos are
+   ~0.562 and the cut-outs ~0.572. Matching the tile to the art means `contain`
+   barely letterboxes, so the pencil drawing is as large as it can be. */
+.ba img { flex: 1; min-width: 0; aspect-ratio: 4/7; object-fit: contain; object-position: center; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px var(--card-ring); padding: 4px; }
+.ba .arrow { flex: 0 0 auto; color: var(--purple); display: grid; place-items: center; }
+.ba .arrow svg { width: 22px; height: 22px; }
 .showcase-teaser { text-align: center; }
 .teaser-strip { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 .teaser-strip img { width: 110px; height: 145px; object-fit: cover; object-position: top center; border-radius: 10px; background: #fff; padding: 6px; box-shadow: var(--shadow-sm); transform: rotate(-2deg); }
